@@ -116,7 +116,6 @@ public class User implements Serializable{
     /**
      * @return the password
      */
-    @JsonIgnore
     public String getPassword() {
         return password;
     }
@@ -124,7 +123,6 @@ public class User implements Serializable{
     /**
      * @param password the password to set
      */
-    @JsonProperty("password")
     public void setPassword(String password) {
         this.password = password;
     }

@@ -2,6 +2,7 @@ package com.br.helpdesk.service;
 
 import com.br.helpdesk.model.User;
 import com.br.helpdesk.repository.UserRepository;
+import java.util.ArrayList;
 import java.util.List;
 import javax.annotation.Resource;
 import org.apache.commons.collections.IteratorUtils;
@@ -18,15 +19,24 @@ public class UserService {
     }
 
     public User save(User model) {
-        if(model.getId()!= null && model.getId()>0 && (model.getPassword()==null || model.getPassword().equals(""))){
+        // caso usuário já exista no banco e tenha sido alterado em campos que não sejam o password
+        if ((model.getId() != null && model.getId() > 0)
+                && (model.getPassword() == null || model.getPassword().equals(""))) {
+            // pesquisa o usuário salvo no banco para setar a senha antiga ao usuário que está sendo salvo.
             User userTemp = repository.findOne(model.getId());
             model.setPassword(userTemp.getPassword());
         }
-        return repository.save(model);
+        model = repository.save(model);
+        model = (User) removePassword(null, model);
+        return model;
     }
 
     public List<User> findAll() {
-        return IteratorUtils.toList(repository.findAll().iterator());
+        List<User> list = IteratorUtils.toList(repository.findAll().iterator());
+        if (list != null && list.size() > 0) {
+            list = (List) removePassword(list, null);
+        }
+        return list;
     }
 
     public void delete(User model) {
@@ -34,22 +44,55 @@ public class UserService {
     }
 
     public User findByUserName(String username) {
-        return repository.findByUserName(username);
+        User user = repository.findByUserName(username);
+        user = (User) removePassword(null, user);
+        return user;
     }
 
     public User findById(Long codigo) {
-        return repository.findOne(codigo);
+        User user = repository.findOne(codigo);
+        user = (User) removePassword(null, user);
+        return user;
     }
 
     public List<User> findByUserAdmin() {
-        return repository.findByUserAdmin();
+        List<User> list = repository.findByUserAdmin();
+        list = (List) removePassword(list, null);
+        return list;
     }
 
     public User findByEmail(String email) {
-        return repository.findByEmail(email);
+        User user = repository.findByEmail(email);
+        user = (User) removePassword(null, user);
+        return user;
     }
 
-    public User findByName(String name){
-        return repository.findByName(name);
+    public User findByName(String name) {
+        User user = repository.findByName(name);
+        user = (User) removePassword(null, user);
+        return user;
+    }
+
+    /**
+     * Remover o atributo de password dos usuário para retornar a requisição. <br>
+     * Recebe uma lista de usuários ou um usuário apenas.
+     * 
+     * @param list
+     * @param user
+     * @return 
+     */
+    public Object removePassword(List<User> list, User user) {
+        // caso seja uma lista de usuário, retira a senha de todos e retorna a lista
+        if (list != null && list.size() > 0) {
+            for (User userTemp : list) {
+                userTemp.setPassword("");
+            }
+            return list;
+            // caso seja apenas um usuário, retira a senha do mesmo e retorna.
+        } else if (user != null) {
+            user.setPassword("");
+            return user;
+        }
+        return null;
     }
 }
