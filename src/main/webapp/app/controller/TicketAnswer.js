@@ -134,7 +134,7 @@ Ext.define('Helpdesk.controller.TicketAnswer', {
                 var resposta = Ext.create('Helpdesk.view.ticket.TicketAnswerPanel', {
                     title: '<div class="div-title-answer"><p align="left">' + answer.data.ticket.user.name + '</p><p class="date-title-answer">' + dateTemp + '</p></div>'
                 });
-                resposta.down('label#corpo').text = answer.data.description;
+                resposta.down('label#corpo').html = '<pre class="answer-format">'+answer.data.ticket.description+'</pre>';
                 resposta.down('hiddenfield#id').text = answer.data.id;
                 resposta.down('hiddenfield#idAnswer').text = 0;
                 answersList[0] = resposta;
@@ -147,7 +147,7 @@ Ext.define('Helpdesk.controller.TicketAnswer', {
                     resposta = Ext.create('Helpdesk.view.ticket.TicketAnswerPanel', {
                         title: '<div class="div-title-answer"><p align="left">' + name + '</p><p class="date-title-answer">' + date + '</p></div>'
                     });
-                    resposta.down('label#corpo').text = answerTemp.description;
+                    resposta.down('label#corpo').html = '<pre class="answer-format">'+answerTemp.description+'</pre>';
                     resposta.down('hiddenfield#id').text = answer.data.id;
                     resposta.down('hiddenfield#idAnswer').text = answerTemp.id;
                     answersList[answersList.length] = resposta;

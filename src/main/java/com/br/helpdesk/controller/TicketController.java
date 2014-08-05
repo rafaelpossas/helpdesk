@@ -223,19 +223,19 @@ public class TicketController {
     public @ResponseBody
     String getTextMenu(@RequestParam(value = "user") String username, HttpServletResponse response) throws UnsupportedEncodingException {
         User user = this.userService.findByUserName(username);
-        int todos, abertos, fechados, withoutresponsible, mytickets;
+        Long todos, abertos, fechados, withoutresponsible, mytickets;
         if (user.getUserGroup().getId() == Consts.ADMIN_GROUP_ID) {//SUPERUSER
-            todos = ticketService.findAll().size();
-            abertos = ticketService.findByIsOpenAndResponsibleNotNull(true).size();
-            fechados = ticketService.findByIsOpen(false).size();
-            mytickets = ticketService.findByResponsible(user).size();
-            withoutresponsible = ticketService.findByResponsible(null).size();
+            todos = ticketService.countFindAll();
+            abertos = ticketService.countByIsOpenAndResponsibleNotNull(true);
+            fechados = ticketService.countByIsOpen(false);
+            mytickets = ticketService.countByResponsible(user);
+            withoutresponsible = ticketService.countByResponsible(null);
         } else {
-            todos = ticketService.findByUser(user).size();
-            abertos = ticketService.findByIsOpenAndUser(true, user).size();
-            fechados = ticketService.findByIsOpenAndUser(false, user).size();
-            mytickets = 0;
-            withoutresponsible = 0;
+            todos = ticketService.countByUser(user);
+            abertos = ticketService.countByIsOpenAndUser(true, user);
+            fechados = ticketService.countByIsOpenAndUser(false, user);
+            mytickets = 0L;
+            withoutresponsible = 0L;
         }
         return "{\"todos\":'" + todos + "', \"abertos\": '" + abertos + "', \"fechados\": '" + fechados + "', \"mytickets\": '" + mytickets + "', \"withoutresponsible\": '" + withoutresponsible + "'}";
     }

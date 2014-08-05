@@ -28,9 +28,9 @@ Ext.define('Helpdesk.view.ticket.TicketGrid', {
                 dataIndex: 'id',
                 flex: 0,
                 renderer: function(value, metaData, record) { // #2
-                    var userLastInteration = record.get('userLastInteration').id;
-                    var userLogged = Helpdesk.Globals.userLogged.id;
-                    if (parseInt(userLastInteration) === parseInt(userLogged)) {
+                    var userLastInteration = record.get('userLastInteration');
+                    var userLogged = Helpdesk.Globals.userLogged;
+                    if (record.get('isOpen') === false || parseInt(userLastInteration.id) === parseInt(userLogged.id)) {
                         return value;
                     } else {
                         return '<b>' + value + '</b>';
@@ -43,7 +43,7 @@ Ext.define('Helpdesk.view.ticket.TicketGrid', {
                 renderer: function(value, metaData, record) { // #2
                     var userLastInteration = record.get('userLastInteration').id;
                     var userLogged = Helpdesk.Globals.userLogged.id;
-                    if (parseInt(userLastInteration) === parseInt(userLogged)) {
+                    if (record.get('isOpen') === false || parseInt(userLastInteration) === parseInt(userLogged)) {
                         return value;
                     } else {
                         return '<b>' + value + '</b>';
@@ -57,7 +57,7 @@ Ext.define('Helpdesk.view.ticket.TicketGrid', {
                 renderer: function(value, metaData, record) { // #2
                     var userLastInteration = record.get('userLastInteration').id;
                     var userLogged = Helpdesk.Globals.userLogged.id;
-                    if (parseInt(userLastInteration) === parseInt(userLogged)) {
+                    if (record.get('isOpen') === false || parseInt(userLastInteration) === parseInt(userLogged)) {
                         return value;
                     } else {
                         return '<b>' + value + '</b>';
@@ -70,7 +70,7 @@ Ext.define('Helpdesk.view.ticket.TicketGrid', {
                 renderer: function(value, metaData, record) { // #2
                     var userLastInteration = record.get('userLastInteration').id;
                     var userLogged = Helpdesk.Globals.userLogged.id;
-                    if (parseInt(userLastInteration) === parseInt(userLogged)) {
+                    if (record.get('isOpen') === false || parseInt(userLastInteration) === parseInt(userLogged)) {
                         return value;
                     } else {
                         return '<b>' + value + '</b>';
@@ -84,7 +84,7 @@ Ext.define('Helpdesk.view.ticket.TicketGrid', {
                 renderer: function(value, metaData, record) { // #2
                     var userLastInteration = record.get('userLastInteration').id;
                     var userLogged = Helpdesk.Globals.userLogged.id;
-                    if (parseInt(userLastInteration) === parseInt(userLogged)) {
+                    if (record.get('isOpen') === false || parseInt(userLastInteration) === parseInt(userLogged)) {
                         return value;
                     } else {
                         return '<b>' + value + '</b>';
@@ -98,7 +98,7 @@ Ext.define('Helpdesk.view.ticket.TicketGrid', {
                 renderer: function(value, metaData, record) { // #2
                     var userLastInteration = record.get('userLastInteration').id;
                     var userLogged = Helpdesk.Globals.userLogged.id;
-                    if (parseInt(userLastInteration) === parseInt(userLogged)) {
+                    if (record.get('isOpen') === false || parseInt(userLastInteration) === parseInt(userLogged)) {
                         return value ? translations.OPENED : translations.CLOSED;
                     } else {
                         return value ? '<b>' + translations.OPENED + '</b>' : '<b>' + translations.CLOSED + '</b>';
@@ -114,7 +114,7 @@ Ext.define('Helpdesk.view.ticket.TicketGrid', {
                     var userLogged = Helpdesk.Globals.userLogged.id;
                     var lastInteration = new Date(value);
                     lastInteration = Ext.Date.format(lastInteration, translations.FORMAT_JUST_DATE);
-                    if (parseInt(userLastInteration) === parseInt(userLogged)) {
+                    if (record.get('isOpen') === false || parseInt(userLastInteration) === parseInt(userLogged)) {
                         return lastInteration;
                     } else {
                         return '<b>' + lastInteration + '</b>';
@@ -129,7 +129,7 @@ Ext.define('Helpdesk.view.ticket.TicketGrid', {
                     if (value !== null) {
                         var userLastInteration = record.get('userLastInteration').id;
                         var userLogged = Helpdesk.Globals.userLogged.id;
-                        if (parseInt(userLastInteration) === parseInt(userLogged)) {
+                        if (record.get('isOpen') === false || parseInt(userLastInteration) === parseInt(userLogged)) {
                             return value;
                         } else {
                             return '<b>' + value + '</b>';
