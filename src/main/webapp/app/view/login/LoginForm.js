@@ -27,7 +27,6 @@ Ext.define('Helpdesk.view.login.LoginForm', {
                 anchor: '100%',
                 labelWidth: 100,
                 allowBlank: false,
-                vtype: 'alphanum',
                 minLength: 3,
                 msgTarget: 'under'
                 

@@ -139,8 +139,7 @@ public class PriorityIntegrationTest {
     @Test
     public void testDeleteEntityDependency() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.delete("/priority/{id}", 1L))
-                .andExpect(MockMvcResultMatchers.status().isForbidden())//verifica se o retorno � forbidden    
-                .andDo(MockMvcResultHandlers.print());
+                .andExpect(MockMvcResultMatchers.status().isForbidden());//verifica se o retorno � forbidden    
     }
     
     @Test

@@ -138,6 +138,8 @@ Ext.define('Helpdesk.controller.Login', {
         var form = button.up('form');
         var record = form.getRecord();
         var values = form.getValues();
+        values.isEnabled = true;
+        values.userName = values.email;
         record.set(values);
 
         this.changeUserStoreProperties(0);

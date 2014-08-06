@@ -133,13 +133,6 @@ public class CategoryIntegrationTest {
                 .andExpect(MockMvcResultMatchers.status().isNotFound());//verifica se o retorno � entityNotFound    
     }
     
-//    @Test
-//    public void testDeleteEntityDependency() throws Exception {
-//        mockMvc.perform(MockMvcRequestBuilders.delete("/category/{id}", 1L))
-//                .andExpect(MockMvcResultMatchers.status().isForbidden())//verifica se o retorno � forbidden    
-//                .andDo(MockMvcResultHandlers.print());
-//    }
-    
     @Test
     public void testDeleteEntity() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.delete("/category/{id}", 5L))
