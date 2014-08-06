@@ -614,6 +614,8 @@ Ext.define('Helpdesk.controller.Ticket', {
         record.data.endDate = null;
         record.data.user = Helpdesk.Globals.userLogged;
         record.data.isOpen = true;
+        record.data.lastInteration = null;
+        record.data.userLastInteration = Helpdesk.Globals.userLogged;
 
         if (Helpdesk.Globals.userLogged.userGroup.id != Helpdesk.Globals.idAdminGroup) {
             record.data.responsible = null;
@@ -621,7 +623,6 @@ Ext.define('Helpdesk.controller.Ticket', {
             record.data.estimateTime = null;
             record.data.client = Helpdesk.Globals.userLogged.client;
         } else {
-            console.log(record.data.estimateTime);
             // categoria
             if (form.down('combobox#categoryTicket').getValue() === null) {
                 record.data.category = null;

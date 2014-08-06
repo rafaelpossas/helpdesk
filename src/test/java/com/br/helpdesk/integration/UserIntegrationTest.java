@@ -126,6 +126,7 @@ public class UserIntegrationTest {
         newUser.setUserName("login");
         newUser.setClient(client);
         newUser.setUserGroup(userGroup);
+        newUser.setPicture("");
 
         MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.put("/user")
                 .content(TestUtil.convertObjectToJsonBytes(newUser))

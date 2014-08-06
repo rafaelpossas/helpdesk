@@ -159,7 +159,7 @@ Ext.define('Helpdesk.view.ticket.TicketGrid', {
         
         var idUserGroupUserLast = parseInt(userLastInteration.userGroup.id);
         var idUserGroupUserLogged = parseInt(userLogged.userGroup.id);
-        
+
         // testa se o ticket está aberto.
         if(isOpen){
             // testa se o id de quem está logado é diferente do id do usuário da última interação.

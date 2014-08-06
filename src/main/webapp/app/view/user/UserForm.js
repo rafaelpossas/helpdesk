@@ -7,7 +7,7 @@ Ext.define('Helpdesk.view.user.UserForm', {
     extend: 'Ext.form.Panel',
     alias: 'widget.userform',
     id: 'userForm',
-    requires: ['Helpdesk.util.Util', 'Helpdesk.view.user.UserGroupComboBox','Helpdesk.view.client.ClientComboBox'],
+    requires: ['Helpdesk.util.Util', 'Helpdesk.view.user.UserGroupComboBox', 'Helpdesk.view.client.ClientComboBox'],
     bodyPadding: 5,
     layout: {
         type: 'hbox',
@@ -52,7 +52,7 @@ Ext.define('Helpdesk.view.user.UserForm', {
                     fieldLabel: translations.PASSWORD,
                     id: 'firstPass',
                     name: 'password'
-                },                
+                },
                 {
                     id: 'confirmPasswordUser',
                     inputType: 'password',
@@ -96,9 +96,9 @@ Ext.define('Helpdesk.view.user.UserForm', {
                     }
 
                 },
-                {                    
+                {
                     xtype: 'checkbox',
-                    fieldLabel: translations.ACTIVE,                    
+                    fieldLabel: translations.ACTIVE,
                     beforeLabelTextTpl: '',
                     id: 'checkState'
                 },
@@ -107,7 +107,6 @@ Ext.define('Helpdesk.view.user.UserForm', {
                     id: 'imgprofile',
                     fieldLabel: translations.PICTURE,
                     emptyText: translations.SELECT_A_PROFILE_PICTURE,
-                    name: 'picture',
                     buttonText: translations.BROWSE,
                     allowBlank: true,
                     beforeLabelTextTpl: '',
@@ -129,7 +128,9 @@ Ext.define('Helpdesk.view.user.UserForm', {
                     xtype: 'image', // #2
                     width: 150,
                     height: 200,
-                    src: ''         // #3
+                    id: 'selectedImage',
+                    name: 'picture',
+                    src: ''
                 }
             ]
         }
@@ -141,10 +142,14 @@ Ext.define('Helpdesk.view.user.UserForm', {
         }
         var filename = value.substr(fileNameIndex);
 
-        var IsValid = this.fileValidation(view, filename);
+        var IsValid = this.fileUpload(filename, view);
         if (!IsValid) {
             return;
         }
+    },
+    fileUpload: function(val, field) {
+        var fileName = /^.*\.(gif|png|bmp|jpg|jpeg)$/i;
+        return fileName.test(val);
     }
 
 });

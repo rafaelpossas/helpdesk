@@ -88,14 +88,7 @@ Ext.define('Helpdesk.controller.User', {
         win.close();
     },
     onButtonClickSave: function(button, e, options) {
-        var win = button.up('window');
-        var form = win.down('form');
-
-        //var imageprofile = form.down('multiupload#imgprofile');
-       // console.log(imageprofile);
-       // this.submitImageProfile(imageprofile);
         this.saveUser(button);
-
     },
     submitImageProfile: function(filefield) {
         var scope = this;
@@ -172,10 +165,15 @@ Ext.define('Helpdesk.controller.User', {
             var checkState = form.down('checkbox#checkState');
             record.data.isEnabled = checkState.value;
 
+            var image = form.down('image#selectedImage');
+            record.data.picture = image.src;
+            
             this.getUsersStore().add(record);
             this.getUsersStore().sync();
             this.getUsersStore().load();  
-            this.getUsersList().getStore().load();            
+            this.getUsersList().getStore().load(); 
+                      
+            win.close();
                         
         } else {
             Ext.Msg.alert(translations.INFORMATION, translations.CHECK_ADDED_INFORMATIONS);
@@ -247,7 +245,7 @@ Ext.define('Helpdesk.controller.User', {
 
             if (record.get('picture')) { //#4
                 var img = editWindow.down('image');
-                img.setSrc('resources/profileImages/' + record.get('picture'));
+                img.setSrc(record.get('picture'));
             }
             editWindow.setTitle(record.get('name')); // #5
             editWindow.show();
