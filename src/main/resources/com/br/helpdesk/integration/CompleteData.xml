@@ -50,6 +50,4 @@
             user_id="1" start_date="2014-10-10" end_date="2014-10-10" steps_ticket="EXISTE_ENTIDADE_COM_ESSE_NOME" 
             category_id="2" client_id="1" priority_id="3" estimate_time="2014-10-10" responsible_id="1"
             last_interation="2014-10-10" user_last_interation_id="1"/>
-    
-    <Config_email id="1" folder="Inbox" imap="imap.gmail.com" imaps="imaps" password="streetcar" port="465" smtp="smtp.gmail.com" user="ricardoskacore@gmail.com" />
 </dataset>

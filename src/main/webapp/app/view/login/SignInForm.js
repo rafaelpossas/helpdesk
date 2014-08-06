@@ -12,32 +12,7 @@ Ext.apply(Ext.form.VTypes, {
         return true;
     },
     
-    passwordText : translations.PASSWORD_NOT_MATCH,
-    
-    uniqueUserName:  function(v) {
-        var retorno = true;
-        if(v.length > 2){
-            Ext.Ajax.request({
-                url: 'login/validuser',
-                method: 'POST',
-                async:false,
-                params: {
-                    username : v
-                },
-                success: function(o) {
-                    if (o.responseText === "false") {
-                        retorno = false;
-                    }
-                    else{
-                        retorno = true;
-                    }
-                }
-            });
-        }
-        return retorno;
-    },
-    
-    uniqueUserNameText: translations.USER_IN_USE
+    passwordText : translations.PASSWORD_NOT_MATCH   
 });
 
 Ext.define('Helpdesk.view.login.SignInForm', {
@@ -75,13 +50,7 @@ Ext.define('Helpdesk.view.login.SignInForm', {
         {
             fieldLabel: translations.NAME,
             name: 'name'
-        },
-        {
-            fieldLabel: translations.USER,
-            name: 'userName',
-            vtype:'uniqueUserName',
-            maskRe:/[a-z0-9_]/i
-        },         
+        },       
         {
             fieldLabel: translations.EMAIL,
             maxLength: 100,

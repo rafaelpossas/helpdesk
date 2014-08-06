@@ -139,8 +139,7 @@ public class UserGroupIntegrationTest {
     @Test
     public void testDeleteEntityDependency() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.delete("/group/{id}", 1L))
-                .andExpect(MockMvcResultMatchers.status().isForbidden())//verifica se o retorno � forbidden    
-                .andDo(MockMvcResultHandlers.print());
+                .andExpect(MockMvcResultMatchers.status().isForbidden());//verifica se o retorno � forbidden   
     }
     
     @Test

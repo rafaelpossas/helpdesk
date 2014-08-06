@@ -7,10 +7,10 @@ package com.br.helpdesk.service;
 
 import com.Consts;
 import com.br.helpdesk.controller.TicketAnswerController;
-import com.br.helpdesk.model.ConfigEmail;
 import com.br.helpdesk.model.Ticket;
 import com.br.helpdesk.model.TicketAnswer;
 import com.br.helpdesk.model.User;
+import com.br.helpdesk.util.EmailPropertiesLoader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -46,14 +46,7 @@ public class EmailService {
     public static int EMAIL_NEW_ANSWER = 1;
     public static int EMAIL_CHANGES = 2;
 
-    public static Properties PROPERTIES;
-
-    @Autowired
-    private ConfigEmailService configEmailService;
-
-    public void setConfigEmailService(ConfigEmailService service) {
-        this.configEmailService = service;
-    }
+    public static Properties PROPERTIES = EmailPropertiesLoader.propertiesLoader();
 
     @Autowired
     private UserService userService;
@@ -64,50 +57,7 @@ public class EmailService {
 
     @Autowired
     private TicketAnswerController answerController;
-
-    private ConfigEmail configEmail;
-
-    public void getEmailsNaoLidos() throws IOException, Exception {
-        // Create all the needed properties - empty!
-        Properties connectionProperties = new Properties();
-        // Create the session
-        Session session = Session.getDefaultInstance(connectionProperties, null);
-        try {
-            Store store = session.getStore(configEmail.getImaps());
-            // Set the server depending on the parameter flag value           
-            store.connect(configEmail.getImap(), configEmail.getUser(), configEmail.getPassword());
-
-            // Get the Inbox folder
-            Folder inbox = store.getFolder(configEmail.getFolder());
-
-            //READ_ONLY - Apenas le
-            //READ_WRITE- Le e marca como lido
-            inbox.open(Folder.READ_ONLY);
-
-            // Get messages not seen
-            FlagTerm ft = new FlagTerm(new Flags(Flags.Flag.SEEN), false);
-            Message messages[] = inbox.search(ft);
-
-            // Display the messages
-            for (Message message : messages) {
-                System.out.println("\n-------- E M A I L --------");
-                System.out.println("\nTitle: " + message.getSubject());
-                getIdTicketFromTitle(message.getSubject());
-                System.out.println("\n-- C O N T E N T --");
-                if (message.getContent() instanceof MimeMultipart) {
-                    System.out.println("\n" + ((MimeMultipart) message.getContent()).getBodyPart(0).getContent());
-                } else {
-                    System.out.println("\n" + message.getContent());
-                }
-                System.out.println("-------------------");
-                System.out.println("\n---------------------------");
-            }
-
-        } catch (MessagingException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
+    
     /**
      * Return the primary text content of the message.
      */
@@ -154,41 +104,11 @@ public class EmailService {
         return null;
     }
 
-    /**
-     * Retorna o ID do ticket de acordo com a String no padrão ..... #09123#
-     * .....
-     *
-     * @param titulo
-     * @return
-     */
-    private int getIdTicketFromTitle(String titulo) {
-        int id = 0;
-        Pattern pattern = Pattern.compile("#(.*?)#");
-        Matcher matcher = pattern.matcher(titulo);
-        if (matcher.find()) {
-            String idString = matcher.group(1);
-            id = Integer.parseInt(idString);
-        }
-        return id;
-    }
-
-    private Session getSession() {
-        if (configEmailService != null) {
-            configEmail = configEmailService.findById(1L);
-            if (configEmail != null) {
-                PROPERTIES = new Properties();
-                PROPERTIES.put("mail.smtp.host", configEmail.getSmtp());
-                PROPERTIES.put("mail.smtp.socketFactory.port", configEmail.getPort());
-                PROPERTIES.put("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
-                PROPERTIES.put("mail.smtp.auth", "true");
-                PROPERTIES.put("mail.smtp.port", configEmail.getPort());
-            }
-        }
-
+    private Session getSession() {        
         Session session = Session.getDefaultInstance(PROPERTIES, new javax.mail.Authenticator() {
             @Override
             protected PasswordAuthentication getPasswordAuthentication() {
-                return new PasswordAuthentication(configEmail.getUser(), configEmail.getPassword());
+                return new PasswordAuthentication(PROPERTIES.getProperty("mail.user"), PROPERTIES.getProperty("mail.password"));
             }
         });
         return session;
@@ -199,7 +119,7 @@ public class EmailService {
         String emails = getCorrectAdress(listEmailsTo);
         try {
             Message message = new MimeMessage(session);
-            message.setFrom(new InternetAddress(configEmail.getUser()));
+            message.setFrom(new InternetAddress(PROPERTIES.getProperty("mail.user")));
             message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(emails));
             Long ticketId = 0L;
             String ticketTitle = "";
@@ -235,8 +155,7 @@ public class EmailService {
             
             Transport.send(message);
 
-        } catch (MessagingException e) {
-        }
+        } catch (MessagingException e) {}
     }
 
     private String contentNewTicket(Ticket ticket) {
@@ -532,13 +451,13 @@ public class EmailService {
         Store store = null;
         try {
             // Set the store depending on the parameter flag value
-            store = session.getStore(configEmail.getImaps());
+            store = session.getStore(PROPERTIES.getProperty("mail.imaps"));
             // Set the server depending on the parameter flag value            
             //VALORES DO SERVIDOR
-            store.connect(configEmail.getImap(), configEmail.getUser(), configEmail.getPassword());
+            store.connect(PROPERTIES.getProperty("mail.imap.gmail"), PROPERTIES.getProperty("mail.user"), PROPERTIES.getProperty("mail.password"));
 
             // Get the Inbox folder
-            Folder inbox = store.getFolder(configEmail.getFolder());
+            Folder inbox = store.getFolder(PROPERTIES.getProperty("mail.folder"));
             // Set the mode to the read-write mode
             inbox.open(Folder.READ_WRITE);
 
@@ -590,56 +509,6 @@ public class EmailService {
         }
     }
 
-//    public List<String> getListEmailsToSend(Ticket olderTicket, Ticket newTicket, TicketAnswer ticketAnswer) {
-//        List<String> listEmails = new ArrayList<String>();
-//        User userTicket;
-//        User userResponsible;
-//        User userAnswer;
-//
-//        if (ticketAnswer != null) {
-//            userAnswer = ticketAnswer.getUser();
-//            userTicket = olderTicket.getUser();
-//            userResponsible = olderTicket.getResponsible();
-//
-//            if (userTicket != null && userResponsible != null) {
-//                if (userAnswer.getId().equals(userTicket.getId())) {
-//                    listEmails.add(userResponsible.getEmail());
-//                } else if (userAnswer.getId().equals(userResponsible.getId())) {
-//                    listEmails.add(userTicket.getEmail());
-//                } else {
-//                    listEmails.add(userResponsible.getEmail());
-//                    listEmails.add(userTicket.getEmail());
-//                }
-//            } else if (userTicket != null) {
-//                if (!userAnswer.getId().equals(userTicket.getId())) {
-//                    listEmails.add(userTicket.getEmail());
-//                } else {
-//                    listEmails.addAll(getAdminEmails());
-//                }
-//            } else if (userResponsible != null) {
-//                if (userAnswer.getId().equals(userResponsible.getId())) {
-//                    listEmails.add(userResponsible.getEmail());
-//                }
-//            }
-//        } else {
-//            if (olderTicket == null) {
-//                if (newTicket.getResponsible() == null) {
-//                    listEmails.addAll(getAdminEmails());
-//                } else {
-//                    listEmails.add(newTicket.getResponsible().getEmail());
-//                }
-//            } else {
-//                if (newTicket.getResponsible() != null) {
-//                    listEmails.add(newTicket.getResponsible().getEmail());
-//                }
-//                if (olderTicket.getResponsible() != null) {
-//                    listEmails.add(olderTicket.getResponsible().getEmail());
-//                }
-//            }
-//        }
-//
-//        return listEmails;
-//    }
     public List<String> getListEmailsToSend(Ticket ticket, Ticket newTicket, TicketAnswer ticketAnswer) {
         List<String> listEmails = new ArrayList<String>();
         User userAnswer;
