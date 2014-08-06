@@ -614,6 +614,8 @@ Ext.define('Helpdesk.controller.Ticket', {
         record.data.endDate = null;
         record.data.user = Helpdesk.Globals.userLogged;
         record.data.isOpen = true;
+        record.data.lastInteration = null;
+        record.data.userLastInteration = Helpdesk.Globals.userLogged;
 
         if (Helpdesk.Globals.userLogged.userGroup.id != Helpdesk.Globals.idAdminGroup) {
             record.data.responsible = null;
@@ -621,7 +623,6 @@ Ext.define('Helpdesk.controller.Ticket', {
             record.data.estimateTime = null;
             record.data.client = Helpdesk.Globals.userLogged.client;
         } else {
-            console.log(record.data.estimateTime);
             // categoria
             if (form.down('combobox#categoryTicket').getValue() === null) {
                 record.data.category = null;
@@ -828,7 +829,7 @@ Ext.define('Helpdesk.controller.Ticket', {
             } else {
                 ticketView.down('text#tktResponsible').setText(translations.NO_RESPONSIBLE);
             }
-
+            
             //text passos para reproduzir o erro
             ticketView.down('text#tktSteps').setText(ticket.stepsTicket);
 
@@ -844,7 +845,7 @@ Ext.define('Helpdesk.controller.Ticket', {
                     var resposta = Ext.create('Helpdesk.view.ticket.TicketAnswerPanel', {
                         title: '<div class="div-title-answer"><p align="left">' + ticket.userName + '</p><p class="date-title-answer">' + dateInicial + '</p></div>'
                     });
-                    resposta.down('label#corpo').text = ticket.description;
+                    resposta.down('label#corpo').html = '<pre class="answer-format">'+ticket.description+'</pre>';
                     resposta.down('hiddenfield#id').text = ticket.id;
                     resposta.down('hiddenfield#idAnswer').text = 0;
 
@@ -859,7 +860,7 @@ Ext.define('Helpdesk.controller.Ticket', {
                         resposta = Ext.create('Helpdesk.view.ticket.TicketAnswerPanel', {
                             title: '<div class="div-title-answer"><p align="left">' + name + '</p><p class="date-title-answer">' + date + '</p></div>'
                         });
-                        resposta.down('label#corpo').text = answerTemp.description;
+                        resposta.down('label#corpo').html = '<pre class="answer-format">'+answerTemp.description+'</pre>';
                         resposta.down('hiddenfield#id').text = ticket.id;
                         resposta.down('hiddenfield#idAnswer').text = answerTemp.id;
 

@@ -1,7 +1,5 @@
 package com.br.helpdesk.repository;
 
-import com.br.helpdesk.model.Category;
-import com.br.helpdesk.model.Client;
 import com.br.helpdesk.model.Ticket;
 import com.br.helpdesk.model.User;
 import org.springframework.data.jpa.repository.Query;
@@ -40,6 +38,21 @@ public interface TicketRepository extends CrudRepository<Ticket, Long> {
     List<Ticket> findByIsOpenAndResponsibleNotNull(Boolean isOpen);
 
     Page<Ticket> findAll(Pageable pageable);
+    
+    @Query(
+            "Select count(t) FROM Ticket t"
+    )
+    Long countByFindAll();
+    
+    Long countByIsOpenAndResponsibleNotNull(Boolean isOpen);
+    
+    Long countByIsOpen(Boolean isOpen);
+    
+    Long countByResponsibleAndIsOpen(User user, Boolean isOpen);
+    
+    Long countByUser(User user);
+    
+    Long countByIsOpenAndUser(Boolean isOpen, User user);   
 
     @Query(
             "Select t FROM Ticket t WHERE LOWER(t.title) LIKE LOWER(CONCAT('%', :searchTerm, '%')) "

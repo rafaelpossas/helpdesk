@@ -64,12 +64,40 @@ public class TicketService {
         List<Ticket> resultFinal = IteratorUtils.toList(repository.findAll().iterator());
         resultFinal = orderByLastInteration(resultFinal);
         return resultFinal;
+    }    
+       
+    /************************************ COUNT *******************************************/
+    
+    public Long countFindAll() {
+        return repository.countByFindAll();
     }
-
+    
+    public Long countByIsOpenAndResponsibleNotNull(Boolean isOpen) {
+        return repository.countByIsOpenAndResponsibleNotNull(isOpen);
+    }
+    
+    public Long countByIsOpen(Boolean isOpen) {
+        return repository.countByIsOpen(isOpen);
+    }
+    
+    public Long countByResponsible(User user) {        
+        return repository.countByResponsibleAndIsOpen(user, true);
+    }
+    
+    public Long countByUser(User user) {        
+        return repository.countByUser(user);
+    }
+    
+    public Long countByIsOpenAndUser(Boolean isOpen, User user) {        
+        return repository.countByIsOpenAndUser(isOpen, user);
+    }
+    
+    /************************************************************************************** */
+    
     public void delete(Ticket model) {
         repository.delete(model);
     }
-
+    
     public List<Ticket> findByUser(User user) {
         List<Ticket> resultFinal = IteratorUtils.toList(repository.findByUser(user).iterator());
         resultFinal = orderByWaitingAndLastInteration(resultFinal, user);
@@ -258,9 +286,13 @@ public class TicketService {
         Collections.sort(list, new Comparator<Ticket>() {
             @Override
             public int compare(Ticket o1, Ticket o2) {
-                return (o1.getLastInteration().getTime() > o2.getLastInteration().getTime() ? -1 : 1);
+                if(o1.getLastInteration()!=null && o2.getLastInteration()!=null){
+                    return (o1.getLastInteration().getTime() > o2.getLastInteration().getTime() ? -1 : 1);
+                } 
+                return 0;
             }
         });
         return list;
-    }
+    }   
+
 }

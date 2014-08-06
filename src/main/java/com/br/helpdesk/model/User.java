@@ -7,22 +7,18 @@
 package com.br.helpdesk.model;
 
 import java.io.Serializable;
-import java.util.List;
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 import org.codehaus.jackson.annotate.JsonAutoDetect;
-import org.codehaus.jackson.annotate.JsonIgnore;
-import org.codehaus.jackson.annotate.JsonProperty;
 
 /**
  *
@@ -65,6 +61,10 @@ public class User implements Serializable{
     @ManyToOne
     @JoinColumn(name="USER_GROUP_ID",nullable=false)
     private UserGroup userGroup;
+    
+    @Lob
+    @Column(name="PICTURE_BYTE",nullable=true)
+    private String picture;
     
     @Transient
     private String userGroupName;
@@ -198,6 +198,13 @@ public class User implements Serializable{
     public void setClientName(String clientName) {
         this.clientName = clientName;
     }
-    
+
+    public String getPicture() {
+        return picture;
+    }
+
+    public void setPicture(String picture) {
+        this.picture = picture;
+    }
     
 }

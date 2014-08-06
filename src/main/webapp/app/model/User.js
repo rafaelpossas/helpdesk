@@ -16,6 +16,7 @@ Ext.define('Helpdesk.model.User', {
         {name: 'client'},
         {name: 'isEnabled'},
         {name: 'email'},
+        {name: 'picture'},
         {name: 'userGroup'},
         {name: 'userGroupName', mapping: 'userGroup.name',persist : false},
         {name: 'clientName', mapping: 'client.name',persist : false}

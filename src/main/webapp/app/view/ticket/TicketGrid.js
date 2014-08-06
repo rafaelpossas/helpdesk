@@ -28,12 +28,11 @@ Ext.define('Helpdesk.view.ticket.TicketGrid', {
                 dataIndex: 'id',
                 flex: 0,
                 renderer: function(value, metaData, record) { // #2
-                    var userLastInteration = record.get('userLastInteration').id;
-                    var userLogged = Helpdesk.Globals.userLogged.id;
-                    if (parseInt(userLastInteration) === parseInt(userLogged)) {
-                        return value;
-                    } else {
+                    var isBold = this.testIsBold(record);
+                    if (isBold) {
                         return '<b>' + value + '</b>';
+                    } else {
+                        return value;
                     }
                 }
             }, {
@@ -41,12 +40,11 @@ Ext.define('Helpdesk.view.ticket.TicketGrid', {
                 flex: 1,
                 dataIndex: 'clientName',
                 renderer: function(value, metaData, record) { // #2
-                    var userLastInteration = record.get('userLastInteration').id;
-                    var userLogged = Helpdesk.Globals.userLogged.id;
-                    if (parseInt(userLastInteration) === parseInt(userLogged)) {
-                        return value;
-                    } else {
+                    var isBold = this.testIsBold(record);
+                    if (isBold) {
                         return '<b>' + value + '</b>';
+                    } else {
+                        return value;
                     }
                 }
             }, {
@@ -55,12 +53,11 @@ Ext.define('Helpdesk.view.ticket.TicketGrid', {
                 width: 170,
                 dataIndex: 'userName',
                 renderer: function(value, metaData, record) { // #2
-                    var userLastInteration = record.get('userLastInteration').id;
-                    var userLogged = Helpdesk.Globals.userLogged.id;
-                    if (parseInt(userLastInteration) === parseInt(userLogged)) {
-                        return value;
-                    } else {
+                    var isBold = this.testIsBold(record);
+                    if (isBold) {
                         return '<b>' + value + '</b>';
+                    } else {
+                        return value;
                     }
                 }
             }, {
@@ -68,12 +65,11 @@ Ext.define('Helpdesk.view.ticket.TicketGrid', {
                 flex: 2,
                 dataIndex: 'title',
                 renderer: function(value, metaData, record) { // #2
-                    var userLastInteration = record.get('userLastInteration').id;
-                    var userLogged = Helpdesk.Globals.userLogged.id;
-                    if (parseInt(userLastInteration) === parseInt(userLogged)) {
-                        return value;
-                    } else {
+                    var isBold = this.testIsBold(record);
+                    if (isBold) {
                         return '<b>' + value + '</b>';
+                    } else {
+                        return value;
                     }
                 }
             }, {
@@ -82,12 +78,11 @@ Ext.define('Helpdesk.view.ticket.TicketGrid', {
                 flex: 0,
                 dataIndex: 'categoryName',
                 renderer: function(value, metaData, record) { // #2
-                    var userLastInteration = record.get('userLastInteration').id;
-                    var userLogged = Helpdesk.Globals.userLogged.id;
-                    if (parseInt(userLastInteration) === parseInt(userLogged)) {
-                        return value;
-                    } else {
+                    var isBold = this.testIsBold(record);
+                    if (isBold) {
                         return '<b>' + value + '</b>';
+                    } else {
+                        return value;
                     }
                 }
             }, {
@@ -96,12 +91,11 @@ Ext.define('Helpdesk.view.ticket.TicketGrid', {
                 flex: 0,
                 dataIndex: 'isOpen',
                 renderer: function(value, metaData, record) { // #2
-                    var userLastInteration = record.get('userLastInteration').id;
-                    var userLogged = Helpdesk.Globals.userLogged.id;
-                    if (parseInt(userLastInteration) === parseInt(userLogged)) {
-                        return value ? translations.OPENED : translations.CLOSED;
-                    } else {
+                    var isBold = this.testIsBold(record);
+                    if (isBold) {
                         return value ? '<b>' + translations.OPENED + '</b>' : '<b>' + translations.CLOSED + '</b>';
+                    } else {
+                        return value ? translations.OPENED : translations.CLOSED;
                     }
                 }
             }, {
@@ -110,14 +104,13 @@ Ext.define('Helpdesk.view.ticket.TicketGrid', {
                 flex: 0,
                 dataIndex: 'lastInteration',
                 renderer: function(value, metaData, record) { // #2
-                    var userLastInteration = record.get('userLastInteration').id;
-                    var userLogged = Helpdesk.Globals.userLogged.id;
                     var lastInteration = new Date(value);
                     lastInteration = Ext.Date.format(lastInteration, translations.FORMAT_JUST_DATE);
-                    if (parseInt(userLastInteration) === parseInt(userLogged)) {
-                        return lastInteration;
+                    var isBold = this.testIsBold(record);
+                    if (isBold) {
+                        return '<b>'+lastInteration+'</b>';
                     } else {
-                        return '<b>' + lastInteration + '</b>';
+                        return lastInteration;
                     }
                 }
             }, {
@@ -127,12 +120,11 @@ Ext.define('Helpdesk.view.ticket.TicketGrid', {
                 dataIndex: 'responsibleName',
                 renderer: function(value, metaData, record) { // #2
                     if (value !== null) {
-                        var userLastInteration = record.get('userLastInteration').id;
-                        var userLogged = Helpdesk.Globals.userLogged.id;
-                        if (parseInt(userLastInteration) === parseInt(userLogged)) {
-                            return value;
-                        } else {
+                        var isBold = this.testIsBold(record);
+                        if (isBold) {
                             return '<b>' + value + '</b>';
+                        } else {
+                            return value;
                         }
                     }
                     return '';
@@ -156,6 +148,37 @@ Ext.define('Helpdesk.view.ticket.TicketGrid', {
                 }
             }
 
-        }]
+        }],
+    // teste para verificar se o ticket no grid precisa ficar em negrito.
+    testIsBold: function(record){
+        var userLastInteration = record.get('userLastInteration');
+        var userLogged = Helpdesk.Globals.userLogged;
+        var isOpen = record.get('isOpen');        
+        var idUserLast = parseInt(userLastInteration.id);
+        var idUserLogged = parseInt(userLogged.id);
+        
+        var idUserGroupUserLast = parseInt(userLastInteration.userGroup.id);
+        var idUserGroupUserLogged = parseInt(userLogged.userGroup.id);
+
+        // testa se o ticket está aberto.
+        if(isOpen){
+            // testa se o id de quem está logado é diferente do id do usuário da última interação.
+            if(idUserLast!==idUserLogged){
+                // testa se o usuário logado é administrador.
+                if(idUserGroupUserLogged === parseInt(Helpdesk.Globals.idAdminGroup)){
+                    // testa se o usuário da última interação também é um administrador.
+                    if(idUserGroupUserLast !== parseInt(Helpdesk.Globals.idAdminGroup)){
+                        return true;
+                    }                
+                } else {
+                    // testa se os ids do usuário logado e do usuário da última interação são diferentes.
+                    if(idUserLast !== idUserLogged){
+                        return true;
+                    }
+                }
+            }            
+        }            
+        return false;
+    }
 });
 
