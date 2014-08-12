@@ -622,7 +622,9 @@
     width: 100%;
     height: 30px;
     float: left;
-    margin-top: -10px;
+    margin-top: 7px;
+    margin-left: auto;
+    margin-right: auto;    
 }
 
 .date-title-answer{
@@ -651,4 +653,39 @@
 .answer-format{
     overflow:auto;
     white-space: pre-line;
+}
+
+.state-ticket-grid{
+    background: #F5E49D !important;  
+    width: 85px;
+    height: 21px;
+    
+    border-top-left-radius: 3px;
+    -webkit-border-top-left-radius:3px;
+    -moz-border-radius-topleft:3px;
+
+    border-top-right-radius: 3px;
+    -webkit-border-top-right-radius: 3px;
+    -moz-border-radius-topright: 3px;
+
+    border-bottom-right-radius: 3px;
+    -webkit-border-bottom-right-radius: 3px;
+    -moz-border-radius-bottomright: 3px;
+
+    border-bottom-left-radius: 3px;
+    -webkit-border-bottom-left-radius: 3px;
+    -moz-border-radius-bottomleft: 3px;
+}
+
+.name-profile-answer{
+    text-align: left;
+    padding-bottom: 25px;
+}
+
+.image-profile-asnwer{
+    margin-left: -5px;
+    padding: 3px;
+    height: 40px;
+    margin-top: -8px !important;
+    width: 40px;
 }

@@ -1,8 +1,6 @@
 package com.br.helpdesk.service;
 
-import com.Consts;
 import com.br.helpdesk.model.Ticket;
-import com.br.helpdesk.model.TicketAnswer;
 import com.br.helpdesk.model.User;
 import com.br.helpdesk.repository.TicketRepository;
 import java.util.ArrayList;
@@ -64,40 +62,42 @@ public class TicketService {
         List<Ticket> resultFinal = IteratorUtils.toList(repository.findAll().iterator());
         resultFinal = orderByLastInteration(resultFinal);
         return resultFinal;
-    }    
-       
-    /************************************ COUNT *******************************************/
-    
+    }
+
+    /**
+     * ********************************** COUNT ******************************************
+     */
     public Long countFindAll() {
         return repository.countByFindAll();
     }
-    
+
     public Long countByIsOpenAndResponsibleNotNull(Boolean isOpen) {
         return repository.countByIsOpenAndResponsibleNotNull(isOpen);
     }
-    
+
     public Long countByIsOpen(Boolean isOpen) {
         return repository.countByIsOpen(isOpen);
     }
-    
-    public Long countByResponsible(User user) {        
+
+    public Long countByResponsible(User user) {
         return repository.countByResponsibleAndIsOpen(user, true);
     }
-    
-    public Long countByUser(User user) {        
+
+    public Long countByUser(User user) {
         return repository.countByUser(user);
     }
-    
-    public Long countByIsOpenAndUser(Boolean isOpen, User user) {        
+
+    public Long countByIsOpenAndUser(Boolean isOpen, User user) {
         return repository.countByIsOpenAndUser(isOpen, user);
     }
-    
-    /************************************************************************************** */
-    
+
+    /**
+     * ************************************************************************************
+     */
     public void delete(Ticket model) {
         repository.delete(model);
     }
-    
+
     public List<Ticket> findByUser(User user) {
         List<Ticket> resultFinal = IteratorUtils.toList(repository.findByUser(user).iterator());
         resultFinal = orderByWaitingAndLastInteration(resultFinal, user);
@@ -105,7 +105,7 @@ public class TicketService {
     }
 
     public List<Ticket> findByUserWithPaging(User user, Pageable pageable) {
-        List<Ticket> resultFinal = IteratorUtils.toList(repository.findByUser(user, pageable).iterator());
+        List<Ticket> resultFinal = IteratorUtils.toList(repository.findByUserOrderByIdDesc(user, pageable).iterator());
         resultFinal = orderByWaitingAndLastInteration(resultFinal, user);
         return resultFinal;
     }
@@ -115,13 +115,13 @@ public class TicketService {
     }
 
     public List<Ticket> findByIsOpenWithPaging(Boolean isOpen, Pageable pageable, User user) {
-        List<Ticket> resultFinal = IteratorUtils.toList(repository.findByIsOpen(isOpen, pageable).iterator());
+        List<Ticket> resultFinal = IteratorUtils.toList(repository.findByIsOpenOrderByIdDesc(isOpen, pageable).iterator());
         resultFinal = orderByWaitingAndLastInteration(resultFinal, user);
         return resultFinal;
     }
-    
+
     public List<Ticket> findByIsOpenAndResponsibleNotNullWithPaging(Boolean isOpen, Pageable pageable, User user) {
-        List<Ticket> resultFinal = IteratorUtils.toList(repository.findByIsOpenAndResponsibleNotNull(isOpen, pageable).iterator());
+        List<Ticket> resultFinal = IteratorUtils.toList(repository.findByIsOpenAndResponsibleNotNullOrderByIdDesc(isOpen, pageable).iterator());
         resultFinal = orderByWaitingAndLastInteration(resultFinal, user);
         return resultFinal;
     }
@@ -133,7 +133,7 @@ public class TicketService {
     }
 
     public List<Ticket> findByIsOpenAndUserWithPaging(Boolean isOpen, User user, Pageable pageable) {
-        List<Ticket> resultFinal = IteratorUtils.toList(repository.findByIsOpenAndUser(isOpen, user, pageable).iterator());
+        List<Ticket> resultFinal = IteratorUtils.toList(repository.findByIsOpenAndUserOrderByIdDesc(isOpen, user, pageable).iterator());
         resultFinal = orderByWaitingAndLastInteration(resultFinal, user);
         return resultFinal;
     }
@@ -149,8 +149,8 @@ public class TicketService {
     }
 
     public List<Ticket> findByResponsibleWithPaging(User user, Pageable pageable) {
-        List<Ticket> resultFinal = IteratorUtils.toList(repository.findByResponsibleAndIsOpen(user, true, pageable).iterator());
-        resultFinal = orderByLastInteration(resultFinal);
+        List<Ticket> resultFinal = IteratorUtils.toList(repository.findByResponsibleAndIsOpenOrderByIdDesc(user, true, pageable).iterator());
+        resultFinal = orderByWaitingAndLastInteration(resultFinal, user);
         return resultFinal;
     }
 
@@ -215,7 +215,7 @@ public class TicketService {
     public List<Ticket> findBetweenEndDateAndUser(Date firstDate, Date lastDate, long userId) {
         return IteratorUtils.toList(repository.findBetweenEndDateAndUser(firstDate, lastDate, userId).iterator());
     }
-    
+
     public List<Ticket> findByIsOpenAndResponsibleNotNull(Boolean isOpen) {
         return IteratorUtils.toList(repository.findByIsOpenAndResponsibleNotNull(isOpen).iterator());
     }
@@ -248,35 +248,49 @@ public class TicketService {
     public List<Ticket> getListByWaiting(List<Ticket> list, User user) {
         List<Ticket> result = new ArrayList<Ticket>();
         if (list != null && user != null) {
-            TicketAnswer answerTemp;
-            List<User> listAdmin = userService.findByUserAdmin();
+            boolean userIsAdmin = false;
+            boolean userLastIsAdmin = false;
+            boolean insert = false;
+            User userLast = null;
 
-            boolean insert = true;
+            List<User> listAdmin = userService.findByUserAdmin();
+            for (User admin : listAdmin) {
+                if (user.getId().equals(admin.getId())) {
+                    userIsAdmin = true;
+                }
+            }
+
             for (Ticket ticket : list) {
-                // ultima interação do ticket.
-                answerTemp = ticketAnswerService.findLastAnswersByTicket(ticket);
-                if (answerTemp != null) {
-                    // se na última resposta não foi o usuário logado que respondeu.
-                    if (!answerTemp.getUser().getId().equals(user.getId())) {
-                        // se o usuário logado é um admin
-                        if (user.getUserGroup().getId() == Consts.ADMIN_GROUP_ID) {//SUPERUSER
-                            for (User admin : listAdmin) {
-                                // se o usuário da última resposta também é um admin
-                                if (answerTemp.getUser().getId().equals(admin.getId())) {
-                                    insert = false;
-                                }
+                // usuário da ultima interação do ticket.
+                userLast = ticket.getUserLastInteration();
+
+                // verifica se o usuário da última interação é diferente do usuário logado.
+                if (!userLast.getId().equals(user.getId())) {
+                    if (userIsAdmin) {
+                        // verifica se o usuário da última interação é admin.
+                        for (User admin : listAdmin) {
+                            if (userLast.getId().equals(admin.getId())) {
+                                userLastIsAdmin = true;
                             }
                         }
+                        // verifica se alguns dos dois usuários não é usuário admin.
+                        if ((!userIsAdmin) || (!userLastIsAdmin)) {
+                            if (!user.getId().equals(userLast.getId())) {
+                                insert = true;
+                            }
+                        }
+                    } else {
+                        // se o usuário logado não for admin, verifica se o usuário da última interação é o mesmo.
+                        if (!user.getId().equals(userLast.getId())) {
+                            insert = true;
+                        }
                     }
-                    // caso não tenham alterações no ticket, verifica se o usuário não é o criador do ticket.
-                }
-                if (user.getId().equals(ticket.getId())) {
-                    insert = false;
                 }
                 if (insert) {
                     result.add(ticket);
                 }
-                insert = true;
+                userLastIsAdmin = false;
+                insert = false;
             }
         }
         return result;
@@ -286,13 +300,13 @@ public class TicketService {
         Collections.sort(list, new Comparator<Ticket>() {
             @Override
             public int compare(Ticket o1, Ticket o2) {
-                if(o1.getLastInteration()!=null && o2.getLastInteration()!=null){
+                if (o1.getLastInteration() != null && o2.getLastInteration() != null) {
                     return (o1.getLastInteration().getTime() > o2.getLastInteration().getTime() ? -1 : 1);
-                } 
+                }
                 return 0;
             }
         });
         return list;
-    }   
+    }
 
 }

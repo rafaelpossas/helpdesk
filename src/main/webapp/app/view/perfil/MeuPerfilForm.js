@@ -29,7 +29,6 @@ Ext.define('Helpdesk.view.perfil.MeuPerfilForm', {
             fieldLabel: translations.EMAIL,
             maxLength: 100,
             name: 'email',
-            vtype: 'email',
             minLength: 0,
             value: Helpdesk.Globals.userLogged.email,
             width: 500,

@@ -92,10 +92,11 @@ Ext.define('Helpdesk.view.ticket.TicketGrid', {
                 dataIndex: 'isOpen',
                 renderer: function(value, metaData, record) { // #2
                     var isBold = this.testIsBold(record);
+                    var state = this.testStateTicket(record);
                     if (isBold) {
-                        return value ? '<b>' + translations.OPENED + '</b>' : '<b>' + translations.CLOSED + '</b>';
+                        return '<span class="state-ticket-grid"><b>'+state+'</b></span>';
                     } else {
-                        return value ? translations.OPENED : translations.CLOSED;
+                        return state;
                     }
                 }
             }, {
@@ -179,6 +180,32 @@ Ext.define('Helpdesk.view.ticket.TicketGrid', {
             }            
         }            
         return false;
+    },
+    testStateTicket: function(record){
+        var userLastInteration = record.get('userLastInteration');
+        var userLogged = Helpdesk.Globals.userLogged;
+        var isOpen = record.get('isOpen');        
+        var idUserLast = parseInt(userLastInteration.id);
+        var idUserLogged = parseInt(userLogged.id);
+        
+        var idUserGroupUserLast = parseInt(userLastInteration.userGroup.id);
+        var idUserGroupUserLogged = parseInt(userLogged.userGroup.id);
+
+        // testa se o ticket está aberto.
+        if(isOpen){
+            if(idUserGroupUserLogged !== parseInt(Helpdesk.Globals.idAdminGroup)){
+                return translations.OPENED;
+            } else {
+                if(idUserGroupUserLast === parseInt(Helpdesk.Globals.idAdminGroup)){
+                    return translations.ANSWERED;
+                } else if(idUserLast !== idUserLogged){
+                    return translations.WAITING;
+                } else {
+                    return translations.ANSWERED;
+                }
+            }                   
+        }            
+        return translations.CLOSED;
     }
 });
 

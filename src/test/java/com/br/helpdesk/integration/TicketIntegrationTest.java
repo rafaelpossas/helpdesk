@@ -299,6 +299,8 @@ public class TicketIntegrationTest {
         newTicket.setEstimateTime(null);
         newTicket.setEndDate(null);
         newTicket.setResponsible(null);
+        newTicket.setLastInteration(new Date());
+        newTicket.setUserLastInteration(user);
         
         MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.post("/ticket")                
                 .content(TestUtil.convertObjectToJsonBytes(newTicket))          
