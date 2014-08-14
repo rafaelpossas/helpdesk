@@ -997,7 +997,7 @@ Ext.define('Helpdesk.controller.Ticket', {
      * 
      * @param {type} ticketView
      * @param {type} record
-     * @param {type} answersTotal
+     * @param {type} answersList
      * @returns {undefined}
      */
     formatAnswerWithFilesAndChanges: function(ticketView, record, answersList) {
@@ -1015,14 +1015,14 @@ Ext.define('Helpdesk.controller.Ticket', {
                     ticketView.down('panel#tktAnswers').items.add(answersList[i]);
                 }
                 ticketView.down('panel#tktAnswers').doLayout();
-                //expando panel da última resposta inserida.
+                //expandindo panel da última resposta inserida.
                 var answers = ticketView.down('panel#tktAnswers').items;
                 var itemsLength = answers.length;
                 if (itemsLength > 0) {
                     answers.items[itemsLength - 1].expand(true);
                     answers.items[itemsLength - 1].el.setStyle('margin', '0 0 10px 0');
                 }
-                ticketView.down('panel#tktAnswers').doLayout();
+                //ticketView.down('panel#tktAnswers').doLayout();
             }
 
         }
@@ -1261,7 +1261,7 @@ Ext.define('Helpdesk.controller.Ticket', {
                 user: Helpdesk.Globals.userLogged.userName,
                 start: 0,
                 limit: Helpdesk.Globals.pageSizeGrid
-            },
+            },            
             callback: function(result) {
                 myscope.backToDefaultStore(myscope);
                 myscope.setSideMenuButtonText();
