@@ -90,11 +90,6 @@ Ext.define('Helpdesk.controller.User', {
     onButtonClickSave: function(button, e, options) {
         this.saveUser(button);
     },
-    submitImageProfile: function(filefield) {
-        var scope = this;
-        console.log(filefield.getValue());
-
-    },
     saveUser: function(button) {
         var win = button.up('window');
         var form = win.down('form');
@@ -158,6 +153,7 @@ Ext.define('Helpdesk.controller.User', {
         }
 
         if (check) {
+            var scope = this;
             var record = form.getRecord();
             var values = form.getValues();
             record.set(values);
@@ -169,12 +165,12 @@ Ext.define('Helpdesk.controller.User', {
             record.data.picture = image.src;
             
             this.getUsersStore().add(record);
-            this.getUsersStore().sync();
-            this.getUsersStore().load();  
-            this.getUsersList().getStore().load(); 
-                      
-            win.close();
-                        
+            this.getUsersStore().sync({
+                callback: function(){
+                    scope.getUsersList().getStore().load();
+                    win.close();
+                }
+            });                        
         } else {
             Ext.Msg.alert(translations.INFORMATION, translations.CHECK_ADDED_INFORMATIONS);
         }
@@ -192,7 +188,7 @@ Ext.define('Helpdesk.controller.User', {
             };
             reader.readAsDataURL(file); // #7
         } else if (!(/image/i).test(file.type)) { // #8
-            Ext.Msg.alert('Warning', 'You can only upload image files!');
+            Ext.Msg.alert(translations.INFORMATION, translations.ONLY_UPLOAD_IMAGES);
             filefield.reset(); // #9
         }
     },

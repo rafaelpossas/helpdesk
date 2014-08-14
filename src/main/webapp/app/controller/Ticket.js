@@ -103,30 +103,30 @@ Ext.define('Helpdesk.controller.Ticket', {
         if (typeof this.getTicketPanel() !== 'undefined') {
             if (Helpdesk.Globals.userLogged.userGroup.id == Helpdesk.Globals.idAdminGroup) {
                 //Verifica se algum botão já estava marcado e busca os tickets de acordo com a seleção correspondente
-                if(this.getTicketSideMenu().down('#buttonAll').pressed){
+                if (this.getTicketSideMenu().down('#buttonAll').pressed) {
                     this.getAllTickets();
                     this.getTicketSideMenu().down('#buttonAll').toggle(true);
-                }               
-                else if(this.getTicketSideMenu().down('#buttonMyTickets').pressed){
+                }
+                else if (this.getTicketSideMenu().down('#buttonMyTickets').pressed) {
                     this.getMyTickets();
                     this.getTicketSideMenu().down('#buttonMyTickets').toggle(true);
-                }                
-                else if(this.getTicketSideMenu().down('#buttonWithoutResponsible').pressed){
+                }
+                else if (this.getTicketSideMenu().down('#buttonWithoutResponsible').pressed) {
                     this.getTicketsWithoutResponsible();
                     this.getTicketSideMenu().down('#buttonWithoutResponsible').toggle(true);
-                }                
-                else if(this.getTicketSideMenu().down('#buttonOpened').pressed){
+                }
+                else if (this.getTicketSideMenu().down('#buttonOpened').pressed) {
                     this.getTicketsOpened();
                     this.getTicketSideMenu().down('#buttonOpened').toggle(true);
-                }                
-                else if(this.getTicketSideMenu().down('#buttonClosed').pressed){
+                }
+                else if (this.getTicketSideMenu().down('#buttonClosed').pressed) {
                     this.getTicketsClosed();
                     this.getTicketSideMenu().down('#buttonClosed').toggle(true);
-                }               
-                else{
+                }
+                else {
                     this.getMyTickets();
                     this.getTicketSideMenu().down('#buttonMyTickets').toggle(true);
-                }            
+                }
             } else {
                 this.getTicketsOpened();
                 this.getTicketSideMenu().down('#buttonOpened').toggle(true);
@@ -164,8 +164,8 @@ Ext.define('Helpdesk.controller.Ticket', {
         if (button.id === 'btnCloseTkt' || button.id === 'btnOpenTkt') {
             var scope = this;
             var mainView = this.getTicketView();
-            
-            
+
+
             var record = button.up('form#ticketMainView').getRecord();
             record.dirty = true;
             var store = this.getTicketsStore();
@@ -214,10 +214,10 @@ Ext.define('Helpdesk.controller.Ticket', {
             ticketView.down('label#lblTicketOpen').setVisible(true);
             ticketView.down('button#btnCloseTkt').setVisible(true);
             ticketView.down('label#lblTicketClosed').setVisible(false);
-            ticketView.down('button#btnOpenTkt').setVisible(false);               
+            ticketView.down('button#btnOpenTkt').setVisible(false);
             //Seta visibilidade do botão salvar
-            if(Helpdesk.Globals.idAdminGroup == Helpdesk.Globals.userLogged.userGroup.id){
-                ticketView.down('button#editTicket').setVisible(true);        
+            if (Helpdesk.Globals.idAdminGroup == Helpdesk.Globals.userLogged.userGroup.id) {
+                ticketView.down('button#editTicket').setVisible(true);
             }
             ticketView.down('button#btnSaveAnswTkt').setVisible(true);
             //Seta visibildade do panel de nova resposta
@@ -228,8 +228,8 @@ Ext.define('Helpdesk.controller.Ticket', {
             ticketView.down('button#btnCloseTkt').setVisible(false);
             ticketView.down('label#lblTicketClosed').setVisible(true);
             ticketView.down('button#btnOpenTkt').setVisible(true);
-            if(Helpdesk.Globals.idAdminGroup == Helpdesk.Globals.userLogged.userGroup.id){
-                ticketView.down('button#editTicket').setVisible(false);        
+            if (Helpdesk.Globals.idAdminGroup == Helpdesk.Globals.userLogged.userGroup.id) {
+                ticketView.down('button#editTicket').setVisible(false);
             }
             //Seta visibilidade do botão salvar
             ticketView.down('button#btnSaveAnswTkt').setVisible(false);
@@ -265,10 +265,10 @@ Ext.define('Helpdesk.controller.Ticket', {
         record.data.responsible = this.getRecordFromComboBox(form.down('combobox#responsibleTicket').getStore(), form.down('combobox#responsibleTicket').getValue());
         record.data.stepsTicket = form.down('textarea#stepsTicket').getValue();
 
-        var estimateTime = form.down('datefield#estimateTime').getValue();        
+        var estimateTime = form.down('datefield#estimateTime').getValue();
         //Adiciona um dia a variável pois o mesmo é perdido ao passar para o java
-        if(estimateTime!==null){
-            estimateTime.setDate(estimateTime.getDate()+1);            
+        if (estimateTime !== null) {
+            estimateTime.setDate(estimateTime.getDate() + 1);
         }
         record.data.estimateTime = estimateTime;
         record.dirty = true;
@@ -648,10 +648,10 @@ Ext.define('Helpdesk.controller.Ticket', {
             //prazo estimado
             if (form.down('datefield#estimateTime').getValue() === null) {
                 record.data.estimateTime = null;
-            }else{
+            } else {
                 //Adiciona um dia a mais na variável pois o mesmo é perdido na conversão para o java               
                 var dateFormattedTemp = new Date(form.down('datefield#estimateTime').getValue());
-                dateFormattedTemp.setDate(dateFormattedTemp.getDate()+1);
+                dateFormattedTemp.setDate(dateFormattedTemp.getDate() + 1);
                 record.data.estimateTime = dateFormattedTemp;
             }
         }
@@ -764,7 +764,7 @@ Ext.define('Helpdesk.controller.Ticket', {
      */
     ticketClicked: function(grid, record, item, index, e, eOpts) {
         var ticketView = this.getTicketCardContainer().getLayout().setActiveItem(Helpdesk.Globals.ticket_details);
-       // ticketView.setLoading(translations.LOADING);
+        // ticketView.setLoading(translations.LOADING);
         ticketView.down('form#ticketMainView').loadRecord(Ext.create('Helpdesk.model.Ticket'));
         this.setValuesFromView(ticketView, record);
     },
@@ -798,7 +798,7 @@ Ext.define('Helpdesk.controller.Ticket', {
             ticketView.down('text#tktBy').setText(ticket.userName);
 
             //formata data Inicial do ticket
-            var dateInicial = new Date(ticket.startDate);            
+            var dateInicial = new Date(ticket.startDate);
             dateInicial = Ext.Date.format(dateInicial, translations.FORMAT_DATE_TIME);
             ticketView.down('text#tktAt').setText(dateInicial);
 
@@ -809,14 +809,14 @@ Ext.define('Helpdesk.controller.Ticket', {
             ticketView.down('text#tktPriority').setText(ticket.priorityName);
 
             //text prazo estimado
-            if (ticket.estimateTime !== null) {                
+            if (ticket.estimateTime !== null) {
                 var dateTemp;
                 if (ticket.estimateTime.toString().indexOf('-') >= 0) {
-                    var splitedDate = ticket.estimateTime.split('-');                
-                    dateTemp = new Date(splitedDate[0],splitedDate[1]-1,splitedDate[2]);    
-                }else{
+                    var splitedDate = ticket.estimateTime.split('-');
+                    dateTemp = new Date(splitedDate[0], splitedDate[1] - 1, splitedDate[2]);
+                } else {
                     dateTemp = new Date(ticket.estimateTime);
-                }                                
+                }
                 dateTemp = Ext.Date.format(dateTemp, translations.FORMAT_JUST_DATE);
                 ticketView.down('text#tktEstimatedTime').setText(dateTemp);
             } else {
@@ -829,7 +829,7 @@ Ext.define('Helpdesk.controller.Ticket', {
             } else {
                 ticketView.down('text#tktResponsible').setText(translations.NO_RESPONSIBLE);
             }
-            
+
             //text passos para reproduzir o erro
             ticketView.down('text#tktSteps').setText(ticket.stepsTicket);
 
@@ -842,10 +842,14 @@ Ext.define('Helpdesk.controller.Ticket', {
             answerStore.load({
                 callback: function() {
                     var answersTotal = new Array();
+                    var image = '<img align="left" class="image-profile-asnwer" ';
+                    if (ticket.user.picture !== null) {
+                        image += 'src="' + ticket.user.picture +'"/>';
+                    }
                     var resposta = Ext.create('Helpdesk.view.ticket.TicketAnswerPanel', {
-                        title: '<div class="div-title-answer"><p align="left">' + ticket.userName + '</p><p class="date-title-answer">' + dateInicial + '</p></div>'
+                        title: '<div class="div-title-answer">'+image+'<p align="left">' + ticket.userName + '</p><p class="date-title-answer">' + dateInicial + '</p></div>'
                     });
-                    resposta.down('label#corpo').html = '<pre class="answer-format">'+ticket.description+'</pre>';
+                    resposta.down('label#corpo').html = '<pre class="answer-format">' + ticket.description + '</pre>';
                     resposta.down('hiddenfield#id').text = ticket.id;
                     resposta.down('hiddenfield#idAnswer').text = 0;
 
@@ -856,11 +860,15 @@ Ext.define('Helpdesk.controller.Ticket', {
                         var name = answerTemp.user.name;
                         dateTemp = new Date(answerTemp.dateCreation);
                         var date = Ext.Date.format(dateTemp, translations.FORMAT_DATE_TIME);
+                        image = '<img align="left" class="image-profile-asnwer" ';
 
+                        if (answerTemp.user.picture !== null) {
+                            image += 'src="' + answerTemp.user.picture + '"/>';
+                        }
                         resposta = Ext.create('Helpdesk.view.ticket.TicketAnswerPanel', {
-                            title: '<div class="div-title-answer"><p align="left">' + name + '</p><p class="date-title-answer">' + date + '</p></div>'
+                            title: '<div class="div-title-answer">' + image + '<p align="left">' + name + '</p><p class="date-title-answer">' + date + '</p></div>'
                         });
-                        resposta.down('label#corpo').html = '<pre class="answer-format">'+answerTemp.description+'</pre>';
+                        resposta.down('label#corpo').html = '<pre class="answer-format">' + answerTemp.description + '</pre>';
                         resposta.down('hiddenfield#id').text = ticket.id;
                         resposta.down('hiddenfield#idAnswer').text = answerTemp.id;
 
@@ -897,7 +905,7 @@ Ext.define('Helpdesk.controller.Ticket', {
             //Seta a visibilidade do botão de edição do ticket
             ticketView.down('button#editTicket').hide();
             ticketView.down('panel#panelElementsNewAnswer').hide();
-        }        
+        }
     },
     /*
      * Muda CardContainer para a view de Edição do ticket.
@@ -989,7 +997,7 @@ Ext.define('Helpdesk.controller.Ticket', {
      * 
      * @param {type} ticketView
      * @param {type} record
-     * @param {type} answersTotal
+     * @param {type} answersList
      * @returns {undefined}
      */
     formatAnswerWithFilesAndChanges: function(ticketView, record, answersList) {
@@ -1007,16 +1015,16 @@ Ext.define('Helpdesk.controller.Ticket', {
                     ticketView.down('panel#tktAnswers').items.add(answersList[i]);
                 }
                 ticketView.down('panel#tktAnswers').doLayout();
-                //expando panel da última resposta inserida.
+                //expandindo panel da última resposta inserida.
                 var answers = ticketView.down('panel#tktAnswers').items;
                 var itemsLength = answers.length;
                 if (itemsLength > 0) {
                     answers.items[itemsLength - 1].expand(true);
                     answers.items[itemsLength - 1].el.setStyle('margin', '0 0 10px 0');
                 }
-                ticketView.down('panel#tktAnswers').doLayout();
+                //ticketView.down('panel#tktAnswers').doLayout();
             }
-            
+
         }
     },
     /**
@@ -1213,10 +1221,10 @@ Ext.define('Helpdesk.controller.Ticket', {
             if (change.newEstimatedTime !== null || change.olderEstimatedTime !== null) {
                 text += translations.ESTIMATED_TIME_CHANGED_FROM;
                 var date;
-                if (change.olderEstimatedTime !== null) { 
-                    
+                if (change.olderEstimatedTime !== null) {
+
                     var dateSpplited = change.olderEstimatedTime.split('-');
-                    date = new Date(dateSpplited[0],dateSpplited[1]-1,dateSpplited[2]);
+                    date = new Date(dateSpplited[0], dateSpplited[1] - 1, dateSpplited[2]);
                     //date = new Date(change.olderEstimatedTime);                   
                     date = Ext.Date.format(date, translations.FORMAT_JUST_DATE);
                     text += "\"" + date + "\" ";
@@ -1225,9 +1233,9 @@ Ext.define('Helpdesk.controller.Ticket', {
                 }
                 text += translations.FOR;
                 if (change.newEstimatedTime !== null) {
-                    
+
                     var dateSpplited = change.newEstimatedTime.split('-');
-                    date = new Date(dateSpplited[0],dateSpplited[1]-1,dateSpplited[2]);                    
+                    date = new Date(dateSpplited[0], dateSpplited[1] - 1, dateSpplited[2]);
                     //date = new Date(change.newEstimatedTime);                    
                     date = Ext.Date.format(date, translations.FORMAT_JUST_DATE);
                     text += " \"" + date + "\"";
@@ -1237,10 +1245,10 @@ Ext.define('Helpdesk.controller.Ticket', {
                 text += ". ";
             }
         }
-        
+
         text += "<br />";
-        text += "<pre>"+textResponsible + "<b>"+responsible+"</b>" + changeDate+"</pre>";
-        
+        text += "<pre>" + textResponsible + "<b>" + responsible + "</b>" + changeDate + "</pre>";
+
         return text;
 
     },
@@ -1253,8 +1261,8 @@ Ext.define('Helpdesk.controller.Ticket', {
                 user: Helpdesk.Globals.userLogged.userName,
                 start: 0,
                 limit: Helpdesk.Globals.pageSizeGrid
-            },
-            callback: function() {
+            },            
+            callback: function(result) {
                 myscope.backToDefaultStore(myscope);
                 myscope.setSideMenuButtonText();
                 //loadStore to toolbar
@@ -1280,7 +1288,7 @@ Ext.define('Helpdesk.controller.Ticket', {
             src: 'attachments/attachments/' + fileId
         });
     },
-        submitValues: function(multiupload) {
+    submitValues: function(multiupload) {
         var scope = this;
         var ticketView = scope.getTicketView();
         if (multiupload.filesListArchive.length > 0) {

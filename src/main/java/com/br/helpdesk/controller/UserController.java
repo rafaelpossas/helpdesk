@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
@@ -58,7 +59,7 @@ public class UserController {
 
     @RequestMapping(value = {"", "/{id}"}, method = {RequestMethod.PUT, RequestMethod.POST})
     @ResponseBody
-    public User save(@RequestBody User user) {        
+    public User save(@RequestBody User user) {
         return userService.save(user);
     }
 
@@ -92,6 +93,26 @@ public class UserController {
     public @ResponseBody
     User getById(@PathVariable long id) {
         return userService.findById(id);
+    }
+
+    @RequestMapping(value = "/update-profile/{username}", 
+            method = RequestMethod.POST, params = {"name", "email", "picture", "password"})
+    public @ResponseBody
+    User saveUpdatesProfile(@PathVariable String username, 
+            @RequestParam(value = "name") String name, 
+            @RequestParam(value = "email") String email, 
+            @RequestParam(value = "picture") String picture, 
+            @RequestParam(value = "password") String password) {
+        User user = this.userService.findByUserName(username);
+        user.setName(name);
+        user.setEmail(email);
+        user.setPicture(picture);
+        if(password!=null && !password.equals("")){
+            user.setPassword(password);
+        }
+        user = userService.save(user);
+        user = (User)userService.removePassword(null, user);
+        return user;
     }
 
     /**

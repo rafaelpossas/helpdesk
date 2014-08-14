@@ -20,6 +20,7 @@ translations = {
     ALREADY_ADDED: ' already added!',
     AGENT: 'Agent',
     ACTIVE: 'Active',
+    ANSWERED: 'Answered',
     //############################################## [ B ] ##############################################//
 
     BACK: 'Back',
@@ -178,6 +179,7 @@ translations = {
     OPEN_FROM: 'Open',
     OPEN_TO: 'Open',
     OPEN_TICKET: 'Open ticket',
+    ONLY_UPLOAD_IMAGES: 'You can only upload image files',
     //############################################## [ P ] ##############################################//
 
     PASSWORD: 'Password',
@@ -305,6 +307,7 @@ translations = {
     WITHOUT_RESPONSIBLE: 'Without responsible',
     WITHOUT_DEADLINE: 'Without deadline',
     WEEK: 'Week',
+    WAITING: 'Waiting',
     //############################################## [ X ] ##############################################//
 
 

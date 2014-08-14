@@ -1,21 +1,23 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+* To change this license header, choose License Headers in Project Properties.
+* To change this template file, choose Tools | Templates
+* and open the template in the editor.
+*/
 
 package com.br.helpdesk.util;
 
 /**
- *
- * @author Andre
- */
- 
+*
+* @author Andre
+*/
+
 import java.io.File;
 import java.net.URL;
 import java.io.FileInputStream;
+import java.io.InputStream;
+import java.net.URL;
 import java.util.Properties;
- 
+
 public class EmailPropertiesLoader {    
  
     //Crio uma instancia da classe properties
@@ -31,6 +33,7 @@ public class EmailPropertiesLoader {
            //Agora crio uma instância de FileInputStream passando via construtor o objeto file instanciado acima
            FileInputStream fileInputStream = new FileInputStream(file);
 
+          //Crio uma instancia da classe properties
            //Leio o fileInputStream recuperando assim o mapa contendo chaves e valores
            prop.load(fileInputStream);
            //Fecho o fileInputStream
@@ -42,5 +45,4 @@ public class EmailPropertiesLoader {
        return prop;
        //Retorno um objeto prop com o mapa correspondente ao meu arquivo properties
    }
-     
 }

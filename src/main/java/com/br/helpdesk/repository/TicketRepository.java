@@ -19,26 +19,26 @@ public interface TicketRepository extends CrudRepository<Ticket, Long> {
 
     List<Ticket> findByIsOpen(Boolean isOpen);
 
-    List<Ticket> findByIsOpen(Boolean isOpen, Pageable pageable);
+    List<Ticket> findByIsOpenOrderByIdDesc(Boolean isOpen, Pageable pageable);
 
     List<Ticket> findByIsOpenAndUser(Boolean isOpen, User user);
 
-    List<Ticket> findByIsOpenAndUser(Boolean isOpen, User user, Pageable pageable);
+    List<Ticket> findByIsOpenAndUserOrderByIdDesc(Boolean isOpen, User user, Pageable pageable);
 
     List<Ticket> findByUser(User user);
 
-    List<Ticket> findByUser(User user, Pageable pageable);
+    List<Ticket> findByUserOrderByIdDesc(User user, Pageable pageable);
 
     List<Ticket> findByResponsibleAndIsOpen(User user, Boolean isOpen);
 
-    List<Ticket> findByResponsibleAndIsOpen(User user, Boolean isOpen, Pageable pageable);
+    List<Ticket> findByResponsibleAndIsOpenOrderByIdDesc(User user, Boolean isOpen, Pageable pageable);
     
-    List<Ticket> findByIsOpenAndResponsibleNotNull(Boolean isOpen, Pageable pageable);
+    List<Ticket> findByIsOpenAndResponsibleNotNullOrderByIdDesc(Boolean isOpen, Pageable pageable);
     
     List<Ticket> findByIsOpenAndResponsibleNotNull(Boolean isOpen);
-
-    Page<Ticket> findAll(Pageable pageable);
     
+    Page<Ticket> findAll(Pageable pageable);
+
     @Query(
             "Select count(t) FROM Ticket t"
     )

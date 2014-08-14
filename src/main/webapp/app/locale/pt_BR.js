@@ -20,6 +20,7 @@ translations = {
     ALREADY_ADDED: ' já foi adicionado!',
     AGENT: 'Agente',
     ACTIVE: 'Ativo',
+    ANSWERED: 'Respondido',
     //############################################## [ B ] ##############################################//
 
     BACK: 'Voltar',
@@ -177,7 +178,8 @@ translations = {
     OPEN: 'Em aberto',
     OPEN_FROM: 'Em aberto',
     OPEN_TO: 'Em aberto',
-    OPEN_TICKET: 'Abrir ticket',    
+    OPEN_TICKET: 'Abrir ticket', 
+    ONLY_UPLOAD_IMAGES: 'Você só pode fazer upload de imagens',
     //############################################## [ P ] ##############################################//
 
     PASSWORD: 'Senha',
@@ -306,6 +308,7 @@ translations = {
     WITHOUT_RESPONSIBLE: 'Sem Responsável',
     WITHOUT_DEADLINE: 'Sem Prazo',
     WEEK: 'Semana',
+    WAITING: 'Aguardando',
     //############################################## [ X ] ##############################################//
 
 
