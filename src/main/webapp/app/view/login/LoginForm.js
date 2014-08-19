@@ -35,8 +35,7 @@ Ext.define('Helpdesk.view.login.LoginForm', {
                 {
                     name: 'j_username',
                     fieldLabel: translations.USER,
-                    id: 'username',
-                    maxLength: 15
+                    id: 'username'
                 },
                 {
                     inputType: 'password',

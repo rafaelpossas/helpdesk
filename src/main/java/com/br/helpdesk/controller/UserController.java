@@ -95,23 +95,37 @@ public class UserController {
         return userService.findById(id);
     }
 
-    @RequestMapping(value = "/update-profile/{username}", 
+    /**
+     * @author andresulivam
+     *
+     * Método que salva as mudanças feitas na tela de alteração do perfil do
+     * usuário logado.
+     *
+     * @param username
+     * @param name
+     * @param email
+     * @param picture
+     * @param password
+     * @return
+     */
+    @RequestMapping(value = "/update-profile/{username}",
             method = RequestMethod.POST, params = {"name", "email", "picture", "password"})
     public @ResponseBody
-    User saveUpdatesProfile(@PathVariable String username, 
-            @RequestParam(value = "name") String name, 
-            @RequestParam(value = "email") String email, 
-            @RequestParam(value = "picture") String picture, 
+    User saveUpdatesProfile(@PathVariable String username,
+            @RequestParam(value = "name") String name,
+            @RequestParam(value = "email") String email,
+            @RequestParam(value = "picture") String picture,
             @RequestParam(value = "password") String password) {
         User user = this.userService.findByUserName(username);
         user.setName(name);
         user.setEmail(email);
         user.setPicture(picture);
-        if(password!=null && !password.equals("")){
+        // teste se o password foi alterado.
+        if (password != null && !password.equals("")) {
             user.setPassword(password);
         }
         user = userService.save(user);
-        user = (User)userService.removePassword(null, user);
+        user = (User) userService.removePassword(null, user);
         return user;
     }
 

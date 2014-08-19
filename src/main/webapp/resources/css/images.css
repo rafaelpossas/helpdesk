@@ -134,3 +134,7 @@
 .has_attachment{
     background-image:url('../img/has_attachment.png') !important;
 }
+
+.no_image{
+    background-image:url('../img/no_image.png') !important;
+}

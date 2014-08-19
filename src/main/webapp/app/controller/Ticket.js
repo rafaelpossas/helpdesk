@@ -841,40 +841,7 @@ Ext.define('Helpdesk.controller.Ticket', {
             answerStore.proxy.url = 'ticket-answer/find-by-ticket/' + ticket.id;
             answerStore.load({
                 callback: function() {
-                    var answersTotal = new Array();
-                    var image = '<img align="left" class="image-profile-asnwer" ';
-                    if (ticket.user.picture !== null) {
-                        image += 'src="' + ticket.user.picture +'"/>';
-                    }
-                    var resposta = Ext.create('Helpdesk.view.ticket.TicketAnswerPanel', {
-                        title: '<div class="div-title-answer">'+image+'<p align="left">' + ticket.userName + '</p><p class="date-title-answer">' + dateInicial + '</p></div>'
-                    });
-                    resposta.down('label#corpo').html = '<pre class="answer-format">' + ticket.description + '</pre>';
-                    resposta.down('hiddenfield#id').text = ticket.id;
-                    resposta.down('hiddenfield#idAnswer').text = 0;
-
-                    //adicionando o primeiro panel a lista de panels de respostas.
-                    answersTotal[0] = resposta;
-                    for (i = 0; i < answerStore.getCount(); i++) {
-                        var answerTemp = answerStore.data.items[i].data;
-                        var name = answerTemp.user.name;
-                        dateTemp = new Date(answerTemp.dateCreation);
-                        var date = Ext.Date.format(dateTemp, translations.FORMAT_DATE_TIME);
-                        image = '<img align="left" class="image-profile-asnwer" ';
-
-                        if (answerTemp.user.picture !== null) {
-                            image += 'src="' + answerTemp.user.picture + '"/>';
-                        }
-                        resposta = Ext.create('Helpdesk.view.ticket.TicketAnswerPanel', {
-                            title: '<div class="div-title-answer">' + image + '<p align="left">' + name + '</p><p class="date-title-answer">' + date + '</p></div>'
-                        });
-                        resposta.down('label#corpo').html = '<pre class="answer-format">' + answerTemp.description + '</pre>';
-                        resposta.down('hiddenfield#id').text = ticket.id;
-                        resposta.down('hiddenfield#idAnswer').text = answerTemp.id;
-
-                        //adicionado o panel de resposta na última posição da lista.
-                        answersTotal[answersTotal.length] = resposta;
-                    }
+                    var answersTotal = scope.formatAnswersPanel(ticket, answerStore.data.items);
                     scope.resetMultiupload(ticketView);
                     scope.formatAnswerWithFilesAndChanges(ticketView, ticket, answersTotal);
                 }
@@ -1261,7 +1228,7 @@ Ext.define('Helpdesk.controller.Ticket', {
                 user: Helpdesk.Globals.userLogged.userName,
                 start: 0,
                 limit: Helpdesk.Globals.pageSizeGrid
-            },            
+            },
             callback: function(result) {
                 myscope.backToDefaultStore(myscope);
                 myscope.setSideMenuButtonText();
@@ -1335,5 +1302,54 @@ Ext.define('Helpdesk.controller.Ticket', {
             ticketView.setLoading(translations.SAVING_TICKET);
             scope.saveTicket();
         }
+    },
+    formatAnswersPanel: function(ticket, answers) {
+        var answersTotal = new Array();
+        var i;
+        var dateTemp;
+
+        var dateInicial = new Date(ticket.startDate);
+        dateInicial = Ext.Date.format(dateInicial, translations.FORMAT_DATE_TIME);
+
+        var image = '<img align="left" ';
+        if (ticket.user.picture !== null) {
+            image += 'src = "' + ticket.user.picture + '" class = "image-profile-asnwer" ';
+        } else {
+            image += 'class = "imagem-default-user"';
+        }
+        image += '/>';
+        var resposta = Ext.create('Helpdesk.view.ticket.TicketAnswerPanel', {
+            title: '<div class="div-title-answer">' + image + '<p class="text-title-answer" align="left">' + ticket.user.name + '</p><p class="date-title-answer">' + dateInicial + '</p></div>'
+        });
+        resposta.down('label#corpo').html = '<pre class="answer-format">' + ticket.description + '</pre>';
+        resposta.down('hiddenfield#id').text = ticket.id;
+        resposta.down('hiddenfield#idAnswer').text = 0;
+
+        //adicionando o primeiro panel a lista de panels de respostas.        
+        answersTotal[0] = resposta;
+
+        for (i = 0; i < answers.length; i++) {
+            var answerTemp = answers[i].data;
+            var name = answerTemp.user.name;
+            dateTemp = new Date(answerTemp.dateCreation);
+            var date = Ext.Date.format(dateTemp, translations.FORMAT_DATE_TIME);
+            image = '<img align="left" ';
+            if (answerTemp.user.picture !== null) {
+                image += 'src = "' + answerTemp.user.picture + '" class = "image-profile-asnwer" ';
+            } else {
+                image += 'class = "imagem-default-user"';
+            }
+            image += '/>';
+            resposta = Ext.create('Helpdesk.view.ticket.TicketAnswerPanel', {
+                title: '<div class="div-title-answer">' + image + '<p class="text-title-answer" align="left">' + name + '</p><p class="date-title-answer">' + date + '</p></div>'
+            });
+            resposta.down('label#corpo').html = '<pre class="answer-format">' + answerTemp.description + '</pre>';
+            resposta.down('hiddenfield#id').text = ticket.id;
+            resposta.down('hiddenfield#idAnswer').text = answerTemp.id;
+
+            //adicionado o panel de resposta na última posição da lista.
+            answersTotal[answersTotal.length] = resposta;
+        }
+        return answersTotal;
     }
 });

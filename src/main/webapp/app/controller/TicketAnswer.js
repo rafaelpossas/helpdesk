@@ -126,35 +126,10 @@ Ext.define('Helpdesk.controller.TicketAnswer', {
         answerStore.proxy.url = 'ticket-answer/find-by-ticket/' + answer.data.ticketId;
         answerStore.load({
             callback: function() {
-                var answersList = new Array();
-                var dateTemp = new Date(answer.data.ticket.startDate);
-                dateTemp = Ext.Date.format(dateTemp, translations.FORMAT_DATE_TIME);
                 panel.removeAll();
-
-                var resposta = Ext.create('Helpdesk.view.ticket.TicketAnswerPanel', {
-                    title: '<div class="div-title-answer"><p align="left">' + answer.data.ticket.user.name + '</p><p class="date-title-answer">' + dateTemp + '</p></div>'
-                });
-                resposta.down('label#corpo').html = '<pre class="answer-format">'+answer.data.ticket.description+'</pre>';
-                resposta.down('hiddenfield#id').text = answer.data.id;
-                resposta.down('hiddenfield#idAnswer').text = 0;
-                answersList[0] = resposta;
-                for (i = 0; i < answerStore.getCount(); i++) {
-                    var answerTemp = answerStore.data.items[i].data;
-                    var name = answerTemp.user.name;
-                    dateTemp = new Date(answerTemp.dateCreation);
-                    var date = Ext.Date.format(dateTemp, translations.FORMAT_DATE_TIME);
-
-                    resposta = Ext.create('Helpdesk.view.ticket.TicketAnswerPanel', {
-                        title: '<div class="div-title-answer"><p align="left">' + name + '</p><p class="date-title-answer">' + date + '</p></div>'
-                    });
-                    resposta.down('label#corpo').html = '<pre class="answer-format">'+answerTemp.description+'</pre>';
-                    resposta.down('hiddenfield#id').text = answer.data.id;
-                    resposta.down('hiddenfield#idAnswer').text = answerTemp.id;
-                    answersList[answersList.length] = resposta;
-                }
-
-                var ticketView = panel.up().up();
                 var ticket = answer.data.ticket;
+                var answersList = scope.getTicketController().formatAnswersPanel(ticket, answerStore.data.items);
+                var ticketView = panel.up().up();
 
                 scope.getTicketController().resetMultiupload(ticketView);
                 scope.getTicketController().formatAnswerWithFilesAndChanges(ticketView, ticket, answersList);

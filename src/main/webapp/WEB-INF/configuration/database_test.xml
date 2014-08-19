@@ -20,12 +20,20 @@
         <property name="password" value="" />
     </bean>
 
-    <!--<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource">
+<!--    <bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource">
+        <property name="driverClassName" value="com.mysql.jdbc.Driver" />
+        <property name="url" value="jdbc:mysql://cymosupport.tecnologia.ws:3306/helpdesk" />
+        <property name="username" value="cymo" />
+        <property name="password" value="cymotecnologia2011" />
+    </bean>-->
+
+<!--    <bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource">
         <property name="driverClassName" value="org.hsqldb.jdbcDriver" />
         <property name="url" value="jdbc:mysql://localhost:3306/helpdesk" />
         <property name="username" value="root" />
         <property name="password" value="root" />
     </bean>-->
+    
     <!-- Hibernate Session Factory -->
     <bean id="sessionFactory"
           class="org.springframework.orm.hibernate4.LocalSessionFactoryBean">
