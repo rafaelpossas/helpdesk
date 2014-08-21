@@ -143,7 +143,7 @@ Ext.define('Helpdesk.view.ticket.EditTicket', {
                                     baseCls: 'description-ticket-bold'
                                 },
                                 {
-                                    xtype: 'text',
+                                    xtype: 'label',
                                     itemId: 'tktSteps',
                                     baseCls: 'description-ticket'
                                 }

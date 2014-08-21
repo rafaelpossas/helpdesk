@@ -4,6 +4,7 @@ import com.br.helpdesk.repository.*;
 import com.br.helpdesk.model.*;
 import com.br.helpdesk.service.*;
 import com.github.springtestdbunit.DbUnitTestExecutionListener;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import javax.annotation.Resource;
@@ -51,8 +52,8 @@ public class CreateBanco {
     public UserGroupService serviceUserGroup;
 
     @Autowired
-    public UserService serviceUser;    
-        
+    public UserService serviceUser;
+
     @Autowired
     public TicketAnswerService serviceTicketAnswer;
 
@@ -73,10 +74,12 @@ public class CreateBanco {
 
     @Resource
     public UserRepository repositoryUser;
-    
+
     @Resource
     public TicketAnswerRepository repositoryTicketAnswer;
-
+    
+    @Resource
+    public PriorityRepository priorityRepository;
 
     @Before
     public void setup() {
@@ -170,5 +173,79 @@ public class CreateBanco {
                 answer = null;
             }
         }
+    }
+
+    //@Test
+    public void updateDatabasePriority() {
+        List<Ticket> allTickets = serviceTicket.findAll();
+        if (allTickets != null && allTickets.size() > 0) {
+            List<Priority> priorities = (List)servicePriority.findAll();
+            for (Ticket ticket : allTickets) {
+                if(isUrgent(ticket)){
+                    ticket.setPriority(priorities.get(4));
+                } else if(isHigh(ticket)){
+                    ticket.setPriority(priorities.get(3));
+                } else if(isMedia(ticket)){
+                    ticket.setPriority(priorities.get(2));
+                } else if(isLow(ticket)){
+                    ticket.setPriority(priorities.get(1));
+                } else {
+                    ticket.setPriority(priorities.get(0));
+                }
+                serviceTicket.save(ticket);
+            }
+        }
+    }
+
+    public boolean isUrgent(Ticket ticket) {
+        String idsTemp = "6 18 36 128 216 249 895";
+        String[] ids = idsTemp.split(" ");
+        long temp = 0L;
+        for (String idTemp : ids) {
+            temp = Long.parseLong(idTemp);
+            if (ticket.getId().equals(temp)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean isHigh(Ticket ticket) {
+        String idsTemp = "88 95 147 171 172 340 711 722 726 730 739 749";
+        String[] ids = idsTemp.split(" ");
+        long temp = 0L;
+        for (String idTemp : ids) {
+            temp = Long.parseLong(idTemp);
+            if (ticket.getId().equals(temp)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean isMedia(Ticket ticket) {
+        String idsTemp = "2 4 8 15 17 19 20 24 29 38 39 40 41 47 54 55 58 69 92 94 99 100 116 163 244 254 283 285 1156";
+        String[] ids = idsTemp.split(" ");
+        long temp = 0L;
+        for (String idTemp : ids) {
+            temp = Long.parseLong(idTemp);
+            if (ticket.getId().equals(temp)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean isLow(Ticket ticket) {
+        String idsTemp = "3 5 9 10 11 12 13 21 22 23 26 27 35 37 42 44 45 50 56 79 90 107 119 121 122 123 134 143 178 303";
+        String[] ids = idsTemp.split(" ");
+        long temp = 0L;
+        for (String idTemp : ids) {
+            temp = Long.parseLong(idTemp);
+            if (ticket.getId().equals(temp)) {
+                return true;
+            }
+        }
+        return false;
     }
 }

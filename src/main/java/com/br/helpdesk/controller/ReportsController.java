@@ -6,12 +6,9 @@
 package com.br.helpdesk.controller;
 
 import com.Consts;
-import com.br.helpdesk.model.User;
-import com.br.helpdesk.repository.CategoryRepository;
 import com.br.helpdesk.service.ReportsService;
 import java.io.UnsupportedEncodingException;
 import java.util.Date;
-import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -23,7 +20,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 /**
  *
- * @author rafaelpossas
+ * @author andresulivam
  */
 @Controller
 @RequestMapping("/reports")
