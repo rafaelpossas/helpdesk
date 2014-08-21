@@ -829,15 +829,19 @@ Ext.define('Helpdesk.controller.Ticket', {
             } else {
                 ticketView.down('text#tktResponsible').setText(translations.NO_RESPONSIBLE);
             }
-
-            //text passos para reproduzir o erro
-            ticketView.down('text#tktSteps').setText(ticket.stepsTicket);
+                      
+            //text passos para reproduzir o erro            
+            ticketView.down('label#tktSteps').text = ticket.stepsTicket;
+            //passos pra reproduzir com a formatação original (quebra de linha, etc)
+            var steps = '<pre>' + ticket.stepsTicket + '</pre>';
+            ticketView.down('label#tktSteps').update(steps);
 
             //Remove todas as respostas do panel            
             ticketView.down('panel#tktAnswers').removeAll(true);
 
             //Recebe todas as respostas do ticket
             var answerStore = this.getTicketAnswersStore();
+            
             answerStore.proxy.url = 'ticket-answer/find-by-ticket/' + ticket.id;
             answerStore.load({
                 callback: function() {

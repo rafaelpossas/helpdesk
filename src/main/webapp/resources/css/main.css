@@ -380,6 +380,8 @@
 
 .description-ticket{    
     font-size: 15px;
+    overflow:auto;
+    white-space: pre-line;
 }
 .description-ticket-bold{
     font-weight: bold;
@@ -655,6 +657,7 @@
 }
 
 .answer-format{
+    
     overflow:auto;
     white-space: pre-line;
 }
