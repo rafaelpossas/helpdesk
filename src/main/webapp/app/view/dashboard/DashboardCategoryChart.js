@@ -8,7 +8,7 @@ Ext.define('Helpdesk.view.dashboard.DashboardCategoryChart', {
     axes: [{
             type: 'Numeric',
             position: 'left',
-            fields: ['ticketCount'],
+            fields: ['count'],
             label: {
                 renderer: Ext.util.Format.numberRenderer('0,0')
             },
@@ -18,7 +18,7 @@ Ext.define('Helpdesk.view.dashboard.DashboardCategoryChart', {
         }, {
             type: 'Category',
             position: 'bottom',
-            fields: ['category'],
+            fields: ['description'],
             title: translations.CATEGORIES
         }],
     series: [{
@@ -30,10 +30,10 @@ Ext.define('Helpdesk.view.dashboard.DashboardCategoryChart', {
                 width: 200,
                 height: 28,
                 renderer: function(storeItem, item) {
-                    if(storeItem.get('ticketCount')>1){
-                        this.setTitle(storeItem.get('category') + ': ' + storeItem.get('ticketCount') + ' Tickets'); 
+                    if(storeItem.get('count')>1){
+                        this.setTitle(storeItem.get('description') + ': ' + storeItem.get('count') + ' Tickets'); 
                     }else{
-                        this.setTitle(storeItem.get('category') + ': ' + storeItem.get('ticketCount') + ' Ticket');
+                        this.setTitle(storeItem.get('description') + ': ' + storeItem.get('count') + ' Ticket');
                     }                                      
                 }
             },
@@ -46,7 +46,7 @@ Ext.define('Helpdesk.view.dashboard.DashboardCategoryChart', {
                 color: '#1e62d0'
             },
             xField: 'category',
-            yField: 'ticketCount',            
+            yField: 'count',            
             renderer: function(sprite, record, attr, index, store){
                 return Ext.apply(attr, {
                     fill: '#1e62d0'

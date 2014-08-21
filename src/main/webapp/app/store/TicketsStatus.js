@@ -1,8 +1,8 @@
 Ext.define('Helpdesk.store.TicketsStatus', {
     extend: 'Ext.data.Store',
-    model: 'Helpdesk.model.TicketStatus',    
+    model: 'Helpdesk.model.DashboardValue',    
     requires: [
-        'Helpdesk.model.TicketStatus'
+        'Helpdesk.model.DashboardValue'
     ],
     autoLoad: false,
     constructor: function(config) {

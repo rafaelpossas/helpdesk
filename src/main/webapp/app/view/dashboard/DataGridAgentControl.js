@@ -3,7 +3,7 @@ Ext.define('Helpdesk.view.dashboard.DataGridAgentControl' ,{
     alias:'widget.datagridagent',
     store: 'TicketsOngoingAgent',
     columns: [
-        { header: translations.AGENT,  dataIndex: 'user', flex:1 },
-        { header: translations.IN_PROGRESS, dataIndex: 'ticketCount'}        
+        { header: translations.AGENT,  dataIndex: 'description', flex:1 },
+        { header: translations.IN_PROGRESS, dataIndex: 'count'}        
     ]
 });

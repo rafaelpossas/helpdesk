@@ -3,6 +3,7 @@ package com.br.helpdesk.controller;
 import com.Consts;
 import com.br.helpdesk.model.Attachments;
 import com.br.helpdesk.model.Category;
+import com.br.helpdesk.model.DashboardValue;
 import com.br.helpdesk.model.Priority;
 import com.br.helpdesk.model.Ticket;
 import com.br.helpdesk.model.User;
@@ -27,6 +28,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import javax.servlet.http.HttpServletResponse;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
@@ -350,4 +352,124 @@ public class TicketController {
     public void handleDataIntegrityViolationException(DataIntegrityViolationException ex, HttpServletResponse response) throws IOException {
         response.sendError(HttpServletResponse.SC_FORBIDDEN, ex.getMessage());
     }
+    
+    /**
+     * 
+     * Recebe os valores que geram os gráficos e informações na tela de dashboard     
+     */
+    @RequestMapping(value = "/dashboard-values", method = RequestMethod.GET)
+    public @ResponseBody List<DashboardValue> getValuesDashboard() {
+        
+        List<DashboardValue> valores = new ArrayList<DashboardValue>();        
+        List<User>users = userService.findAll();
+        Iterable<Category> categories = categoryService.findAll();
+        List<Ticket>tickets = ticketService.findAll();       
+        DashboardValue valor;
+        int count;
+        
+        //Recebe os valores de Tickets x Categoria
+        if(categories!=null){            
+            for(Category category:categories){
+                count = 0;
+                for(Ticket ticket:tickets){
+                    if(ticket.getCategory().getId() == category.getId()){
+                        count++;                        
+                    }
+                }
+                valor = new DashboardValue();
+                valor.setType("categoria-ticket");
+                valor.setCount(count);
+                valor.setDescription(category.getName());
+                valores.add(valor);                
+            }            
+        }
+        
+        //Recebe os valores dos status dos tickets (Abertos,fechados,sem responsável)
+        int countOpen = 0,countClosed = 0,countNoResp = 0,countOnGoing = 0,countOnGoingNoResp = 0;
+        for(Ticket ticket:tickets){
+            if(ticket.isIsOpen()){
+                countOpen++;
+            }else{
+                countClosed++;
+            }
+            if(ticket.getResponsible()==null){
+                countNoResp++;
+            }
+            if(ticket.getResponsible()==null && ticket.isIsOpen()== true){
+                countOnGoingNoResp++;
+            }  
+        }    
+        valor = new DashboardValue();
+        valor.setType("status-ticket");
+        valor.setDescription("Abertos");
+        valor.setCount(countOpen);
+        valores.add(valor);
+        
+        valor = new DashboardValue();
+        valor.setType("open-ticket");
+        valor.setDescription("Abertos");
+        valor.setCount(countOpen);
+        valores.add(valor);
+        
+        valor = new DashboardValue();
+        valor.setType("status-ticket");
+        valor.setDescription("Fechados");
+        valor.setCount(countClosed);
+        valores.add(valor);
+        
+        valor = new DashboardValue();
+        valor.setType("status-ticket");
+        valor.setDescription("Sem Responsável");
+        valor.setCount(countNoResp);
+        valores.add(valor);
+        
+        valor = new DashboardValue();
+        valor.setType("no-responsible-open");
+        valor.setDescription("Sem Responsável");
+        valor.setCount(countOnGoingNoResp);
+        valores.add(valor);
+        
+        //Recebe os valores de Tickets x Usuarios
+        
+        for (User user : users){
+            count = 0;
+            int countAgent = 0;
+            int countOpenTickets = 0;
+            for(Ticket ticket:tickets){
+                if(ticket.getUser()!=null && ticket.getUser().getId() == user.getId()){
+                    count++;
+                }
+                if(ticket.getUser()!=null && ticket.isIsOpen() && ticket.getUser().getId() == user.getId()){
+                    countOpenTickets++;
+                }
+                if(ticket.getResponsible()!=null && ticket.isIsOpen() && ticket.getResponsible().getId() == user.getId()){
+                    countAgent++;
+                }
+            }  
+            if(count>0){
+                valor = new DashboardValue();
+                valor.setType("user-ticket");
+                valor.setDescription(user.getName());
+                valor.setCount(count);
+                valores.add(valor);
+            }
+            if(countOpenTickets>0){
+                valor = new DashboardValue();
+                valor.setType("user-ticket-open");
+                valor.setDescription(user.getName());
+                valor.setCount(countOpenTickets);
+                valores.add(valor);
+            }
+            //Recebe os valores de Tickets x Agentes
+            if(countAgent>0){
+                valor = new DashboardValue();
+                valor.setType("agent-ticket");
+                valor.setDescription(user.getName());
+                valor.setCount(countAgent);
+                valores.add(valor);
+            }
+        }
+        
+        return valores;
+    }   
 }

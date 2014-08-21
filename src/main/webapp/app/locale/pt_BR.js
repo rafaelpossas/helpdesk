@@ -20,6 +20,7 @@ translations = {
     ALREADY_ADDED: ' já foi adicionado!',
     AGENT: 'Agente',
     ACTIVE: 'Ativo',
+    AGENT_TICKET:'agent-ticket',
     //############################################## [ B ] ##############################################//
 
     BACK: 'Voltar',
@@ -59,6 +60,7 @@ translations = {
     COMMENT_INTERNAL_BY: 'Comentário interno por',
     CLOSING_TICKET: 'Encerrando Ticket...',
     CHECK_ADDED_INFORMATIONS: 'Verifique as informações adicionadas!',
+    CATEGORY_TICKET:'categoria-ticket',
     
     //############################################## [ D ] ##############################################//
 
@@ -163,6 +165,7 @@ translations = {
     NAME_CLIENT: 'Nome do Cliente',
     NO: 'Não',
     NO_RESPONSIBLE: 'Sem responsável',
+    NO_RESPONSIBLE_OPEN:'no-responsible-open',
     NEWS: 'Novidades',
     NO_CATEGORY: 'Sem categoria',
     NO_PRIORITY: 'Sem Prioridade',
@@ -177,7 +180,8 @@ translations = {
     OPEN: 'Em aberto',
     OPEN_FROM: 'Em aberto',
     OPEN_TO: 'Em aberto',
-    OPEN_TICKET: 'Abrir ticket',    
+    OPEN_TICKET: 'Abrir ticket',
+    OPEN_TICKET_TITLE:'open-ticket',
     //############################################## [ P ] ##############################################//
 
     PASSWORD: 'Senha',
@@ -244,6 +248,7 @@ translations = {
     SELECT_A_PROFILE_PICTURE: 'Selecione uma foto de perfil',
     SHOW_ALL: '(Mostrar todas)',
     SITUATION: 'Situação',
+    STATUS_TICKET:'status-ticket',
     //############################################## [ T ] ##############################################//
 
     TICKETS: 'Tickets',
@@ -296,6 +301,8 @@ translations = {
     UPLOADING_FILES: 'Enviando arquivos..',
     UNIT: 'unidade',
     URGENT: 'Urgente',
+    USER_TICKET:'user-ticket',
+    USER_TICKET_OPEN:'user-ticket-open',
     //############################################## [ V ] ##############################################//
 
 

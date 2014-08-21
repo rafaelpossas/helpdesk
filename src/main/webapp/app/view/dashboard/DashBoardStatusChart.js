@@ -20,7 +20,7 @@ Ext.define('Helpdesk.view.dashboard.DashBoardStatusChart', {
                   width: 200,
                   height: 28,
                   renderer: function(storeItem, item) {                    
-                    this.setTitle(storeItem.get('name') + ': ' + storeItem.get('count') + ' Tickets');
+                    this.setTitle(storeItem.get('description') + ': ' + storeItem.get('count') + ' Tickets');
                   }
                 },
                 highlight: {
@@ -29,7 +29,7 @@ Ext.define('Helpdesk.view.dashboard.DashBoardStatusChart', {
                   }
                 },
                 label: {
-                    field: 'name',
+                    field: 'description',
                     display: 'rotate',
                     contrast: true,
                     font: '18px Arial'
