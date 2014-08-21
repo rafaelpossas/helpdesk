@@ -152,7 +152,7 @@ Ext.define('Helpdesk.view.ticket.TicketGrid', {
         }],
     // teste para verificar se o ticket no grid precisa ficar em negrito.
     testIsBold: function(record){
-        var userLastInteration = record.get('userLastInteration');
+        /*var userLastInteration = record.get('userLastInteration');
         var userLogged = Helpdesk.Globals.userLogged;
         var isOpen = record.get('isOpen');        
         var idUserLast = parseInt(userLastInteration.id);
@@ -178,7 +178,7 @@ Ext.define('Helpdesk.view.ticket.TicketGrid', {
                     }
                 }
             }            
-        }            
+        }*/            
         return false;
     },
     testStateTicket: function(record){

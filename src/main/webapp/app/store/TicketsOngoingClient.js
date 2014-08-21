@@ -1,8 +1,8 @@
 Ext.define('Helpdesk.store.TicketsOngoingClient', {
     extend: 'Ext.data.Store',
-    model: 'Helpdesk.model.TicketsByUser',
+    model: 'Helpdesk.model.DashboardValue',
     requires: [
-        'Helpdesk.model.TicketsByUser'
+        'Helpdesk.model.DashboardValue'
     ],
     autoLoad: false,
     constructor: function(config) {

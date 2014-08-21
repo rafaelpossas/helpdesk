@@ -21,6 +21,7 @@ translations = {
     AGENT: 'Agent',
     ACTIVE: 'Active',
     ANSWERED: 'Answered',
+    AGENT_TICKET:'agent-ticket',
     //############################################## [ B ] ##############################################//
 
     BACK: 'Back',
@@ -60,6 +61,7 @@ translations = {
     COMMENT_INTERNAL_BY: 'Comment internal by',
     CLOSING_TICKET: 'Closing Ticket...',
     CHECK_ADDED_INFORMATIONS: 'Check the added informations!',
+    CATEGORY_TICKET:'categoria-ticket',
     
     //############################################## [ D ] ##############################################//
 
@@ -164,6 +166,7 @@ translations = {
     NAME_CLIENT: 'Name of client',
     NO: 'No',
     NO_RESPONSIBLE: 'No responsible',
+    NO_RESPONSIBLE_OPEN:'no-responsible-open',
     NEWS: 'News',
     NO_CATEGORY: 'No category',
     NO_PRIORITY: 'No priority',
@@ -180,6 +183,7 @@ translations = {
     OPEN_TO: 'Open',
     OPEN_TICKET: 'Open ticket',
     ONLY_UPLOAD_IMAGES: 'You can only upload image files',
+    OPEN_TICKET_TITLE:'open-ticket',
     //############################################## [ P ] ##############################################//
 
     PASSWORD: 'Password',
@@ -246,6 +250,7 @@ translations = {
     SELECT_A_PROFILE_PICTURE: 'Select a profile picture',
     SHOW_ALL: '(Show all)',
     SITUATION: 'Situation',
+    STATUS_TICKET:'status-ticket',
     //############################################## [ T ] ##############################################//
 
     TICKETS: 'Tickets',
@@ -297,6 +302,8 @@ translations = {
     UPLOADING_FILES: 'Uploading files..',
     UNIT: 'unit',
     URGENT: 'Urgent',
+    USER_TICKET:'user-ticket',
+    USER_TICKET_OPEN:'user-ticket-open',
     //############################################## [ V ] ##############################################//
 
 

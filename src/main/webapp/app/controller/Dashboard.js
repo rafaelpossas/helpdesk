@@ -6,7 +6,8 @@ Ext.define('Helpdesk.controller.Dashboard', {
         'Helpdesk.store.TicketsStatus',
         'Helpdesk.store.Categories',
         'Helpdesk.store.TicketsOngoingClient',
-        'Helpdesk.store.TicketsOngoingAgent'
+        'Helpdesk.store.TicketsOngoingAgent',
+        'Helpdesk.store.DashboardValues'
 
     ],
     extend: 'Ext.app.Controller',
@@ -18,7 +19,8 @@ Ext.define('Helpdesk.controller.Dashboard', {
         'TicketsByCategory',
         'Categories',
         'TicketsOngoingClient',
-        'TicketsOngoingAgent'
+        'TicketsOngoingAgent',
+        'DashboardValues'
     ],
     views: [
         'dashboard.Dashboard',
@@ -144,243 +146,64 @@ Ext.define('Helpdesk.controller.Dashboard', {
      * @returns {undefined}
      * Call the methods that sets the view
      */
-    setChartsAndView: function(form) {
-        this.setCharUsers();
-        this.setChartTicketsStatus();
-        this.setChartCategory();
-        this.setView(form);
-        this.setInformationTable();
-    },
-    /**
-     * 
-     * @returns {undefined}
-     * Sets the values from the table of users
-     */
-    setInformationTable: function() {        
-        var countResp = 0;
-        var countOnGoing = 0;
-        var form = this.getTableTicket().down('tableticket');
+    setChartsAndView: function() {
+        
+        var categoryStore = this.getTicketsByCategoryStore();
+        var userStore = this.getTicketsFromUserStore();
+        var statusTickets = this.getTicketsStatusStore();
+        var clientsStore = this.getTicketsOngoingClientStore();
+        var agentStore = this.getTicketsOngoingAgentStore();
+        var form = this.getTableTicket().down('tableticket');               
+        var store = this.getDashboardValuesStore();
+        this.getTableTicket().setLoading(translations.LOADING);
         var scope = this;
-        var store = this.getTicketsStore();        
+        
+        //Reseta o conteúdo das stores
+        categoryStore.removeAll();
+        userStore.removeAll();
+        statusTickets.removeAll();
+        clientsStore.removeAll();
+        agentStore.removeAll();
+        store.removeAll();
+        
         store.load({
-            callback: function() {
-                for (var i = 0; i < store.getCount(); i++) {  
-                    var ticket = store.data.items[i].data;
-                    if (ticket.responsible === null && ticket.isOpen) {
-                        countResp++;
-                    }
-                    if(ticket.isOpen && ticket.responsible !== null){                       
-                        countOnGoing++;                                                                   
-                    }
-                }                
-                if (countResp === 0) {
-                    form.down('panel#noRespHtml').update('0');
-                } else {
-                    form.down('panel#noRespHtml').update(countResp);
-                }
-                
-                if (countOnGoing === 0) {
-                    form.down('panel#noRespLate').update('0');
-                } else {
-                    form.down('panel#noRespLate').update(countOnGoing);
-                }
-                //Alimenta a store dos data grids
-                scope.setDataGridsTable(store);
-            }
-        });
-    },
-    /**
-     * 
-     * @param {type} ticketsStore
-     * @returns {undefined}
-     * Sets the values from the grids of clients and agents
-     */
-    setDataGridsTable: function(ticketsStore) {
-        var userStore = this.getUsersStore();        
-        var scope = this;
-        userStore.load({
-            callback: function() {
-                scope.getTableTicket().down('datagridagent').getStore().removeAll();
-                scope.getTableTicket().down('datagridclient').getStore().removeAll();
-                var userTemp;
-                var ticketTemp;
-                for (var i = 0; i < userStore.getCount(); i++) {
-                    var countAgent = 0;
-                    var countClient = 0;
-                    userTemp = userStore.data.items[i].data;
-                    for (var k = 0; k < ticketsStore.getCount(); k++) {
-                        ticketTemp = ticketsStore.data.items[k].data;
-                        if (ticketTemp.isOpen === true) {
-                            if (userTemp.userGroup.id == Helpdesk.Globals.idAdminGroup) {
-                                if (ticketTemp.responsible !== null && ticketTemp.responsible.id === userTemp.id) {
-                                    countAgent++;
-                                }
-                            } else {
-                                if (ticketTemp.user.id === userTemp.id) {
-                                    countClient++;
-                                }
-                            }
-                        }
-                    }
-                    var object = new Helpdesk.model.TicketsByUser();
-                    object.data.user = userTemp.name;
-                    if (userTemp.userGroup.id == Helpdesk.Globals.idAdminGroup) {
-                        object.data.ticketCount = countAgent;
-                        scope.getTableTicket().down('datagridagent').getStore().add(object);
-                    }
-                    else if (countClient > 0) {
-                        object.data.ticketCount = countClient;
-                        scope.getTableTicket().down('datagridclient').getStore().add(object);
+            callback:function(){
+                //Seta a store de Tickets x Category                
+                for(var i=0;i<store.getCount();i++){
+                    if(store.data.items[i].data.type === translations.CATEGORY_TICKET){
+                        categoryStore.add(store.data.items[i].data);                        
                     }                    
-                }
-            }
-        });
-    },
-    /**
-     * 
-     * @returns {undefined}
-     * Sets the values from the categories chart
-     */
-    setChartCategory: function() {
-
-        var store = this.getTicketsByCategoryStore();
-        store.removeAll(true);
-        var storeCategories = this.getCategoriesStore();
-        var storeTicket = this.getTicketsStore();
-        storeTicket.load({
-            callback: function() {
-                storeCategories.load({
-                    callback: function() {
-                        for (var i = 0; i < storeCategories.getCount(); i++) {
-                            var count = 0;
-                            for (var k = 0; k < storeTicket.getCount(); k++) {
-                                if (storeCategories.data.items[i].data.id === storeTicket.data.items[k].data.category.id) {
-                                    count++;
-                                }
-                            }
-                            var object = new Helpdesk.model.TicketByCategory();
-                            object.data.category = storeCategories.data.items[i].data.name;
-                            object.data.ticketCount = count;
-                            if (storeCategories.data.items[i].data.name !== 'NO_CATEGORY') {
-                                store.add(object);
-                            }
-                        }
+                    //Seta a store de tickets x users                
+                    if(store.data.items[i].data.type === translations.USER_TICKET){
+                        userStore.add(store.data.items[i].data);                         
+                    }                    
+                    //Seta a store de status x tickets                    
+                    if(store.data.items[i].data.type === translations.STATUS_TICKET){
+                        statusTickets.add(store.data.items[i].data);                        
+                    }                    
+                    //Seta a store de Agent x tickets                    
+                    if(store.data.items[i].data.type === translations.AGENT_TICKET){
+                        agentStore.add(store.data.items[i].data);                        
+                    }                    
+                    //Seta a store de User x tickets                    
+                    if(store.data.items[i].data.type === translations.USER_TICKET_OPEN){
+                        clientsStore.add(store.data.items[i].data);                        
                     }
-                });
-            }
-        });
-
-    },
-    /**
-     * 
-     * @param {type} form
-     * @returns {undefined}
-     * Sets the information of the users in the view
-     */
-    setView: function(form) {
-        var count = 0;
-        var store = this.getUsersStore();
-        store.load({
-            callback: function() {
-                for (var i = 0; i < store.getCount(); i++) {
-                    if (store.data.items[i].data.userGroup.id == Helpdesk.Globals.idAdminGroup) {
-                        count++;
+                    //Seta a store de tickets sem responsável
+                    if(store.data.items[i].data.type === translations.NO_RESPONSIBLE_OPEN){                        
+                        form.down('panel#noRespHtml').update(store.data.items[i].data.count);
+                    }
+                    //Seta a store de tickets em andamento
+                    if(store.data.items[i].data.type === translations.OPEN_TICKET_TITLE){                        
+                        form.down('panel#noRespLate').update(store.data.items[i].data.count);
                     }
                 }
-//                if (count === 0 || count === 1) {
-//                    form.down('#txtDescriptionPlan').setText('Utilizando ' + count + " usuário");
-//                } else {
-//                    form.down('#txtDescriptionPlan').setText('Utilizando ' + count + " usuários");
-//                }
+                scope.getTableTicket().setLoading(false,false);
+                
             }
-        });
-    },
-    /**
-     * @author Ricardo
-     * @returns {undefined}
-     * 
-     * Configura a store que alimenta o gráfico de tickets por pessoa
-     *
-     */
-    setCharUsers: function() {
-        //seta a view           
-
-        var ticketsFromUserStore = this.getTicketsFromUserStore();
-        ticketsFromUserStore.removeAll(true);
-        var ticketsStore = this.getTicketsStore();
-        var usersStore = this.getUsersStore().load({
-            callback: function() {
-                ticketsStore.load({
-                    callback: function() {
-                        for (var i = 0; i < usersStore.getCount(); i++) {
-                            var object = new Helpdesk.model.TicketsByUser();
-                            object.data.user = usersStore.data.items[i].data.name;
-                            var count = 0;
-                            for (var k = 0; k < ticketsStore.getCount(); k++) {
-                                if (usersStore.data.items[i].data.id === ticketsStore.data.items[k].data.user.id) {
-                                    count++;
-                                }
-                            }
-                            object.data.ticketCount = count;
-                            ticketsFromUserStore.add(object);
-                        }
-                    }
-                });
-            }
-        });
-    },
-    /**
-     * 
-     * @returns {undefined}
-     * Sets the ticket's status chart
-     */
-    setChartTicketsStatus: function() {
-        //seta a view
-        //this.getDashboardView().getLayout().setActiveItem(Helpdesk.Globals.status_ticket);
-
-        var opened = 0;
-        var closed = 0;
-        var noResponsible = 0;
-
-        var store = this.getTicketsStatusStore();
-        store.removeAll(true);
-
-        var ticketsStore = this.getTicketsStore();
-        ticketsStore.load({
-            /*params:{
-             user: Helpdesk.Globals.userLogged.userName
-             },*/
-            callback: function() {
-                for (var k = 0; k < ticketsStore.getCount(); k++) {
-                    if (ticketsStore.data.items[k].data.isOpen === true) {
-                        opened++;
-                    } else if (ticketsStore.data.items[k].data.isOpen === false) {
-                        closed++;
-                    }
-                    if (ticketsStore.data.items[k].data.responsible === null) {
-                        noResponsible++;
-                    }
-                }
-
-                var modelOpen = new Helpdesk.model.TicketStatus();
-                modelOpen.data.name = translations.OPENED;
-                modelOpen.data.count = opened;
-                store.add(modelOpen);
-
-                var modelNoResponsible = new Helpdesk.model.TicketStatus();
-                modelNoResponsible.data.name = translations.NO_RESPONSIBLE;
-                modelNoResponsible.data.count = noResponsible;
-                store.add(modelNoResponsible);
-
-                var modelClosed = new Helpdesk.model.TicketStatus();
-                modelClosed.data.name = translations.CLOSED;
-                modelClosed.data.count = closed;
-                store.add(modelClosed);
-
-                ticketsStore.proxy.url = 'ticket';
-            }
-        });
-    },
+        });       
+       
+    },     
     backToDefaultStore: function(scope) {
         scope.getTicketPanel().getStore().proxy.url = 'ticket';
     }
