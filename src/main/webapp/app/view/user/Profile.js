@@ -6,11 +6,12 @@
 Ext.define('Helpdesk.view.user.Profile', {
     extend: 'Ext.window.Window',
     alias: 'widget.profile',
-    height: 350,
+    height: 380,
     width: 550,
     requires: ['Helpdesk.util.Util','Helpdesk.view.user.UserForm'],
     scope: this,
     itemId: 'profileWindow',
+    modal: true,
     layout: {
         type: 'fit'
     },

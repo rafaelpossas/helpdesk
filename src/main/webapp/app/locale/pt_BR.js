@@ -62,6 +62,7 @@ translations = {
     CLOSING_TICKET: 'Encerrando Ticket...',
     CHECK_ADDED_INFORMATIONS: 'Verifique as informações adicionadas!',
     CATEGORY_TICKET:'categoria-ticket',
+    CHANGED_WITH_SUCCESS: 'Alterado com sucesso',
     
     //############################################## [ D ] ##############################################//
 
@@ -91,6 +92,7 @@ translations = {
     EVOLUTION_TICKETS_BY_CLIENT: 'Evolução dos tickets pelo cliente',
     EVOLUTION_TICKETS_BY_USER: 'Evolução dos tickets pelo usuário',
     ESTIMATED_TIME_CHANGED_FROM: 'Prazo estimado alterado de ',
+    EXPIRED: 'Expirado?',
     //############################################## [ F ] ##############################################//
 
     FIRST_TIME_REQUESTING_SERVICE: 'Solicitando Atendimento pela primeira vez?',
@@ -188,8 +190,9 @@ translations = {
     //############################################## [ P ] ##############################################//
 
     PASSWORD: 'Senha',
-    PASSWORD_CHECK: 'Confirmar Senha',
+    PASSWORD_CHECK: 'Confirmar',
     PASSWORD_NOT_MATCH: 'Senhas não conferem',
+    PASSWORD_CHANGED_WITH_SUCCESS:  'Senha alterada com sucesso',
     PICTURE: 'Imagem',
     PORTUGUESE: 'Português',
     PROCYMO_LOGO: '/resources/img/logoProcymo.png',

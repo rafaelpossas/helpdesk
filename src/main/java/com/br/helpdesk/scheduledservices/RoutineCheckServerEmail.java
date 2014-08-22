@@ -17,7 +17,7 @@ public class RoutineCheckServerEmail {
     @Autowired
     private EmailService emailService;
 
-    @Scheduled(fixedDelay=(1000*60)*5)
+    @Scheduled(initialDelay=(1000*60)*5, fixedDelay=(1000*60)*5)
     public void checkServerEmails() throws MessagingException {
         emailService.readEmails();
     }

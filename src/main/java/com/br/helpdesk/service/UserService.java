@@ -48,6 +48,10 @@ public class UserService {
         user = (User) removePassword(null, user);
         return user;
     }
+    public User findByUserNameWithPassword(String userName){
+        User user = repository.findByUserName(userName);
+        return user;
+    }
 
     public User findById(Long codigo) {
         User user = repository.findOne(codigo);

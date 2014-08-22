@@ -35,6 +35,9 @@ Ext.define('Helpdesk.controller.Login', {
             'loginform button#submit': {
                 click: this.onSubmit
             },
+            'credentialsexpiredwindow button#submit_credentials':{
+                click: this.onSubmitCredentials
+            },
             'loginform form textfield': {
                 specialkey: this.onTextfieldSpecialKey
             },
@@ -78,9 +81,27 @@ Ext.define('Helpdesk.controller.Login', {
             submitBtn.fireEvent('click', submitBtn, e, options);
         }
     },
-    onSubmit: function(button, e, options) {
-        console.log('login');
-        var form = button.up('form');
+    onSubmitCredentials: function(button, e, options){
+        var formCredentials = button.up('form');
+        var formLogin = Ext.ComponentQuery.query('#mainform')[0];
+        var user = formLogin.getForm().findField('username').getValue();
+        var newPassword = formCredentials.getForm().findField('new_password').getValue();
+        formCredentials.getForm().findField('user').setValue(user);
+        formCredentials.submit({
+            success: function(obj, action){
+                Ext.ComponentQuery.query('credentialsexpiredwindow')[0].close();
+                formLogin.getForm().findField('password').setValue(newPassword);
+                var submitButton = Ext.ComponentQuery.query('loginform button#submit')[0];
+                submitButton.fireEvent('click',submitButton);
+                
+            },
+            failure: function(form,action){
+                console.log("User Changed Failed");
+            }
+        });
+    },
+    loginSubmit: function(form){
+        console.log("loginSubmit");
         var formTopElement = Ext.get(form.getEl()); // Busca pelo elemento superior que representa o componente (Neste caso o PANEL)
         formTopElement.mask(translations.AUTHENTICATING, 'loading'); // Adiciona a máscara de carregamento 
         form.submit({
@@ -94,27 +115,33 @@ Ext.define('Helpdesk.controller.Login', {
                 var obj = Ext.JSON.decode(action.response.responseText);
                 if (action.failureType === 'server') {
                     var translatedError = "";
-                    if (obj.error === 'badcredentials') {
-                        translatedError = translations.BAD_CREDENTIALS;
-                    }
                     if (obj.error === 'credentialsexpired') {
-                        translatedError = translations.CREDENTIALS_EXPIRED;
+                        var credentialsExpiredWindow = Ext.create('Helpdesk.view.user.CredentialsExpiredWindow');
+                        credentialsExpiredWindow.show();
+                        
+                    } else{
+                        if (obj.error === 'badcredentials') {
+                            translatedError = translations.BAD_CREDENTIALS;
+                        }
+                        if (obj.error === 'accountlocked') {
+                            translatedError = translations.ACCOUNT_LOCKED;
+                        }
+                        if (obj.error === 'accountdisabled') {
+                            translatedError = translations.ACCOUNT_DISABLED;
+                        }
+                        Ext.Msg.alert(translations.LOGIN_FAILED, translatedError);
                     }
-                    if (obj.error === 'accountlocked') {
-                        translatedError = translations.ACCOUNT_LOCKED;
-                    }
-                    if (obj.error === 'accountdisabled') {
-                        translatedError = translations.ACCOUNT_DISABLED;
-                    }
-                    Ext.Msg.alert(translations.LOGIN_FAILED, translatedError);
                 } else {
                     Ext.Msg.alert(translations.ERROR, translations.CONNECTING_ERROR);
 
                 }
-                              
-                form.reset();
             }
         });
+    },
+    onSubmit: function(button, e, options) {
+        var form = button.up('form');
+        this.loginSubmit(form);
+
     },
     onButtonClickSignIn: function(button, e, options) {
         var win = Ext.create('Ext.window.Window', {

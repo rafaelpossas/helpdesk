@@ -160,6 +160,9 @@ Ext.define('Helpdesk.controller.User', {
             
             var checkState = form.down('checkbox#checkState');
             record.data.isEnabled = checkState.value;
+            
+            var expiredState = form.down('checkbox#expiredState');
+            record.data.credentialsNonExpired = !expiredState.value;
 
             var image = form.down('image#selectedImage');
             record.data.picture = image.src;
@@ -232,13 +235,12 @@ Ext.define('Helpdesk.controller.User', {
             clientCombo.setValue(clientRecord);
 
             var checkState = form.down('checkbox#checkState');
-
-            if (record.get('isEnabled') === false) {
-                checkState.setValue(false);
-            } else {
-                checkState.setValue(true);
-            }
-
+            checkState.setValue(record.get('isEnabled'));
+            
+            var isExpiredState = form.down('checkbox#expiredState');
+            isExpiredState.setValue(!record.get('credentialsNonExpired'));
+            
+            
             if (record.get('picture')) { //#4
                 var img = editWindow.down('image');
                 img.setSrc(record.get('picture'));

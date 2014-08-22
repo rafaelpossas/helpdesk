@@ -51,6 +51,10 @@ public class User implements Serializable{
     private Boolean isEnabled;
     
     @Basic
+    @Column(name="CREDENTIALSNONEXPIRED", columnDefinition="boolean default true")
+    private Boolean credentialsNonExpired;
+    
+    @Basic
     @Column(name="EMAIL")
     private String email;
     
@@ -205,6 +209,20 @@ public class User implements Serializable{
 
     public void setPicture(String picture) {
         this.picture = picture;
+    }
+
+    /**
+     * @return the credentialsNonExpired
+     */
+    public Boolean getCredentialsNonExpired() {
+        return credentialsNonExpired;
+    }
+
+    /**
+     * @param credentialsNonExpired the credentialsNonExpired to set
+     */
+    public void setCredentialsNonExpired(Boolean credentialsNonExpired) {
+        this.credentialsNonExpired = credentialsNonExpired;
     }
     
 }

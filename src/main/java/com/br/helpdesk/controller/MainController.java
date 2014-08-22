@@ -14,6 +14,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import org.json.JSONObject;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -38,6 +40,15 @@ public class MainController {
     @Resource
     private UserGroupRepository userGroupRepository;
     
+    @RequestMapping(value="/credentials",method = RequestMethod.POST)
+    public void saveCredentials(HttpServletRequest request, HttpServletResponse response){
+        String newPassword = request.getParameter("new_password");
+        String userString = request.getParameter("user");
+        User user = userRepository.findByUserName(userString);
+        user.setCredentialsNonExpired(Boolean.TRUE);
+        user.setPassword(newPassword);
+        userRepository.save(user);
+    }
     @RequestMapping(value="/login",method = RequestMethod.POST)
     @ResponseBody
     public User createFromLogin(@RequestBody String user) {

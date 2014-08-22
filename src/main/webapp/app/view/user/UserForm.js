@@ -57,7 +57,6 @@ Ext.define('Helpdesk.view.user.UserForm', {
                     id: 'confirmPasswordUser',
                     inputType: 'password',
                     fieldLabel: translations.PASSWORD_CHECK,
-                    labelWidth: 110,
                     vtype: 'password',
                     name: 'confirmPassword',
                     initialPassField: 'firstPass'
@@ -97,12 +96,6 @@ Ext.define('Helpdesk.view.user.UserForm', {
 
                 },
                 {
-                    xtype: 'checkbox',
-                    fieldLabel: translations.ACTIVE,
-                    beforeLabelTextTpl: '',
-                    id: 'checkState'
-                },
-                {
                     xtype: 'filefield',
                     id: 'imgprofile',
                     fieldLabel: translations.PICTURE,
@@ -116,6 +109,18 @@ Ext.define('Helpdesk.view.user.UserForm', {
                             parent.onFileChange(view, value, eOpts);
                         }
                     }
+                },
+                {
+                    xtype: 'checkbox',
+                    fieldLabel: translations.ACTIVE,
+                    beforeLabelTextTpl: '',
+                    id: 'checkState'
+                },
+                {
+                    xtype: 'checkbox',
+                    fieldLabel: translations.EXPIRED,
+                    beforeLabelTextTpl: '',
+                    id: 'expiredState'
                 }
             ]
         },
