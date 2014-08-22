@@ -44,6 +44,9 @@ Ext.define('Helpdesk.controller.Login', {
             'loginform form textfield[id=password]': {
                 keypress: this.onTextfieldKeyPress
             },
+            'credentialsexpiredwindow form textfield': {
+                keypress: this.onTextfieldSpecialKey
+            },
             '#signIn': {
                 click: this.onButtonClickSignIn
             },
@@ -77,8 +80,13 @@ Ext.define('Helpdesk.controller.Login', {
     },
     onTextfieldSpecialKey: function(field, e, options) {
         if (e.getKey() === e.ENTER) {
-            var submitBtn = field.up('form').down('button#submit'); // Pega o elemento pai para depois buscar a referência ao botão
-            submitBtn.fireEvent('click', submitBtn, e, options);
+            var submitBtn = field.up('form').down('button#submit');// Pega o elemento pai para depois buscar a referência ao botão
+            var submitCredencials = Ext.ComponentQuery.query('credentialsexpiredwindow button#submit_credentials')[0];
+            if(submitBtn!== null)
+                submitBtn.fireEvent('click', submitBtn, e, options);
+            
+            if(submitCredencials !== null)
+                submitCredencials.fireEvent('click', submitCredencials, e, options);
         }
     },
     onSubmitCredentials: function(button, e, options){
@@ -86,19 +94,25 @@ Ext.define('Helpdesk.controller.Login', {
         var formLogin = Ext.ComponentQuery.query('#mainform')[0];
         var user = formLogin.getForm().findField('username').getValue();
         var newPassword = formCredentials.getForm().findField('new_password').getValue();
-        formCredentials.getForm().findField('user').setValue(user);
-        formCredentials.submit({
-            success: function(obj, action){
-                Ext.ComponentQuery.query('credentialsexpiredwindow')[0].close();
-                formLogin.getForm().findField('password').setValue(newPassword);
-                var submitButton = Ext.ComponentQuery.query('loginform button#submit')[0];
-                submitButton.fireEvent('click',submitButton);
-                
-            },
-            failure: function(form,action){
-                console.log("User Changed Failed");
-            }
-        });
+        var confirmPassword = formCredentials.getForm().findField('confirm_password').getValue();
+        if(newPassword !== confirmPassword){
+            Ext.Msg.alert(translations.ERROR, translations.PASSWORD_NOT_MATCH);
+        }else{
+            formCredentials.getForm().findField('user').setValue(user);
+            formCredentials.submit({
+                success: function(obj, action){
+                    Ext.ComponentQuery.query('credentialsexpiredwindow')[0].close();
+                    formLogin.getForm().findField('password').setValue(newPassword);
+                    var submitButton = Ext.ComponentQuery.query('loginform button#submit')[0];
+                    submitButton.fireEvent('click',submitButton);
+
+                },
+                failure: function(form,action){
+                    console.log("User Changed Failed");
+                }
+            });
+        }
+
     },
     loginSubmit: function(form){
         console.log("loginSubmit");
@@ -113,18 +127,15 @@ Ext.define('Helpdesk.controller.Login', {
             failure: function(form, action) {
                 formTopElement.unmask(); // Remove máscara de carregamento  
                 var obj = Ext.JSON.decode(action.response.responseText);
+                console.log(action);
                 if (action.failureType === 'server') {
                     var translatedError = "";
-                    if (obj.error === 'credentialsexpired') {
+                    if (obj.error === 'credentialsexpired' || obj.error === 'accountlocked') {
                         var credentialsExpiredWindow = Ext.create('Helpdesk.view.user.CredentialsExpiredWindow');
                         credentialsExpiredWindow.show();
-                        
                     } else{
                         if (obj.error === 'badcredentials') {
                             translatedError = translations.BAD_CREDENTIALS;
-                        }
-                        if (obj.error === 'accountlocked') {
-                            translatedError = translations.ACCOUNT_LOCKED;
                         }
                         if (obj.error === 'accountdisabled') {
                             translatedError = translations.ACCOUNT_DISABLED;

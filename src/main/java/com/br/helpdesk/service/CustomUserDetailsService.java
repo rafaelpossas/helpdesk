@@ -34,14 +34,13 @@ public class CustomUserDetailsService implements UserDetailsService {
         }
         try {
             boolean accountNonExpired = true;
-            boolean accountNonLocked = true;
             return new org.springframework.security.core.userdetails.User(
                             user.getUserName(), 
                             user.getPassword(),
                             user.getIsEnabled(),
                             accountNonExpired,
                             user.getCredentialsNonExpired(),
-                            accountNonLocked,
+                            user.getCredentialsNonExpired(),
                             getRoles());
 
         } catch (Exception e) {
