@@ -75,5 +75,5 @@
     <servlet-mapping>
             <servlet-name>extjs4-file-upload-spring</servlet-name>
             <url-pattern>*.action</url-pattern>
-    </servlet-mapping>    
+    </servlet-mapping> 
 </web-app>

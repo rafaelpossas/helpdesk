@@ -68,13 +68,20 @@ Ext.define('Helpdesk.view.ticket.Ticket', {
                                  padding:'70 10 0 0'
                                },
                                {
-                                   xtype:'combobox',
-                                   itemId:'cmbSearch',
-                                   text:translations.SEARCH,
-                                   hideTrigger:true,
+                                   xtype:'textfield',
+                                   itemId:'searchBox',
                                    width:200,
                                    padding:'70 0 0 0'
-                               } 
+                                   
+                               }
+//                               {
+//                                   xtype:'combobox',
+//                                   itemId:'cmbSearch',
+//                                   text:translations.SEARCH,
+//                                   hideTrigger:true,
+//                                   width:200,
+//                                   padding:'70 0 0 0'
+//                               } 
                            ]
                        }                        
                        ,{

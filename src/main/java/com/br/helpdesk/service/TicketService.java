@@ -1,5 +1,6 @@
 package com.br.helpdesk.service;
 
+import com.Consts;
 import com.br.helpdesk.model.Ticket;
 import com.br.helpdesk.model.User;
 import com.br.helpdesk.repository.TicketRepository;
@@ -12,6 +13,7 @@ import javax.annotation.Resource;
 import org.apache.commons.collections.IteratorUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
@@ -309,4 +311,44 @@ public class TicketService {
         return list;
     }
 
+    public Page<Ticket> searchTickets(User user,String searchTerm,String typeSearch,PageRequest pageRequest){
+        boolean superuser = false;
+        if (user.getUserGroup().getId() == Consts.ADMIN_GROUP_ID) {//SUPERUSER
+            superuser = true;
+        }
+        
+        if(typeSearch.equals("all")){
+            if(superuser){
+                return repository.searchType1Superuser(searchTerm,pageRequest);   
+            }
+            else{
+                return repository.searchType1(user.getId(),searchTerm,pageRequest);       
+            }              
+        }
+        else if(typeSearch.equals("mytickets")){
+            return repository.searchType2(user.getId(),searchTerm,pageRequest); 
+        }
+        else if(typeSearch.equals("withoutresponsible")){
+            return repository.searchType3(searchTerm,pageRequest); 
+        }
+        else if(typeSearch.equals("opened")){
+            if(superuser){
+                return repository.searchType4(true,searchTerm,pageRequest); 
+            }
+            else{
+                return repository.searchType5(user.getId(),true,searchTerm,pageRequest); 
+            }
+        }
+        else if(typeSearch.equals("closed")){
+            if(superuser){
+                return repository.searchType6(false,searchTerm,pageRequest); 
+            }
+            else{
+                return repository.searchType5(user.getId(),false,searchTerm,pageRequest); 
+            }
+        }
+        
+        return null;
+       
+    }
 }

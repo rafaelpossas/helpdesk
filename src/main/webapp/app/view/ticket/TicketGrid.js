@@ -2,7 +2,7 @@ Ext.define('Helpdesk.view.ticket.TicketGrid', {
     extend: 'Ext.grid.Panel',
     alias: 'widget.ticketgrid',
     store: 'Tickets',
-    requires: ['Helpdesk.store.Tickets'],
+    requires: ['Helpdesk.store.Tickets', 'Helpdesk.util.PagingToolBar'],
     border: 0,
     cls: 'grid-style-header',
     scope: this,
@@ -137,22 +137,14 @@ Ext.define('Helpdesk.view.ticket.TicketGrid', {
         }
     },
     dockedItems: [{
-            xtype: 'pagingtoolbar',
-            itemId: 'dockedItem',
-            store: 'Tickets',
+            xtype: 'custompagingtoolbar',
             dock: 'bottom',
-            displayInfo: true,
-            margin: '0 0 30 0',
-            listeners: {
-                afterrender: function() {
-                    this.child('#refresh').hide();
-                }
-            }
+            margin: '0 0 30 0'
+    }],
 
-        }],
     // teste para verificar se o ticket no grid precisa ficar em negrito.
     testIsBold: function(record){
-        /*var userLastInteration = record.get('userLastInteration');
+        var userLastInteration = record.get('userLastInteration');
         var userLogged = Helpdesk.Globals.userLogged;
         var isOpen = record.get('isOpen');        
         var idUserLast = parseInt(userLastInteration.id);
@@ -178,7 +170,7 @@ Ext.define('Helpdesk.view.ticket.TicketGrid', {
                     }
                 }
             }            
-        }*/            
+        }          
         return false;
     },
     testStateTicket: function(record){

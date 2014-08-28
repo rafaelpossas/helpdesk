@@ -18,6 +18,8 @@ import java.io.File;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -31,6 +33,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.data.domain.PageRequest;
@@ -332,6 +335,52 @@ public class TicketController {
         return ticket;
     }
 
+    @RequestMapping(value = {"/save_without_email_routine", "/save_without_email_routine/{id}"}, method = {RequestMethod.POST, RequestMethod.PUT}, params = {"user"})
+    @ResponseBody
+    public Ticket saveWithoutEmailRoutine(@RequestBody Ticket ticket, @RequestParam(value = "user") String username) throws IOException {
+        User user = userService.findByUserName(username);
+        List<File> filesToSave = attachmentsService.getAttachmentsFromUser(username);
+
+        List<String> emails = new ArrayList<String>();
+        Ticket olderTicket = null;
+
+        if (!(ticket.getId() == null)) {
+            olderTicket = ticketService.findById(ticket.getId());
+        } else {
+            ticket.setStartDate(new Date());
+        }
+
+        if (ticket.getPriority() == null) {
+            //buscando 'sem prioridade'
+            Priority priority = priorityService.findById(1L);
+            ticket.setPriority(priority);
+        }
+        //buscando novamente a categoria no banco porque o valor do 'name' está vindo do extjs com o valor de translations
+        Category category = categoryService.findById(ticket.getCategory().getId());
+        ticket.setCategory(category);
+        if (olderTicket == null) {            
+            ticket.setLastInteration(ticket.getStartDate());
+            ticket.setUserLastInteration(ticket.getUser());
+        }
+        ticket = ticketService.save(ticket);
+
+        if (olderTicket != null) {            
+            changesTicketController.save(olderTicket, ticket, user);
+        }
+
+        Attachments attachment = null;
+        for (File file : filesToSave) {
+            attachment = new Attachments();
+            attachment.setName(file.getName());
+            attachment.setByteArquivo(attachmentsService.getBytesFromFile(file));
+            attachment.setTicket(ticket);
+            attachmentsService.save(attachment);
+            file.delete();
+        }
+        return ticket;
+    }
+
+    
     public PageRequest getPageRequest(int limit, int start) {
         int pageSize = limit - start;
         int page;
@@ -342,7 +391,19 @@ public class TicketController {
         }
         return new PageRequest(page, pageSize);
     }
-
+    
+    @RequestMapping(value = "/search", method = RequestMethod.GET, params = {"user","searchterm","typesearch","start", "limit"})
+    public @ResponseBody Page<Ticket> getTicketsBySearch( @RequestParam(value = "user") String username,
+            @RequestParam(value = "searchterm") String searchTerm,
+            @RequestParam(value = "typesearch") String typeSearch,
+            @RequestParam(value = "start") int start, 
+            @RequestParam(value = "limit") int limit) throws UnsupportedEncodingException {
+        PageRequest pageRequest = getPageRequest(limit, start);
+        searchTerm = new String(searchTerm.getBytes(), "UTF-8"); 
+        User user = this.userService.findByUserName(username);
+        return ticketService.searchTickets(user,searchTerm,typeSearch,pageRequest);
+    }
+    
     @ExceptionHandler(EntityNotFoundException.class)
     @ResponseStatus(value = HttpStatus.NOT_FOUND, reason = "Entidade não encontrada")
     public void handleEntityNotFoundException(Exception ex) {

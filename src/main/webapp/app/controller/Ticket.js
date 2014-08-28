@@ -58,6 +58,12 @@ Ext.define('Helpdesk.controller.Ticket', {
             },
             'ticketdetails button': {
                 click: this.setStatusTicket
+            },
+            'ticket textfield#searchBox': {
+                change: {
+                    fn: this.searchFunction,
+                    buffer: 1000
+                }
             }
 
         });
@@ -94,6 +100,10 @@ Ext.define('Helpdesk.controller.Ticket', {
         {
             ref: 'ticketView',
             selector: 'ticket'
+        },
+        {
+            ref: 'searchBox',
+            selector: 'ticket textfield#searchBox'
         }
 
     ],
@@ -351,6 +361,49 @@ Ext.define('Helpdesk.controller.Ticket', {
             return 'ticket/all';
         }
     },
+    searchFunction: function(field, newValue, oldValue, eOpts) {
+        var scope = this;
+        var store = scope.getTicketPanel().getStore();
+        var grid = scope.getTicketPanel();
+        var searchTerm = newValue.trim();
+        var typeSearch = this.getProxy().split('/')[1].trim();
+        
+        if(searchTerm != ""){
+            store.proxy.url = 'ticket/search';
+            store.load({
+                params: {
+                    searchterm: searchTerm,
+                    typesearch: typeSearch,
+                    start: 0,
+                    limit: Helpdesk.Globals.pageSizeGrid
+                },
+                callback:function(response){
+                    var ticketsModel  = Helpdesk.model.Ticket.getProxy().getReader().readRecords(response[0].raw.content);
+                    store.loadData(ticketsModel.records);
+                    var toolbar = grid.dockedItems.items[1];
+                    var totalRecords = response[0].raw.totalElements;                    
+                    toolbar.totalRecords = totalRecords;
+                    toolbar.refreshPagingToolBar(1,toolbar.totalRecords);
+                    scope.onTextFieldChange(newValue, store, grid);
+                }
+            });
+        }else{
+            store.proxy.url = this.getProxy() + '-paging';
+            store.load({
+                params: {
+                    start: 0,
+                    limit: Helpdesk.Globals.pageSizeGrid
+                },
+                callback:function(){
+                    var toolbar = grid.dockedItems.items[1];
+                    var totalRecords = scope.getNumberOfTicketsFromMenuClicked();                    
+                    toolbar.totalRecords = totalRecords;
+                    toolbar.refreshPagingToolBar(1,toolbar.totalRecords);
+                }
+            });
+        }
+        
+    },
     changeCmbSearch: function(field, newValue, oldValue, eOpts) {
         //The method will be executed only if the new value have at least 3 characters
         var scope = this;
@@ -363,9 +416,6 @@ Ext.define('Helpdesk.controller.Ticket', {
             var storeTemp = new Helpdesk.store.Tickets();
             storeTemp.proxy.url = this.getProxy();
             storeTemp.load({
-                params: {
-                    user: Helpdesk.Globals.userLogged.userName
-                },
                 callback: function() {
                     field.up('container#maincontainer').down('#ticketgrid').setLoading(false);
                     for (var i = 0; i < storeTemp.getCount(); i++) {
@@ -400,7 +450,6 @@ Ext.define('Helpdesk.controller.Ticket', {
             store.proxy.url = this.getProxy();
             store.load({
                 params: {
-                    user: Helpdesk.Globals.userLogged.userName,
                     start: 0,
                     limit: Helpdesk.Globals.pageSizeGrid
                 },
@@ -482,6 +531,7 @@ Ext.define('Helpdesk.controller.Ticket', {
      * @returns {undefined}
      */
     onTicketMenuClick: function(btn) {
+        this.getSearchBox().reset();
         this.getTicketCardContainer().getLayout().setActiveItem(Helpdesk.Globals.ticket_datagrid);
         this.getTicketEditContainer().getLayout().setActiveItem(Helpdesk.Globals.ticket_details_view);
         if (typeof this.getTicketPanel() !== 'undefined') {
@@ -1223,6 +1273,36 @@ Ext.define('Helpdesk.controller.Ticket', {
         return text;
 
     },
+    
+    getButtonMenuClicked: function(){ 
+        var form = this.getTicketSideMenu();
+
+        if (form.down('button#buttonAll').pressed === true) {
+            return form.down('button#buttonAll');
+        } else if (form.down('button#buttonMyTickets').pressed === true) {
+            return form.down('button#buttonMyTickets');
+        } else if (form.down('button#buttonWithoutResponsible').pressed === true) {
+            return form.down('button#buttonWithoutResponsible');
+        } else if (form.down('button#buttonOpened').pressed === true) {
+            return form.down('button#buttonOpened');
+        } else if (form.down('button#buttonClosed').pressed === true) {
+            return form.down('button#buttonClosed');
+        } else {
+            return form.down('button#buttonAll');
+        }     
+    },
+    
+    getNumberOfTicketsFromMenuClicked:function(){
+        var buttonClicked = this.getButtonMenuClicked();
+        if(buttonClicked.text.indexOf("(") > -1){
+            return parseInt(buttonClicked.text.split('(')[1].split(')')[0].trim());    
+        }
+        else{
+            return 0;  
+        }
+        
+    },
+    
     loadStoreBasic: function(urlSimples) {
         //loadStore to GRID
         var myscope = this;
@@ -1236,20 +1316,89 @@ Ext.define('Helpdesk.controller.Ticket', {
             callback: function(result) {
                 myscope.backToDefaultStore(myscope);
                 myscope.setSideMenuButtonText();
-                //loadStore to toolbar
+                
+                var totalRecords = myscope.getNumberOfTicketsFromMenuClicked();
+                
                 var toolbar = myscope.getTicketPanel().getDockedItems()[1];
-                toolbar.getStore().proxy.url = 'ticket/' + urlSimples;
-                toolbar.getStore().load({
-                    params: {
-                        user: Helpdesk.Globals.userLogged.userName
-                    },
-                    callback: function() {
-                        toolbar.getStore().proxy.url = 'ticket';
-                    }
-                });
+                toolbar.totalRecords = totalRecords;
+                toolbar.refreshPagingToolBar(1,toolbar.totalRecords);
+                var btnFirst = toolbar.down('#btnFirst');
+                var btnPrev = toolbar.down('#btnPrev');
+                var btnNext = toolbar.down('#btnNext');
+                var btnLast = toolbar.down('#btnLast');
+                var pageItem = toolbar.down('#pageItem');
+                
+                btnFirst.addListener('click', myscope.onBtnFirstClick );
+                btnPrev.addListener('click', myscope.onBtnPrevClick );
+                btnNext.addListener('click', myscope.onBtnNextClick );
+                btnLast.addListener('click', myscope.onBtnLastClick );                
+                pageItem.addListener('change',myscope.onPageItemChange,myscope, {buffer:400});
             }
         });
 
+    },
+    changePage: function(page){
+        var myscope = this;
+        myscope.getTicketPanel().getStore().proxy.url = this.getProxy() + '-paging';
+        myscope.getTicketPanel().getStore().load({
+            params: {
+                user: Helpdesk.Globals.userLogged.userName,
+                start: ((page-1)*Helpdesk.Globals.pageSizeGrid)+1,
+                limit: ((page)*Helpdesk.Globals.pageSizeGrid)
+            },
+            callback: function() {
+                myscope.backToDefaultStore(myscope);
+                myscope.setSideMenuButtonText();
+            }
+        });
+    },
+    onPageItemChange: function( item, newValue, oldValue, eOpts ){
+        var toolbar = item.up();
+        var pageItem = toolbar.down('#pageItem');
+        var totalPages = Math.ceil(toolbar.totalRecords/Helpdesk.Globals.pageSizeGrid);
+        if(newValue > totalPages){
+            if(totalPages > 0){
+                pageItem.setValue(totalPages);
+            }
+            else{
+                pageItem.setValue(1);
+            }
+        }
+        else if(newValue <= 0){
+            pageItem.setValue(1);
+        }
+        
+        this.changePage(newValue);
+        toolbar.refreshPagingToolBar(pageItem.value,toolbar.totalRecords);  
+    },
+    onBtnFirstClick: function( button, e, eOpts ){
+        var toolbar = button.up();
+        var pageItem = toolbar.down('#pageItem');
+        pageItem.setValue(1);
+        toolbar.refreshPagingToolBar(pageItem.value,toolbar.totalRecords);  
+        
+    },
+    onBtnPrevClick: function( button, e, eOpts ){
+        var toolbar = button.up();
+        var pageItem = toolbar.down('#pageItem');        
+        pageItem.setValue(parseInt(pageItem.value) - 1);
+        toolbar.refreshPagingToolBar(pageItem.value,toolbar.totalRecords);
+        
+    },
+    onBtnNextClick: function( button, e, eOpts ){
+        var toolbar = button.up();
+        var pageItem = toolbar.down('#pageItem');        
+        pageItem.setValue(parseInt(pageItem.value) + 1);
+        toolbar.refreshPagingToolBar(pageItem.value,toolbar.totalRecords);   
+        
+    },
+    onBtnLastClick: function( button, e, eOpts ){
+        var toolbar = button.up();
+        var totalPages = Math.ceil(toolbar.totalRecords/Helpdesk.Globals.pageSizeGrid);
+        var pageItem = toolbar.down('#pageItem');
+        pageItem.setValue(totalPages);
+        toolbar.refreshPagingToolBar(pageItem.value,toolbar.totalRecords);   
+        
     },
     downloadFile: function(fileId) {
         Ext.core.DomHelper.append(document.body, {

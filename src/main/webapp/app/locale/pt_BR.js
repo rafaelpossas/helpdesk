@@ -174,6 +174,7 @@ translations = {
     NO_PRIORITY: 'Sem Prioridade',
     NO_DEADLINE_DEFINED: 'Sem prazo estimado',
     NUMBER_OF_TICKETS: 'Número de tickets',
+    NO_RECORDS_TO_DISPLAY: 'Nenhum registro para visualizar',
     //############################################## [ O ] ##############################################//
 
     OPENED: 'Aberto',
@@ -187,6 +188,7 @@ translations = {
     ONLY_UPLOAD_IMAGES: 'Você só pode fazer upload de imagens',
     OPEN_TICKET: 'Abrir ticket',
     OPEN_TICKET_TITLE:'open-ticket',
+    OF: 'de',
     //############################################## [ P ] ##############################################//
 
     PASSWORD: 'Senha',
@@ -199,6 +201,7 @@ translations = {
     PRIORITY: 'Prioridade',
     PARTIAL: '(Parcial)',
     PRIORITY_CHANGED_FROM: 'Prioridade alterada de ',
+    PAGE: 'Página',
     //############################################## [ Q ] ##############################################//
 
     QUANTITY_OF_CREATED_TICKETS: 'Quantidade de Tickets Criados',
@@ -223,6 +226,7 @@ translations = {
     REQUIRED_DESCRIPTION: 'Preencha a descrição!',
     RESPONSIBLE_CHANGED_FROM: 'Responsável alterado de ',
     REOPENING_TICKET: 'Reabrindo Ticket ...',
+    RECORDS: 'registro(s)',
     
     //############################################## [ S ] ##############################################//
 

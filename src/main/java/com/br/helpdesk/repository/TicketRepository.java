@@ -170,5 +170,91 @@ public interface TicketRepository extends CrudRepository<Ticket, Long> {
     )
     public List<Ticket> findBetweenEndDateAndUser(@Param("firstDate") Date firstDate, @Param("lastDate") Date lastDate, @Param("userId") long userId);
 
+    //SEARCH QUERYS
     
+    //SEARCH ALL
+    @Query(
+           "Select t FROM Ticket t WHERE t.user.id = :userId "
+                    + "AND (LOWER(t.title) LIKE LOWER(CONCAT('%', :searchTerm, '%')) "
+                    + "OR LOWER(t.id) LIKE LOWER(CONCAT('%', :searchTerm, '%')) "
+                    + "OR LOWER(t.client.name) LIKE LOWER(CONCAT('%', :searchTerm, '%')) "
+                    + "OR LOWER(t.user.name) LIKE LOWER(CONCAT('%', :searchTerm, '%')) "
+                    + "OR LOWER(t.category.name) LIKE LOWER(CONCAT('%', :searchTerm, '%')) "
+                    + "OR DATE_FORMAT(t.lastInteration, '%d/%m/%Y') LIKE CONCAT('%', :searchTerm, '%')) "
+    )
+    public Page<Ticket> searchType1(@Param("userId") Long userId,@Param("searchTerm") String searchTerm,Pageable pageable);
+    
+    //SEARCH ALL SUPERUSER
+    @Query(
+            "Select t FROM Ticket t WHERE LOWER(t.title) LIKE LOWER(CONCAT('%', :searchTerm, '%')) "
+                    + "OR LOWER(t.id) LIKE LOWER(CONCAT('%', :searchTerm, '%'))"
+                    + "OR LOWER(t.client.name) LIKE LOWER(CONCAT('%', :searchTerm, '%'))"
+                    + "OR LOWER(t.user.name) LIKE LOWER(CONCAT('%', :searchTerm, '%'))"
+                    + "OR LOWER(t.category.name) LIKE LOWER(CONCAT('%', :searchTerm, '%'))"
+                    + "OR DATE_FORMAT(t.lastInteration, '%d/%m/%Y') LIKE CONCAT('%', :searchTerm, '%') "
+    )
+    public Page<Ticket> searchType1Superuser(@Param("searchTerm") String searchTerm,Pageable pageable);
+    
+    //SEARCH MY TICKETS
+    @Query(
+           "Select t FROM Ticket t WHERE t.responsible.id = :userId "
+                    + "AND (LOWER(t.title) LIKE LOWER(CONCAT('%', :searchTerm, '%')) "
+                    + "OR LOWER(t.id) LIKE LOWER(CONCAT('%', :searchTerm, '%')) "
+                    + "OR LOWER(t.client.name) LIKE LOWER(CONCAT('%', :searchTerm, '%')) "
+                    + "OR LOWER(t.user.name) LIKE LOWER(CONCAT('%', :searchTerm, '%')) "
+                    + "OR LOWER(t.category.name) LIKE LOWER(CONCAT('%', :searchTerm, '%')) "
+                    + "OR DATE_FORMAT(t.lastInteration, '%d/%m/%Y') LIKE CONCAT('%', :searchTerm, '%')) "
+    )
+    public Page<Ticket> searchType2(@Param("userId") Long userId,@Param("searchTerm") String searchTerm,Pageable pageable);
+    
+    //SEARCH WITHOUT RESPONSIBLE
+    @Query(
+            "Select t FROM Ticket t WHERE t.responsible IS NULL "
+                    + "AND (t.isOpen = true) "
+                    + "AND (LOWER(t.title) LIKE LOWER(CONCAT('%', :searchTerm, '%')) "
+                    + "OR t.id LIKE LOWER(CONCAT('%', :searchTerm, '%')) "
+                    + "OR LOWER(t.client.name) LIKE LOWER(CONCAT('%', :searchTerm, '%')) "
+                    + "OR LOWER(t.user.name) LIKE LOWER(CONCAT('%', :searchTerm, '%')) "
+                    + "OR LOWER(t.category.name) LIKE LOWER(CONCAT('%', :searchTerm, '%')) "
+                    + "OR DATE_FORMAT(t.lastInteration, '%d/%m/%Y') LIKE CONCAT('%', :searchTerm, '%')) "
+    )
+    public Page<Ticket> searchType3(@Param("searchTerm") String searchTerm,Pageable pageable);
+
+    //SEARCH ISOPEN AND HAS RESPONSIBLE
+    @Query(
+            "Select t FROM Ticket t WHERE t.responsible IS NOT NULL "
+                    + "AND (t.isOpen = :isOpen) "
+                    + "AND (LOWER(t.title) LIKE LOWER(CONCAT('%', :searchTerm, '%')) "
+                    + "OR LOWER(t.id) LIKE LOWER(CONCAT('%', :searchTerm, '%')) "
+                    + "OR LOWER(t.client.name) LIKE LOWER(CONCAT('%', :searchTerm, '%')) "
+                    + "OR LOWER(t.user.name) LIKE LOWER(CONCAT('%', :searchTerm, '%')) "
+                    + "OR LOWER(t.category.name) LIKE LOWER(CONCAT('%', :searchTerm, '%')) "
+                    + "OR DATE_FORMAT(t.lastInteration, '%d/%m/%Y') LIKE CONCAT('%', :searchTerm, '%')) "
+    )
+    public Page<Ticket> searchType4(@Param("isOpen") Boolean isOpen, @Param("searchTerm") String searchTerm,Pageable pageable);
+    
+    //SEARCH ISOPEN FROM USER
+    @Query(
+            "Select t FROM Ticket t WHERE t.user.id = :userId "
+                    + "AND (t.isOpen = :isOpen) "
+                    + "AND (LOWER(t.title) LIKE LOWER(CONCAT('%', :searchTerm, '%')) "
+                    + "OR LOWER(t.id) LIKE LOWER(CONCAT('%', :searchTerm, '%')) "
+                    + "OR LOWER(t.client.name) LIKE LOWER(CONCAT('%', :searchTerm, '%')) "
+                    + "OR LOWER(t.user.name) LIKE LOWER(CONCAT('%', :searchTerm, '%')) "
+                    + "OR LOWER(t.category.name) LIKE LOWER(CONCAT('%', :searchTerm, '%')) "
+                    + "OR DATE_FORMAT(t.lastInteration, '%d/%m/%Y') LIKE CONCAT('%', :searchTerm, '%')) "
+    )
+    public Page<Ticket> searchType5(@Param("userId") Long userId, @Param("isOpen") Boolean isOpen, @Param("searchTerm") String searchTerm,Pageable pageable);
+    
+    //SEARCH ISOPEN ONLY
+    @Query(
+            "Select t FROM Ticket t WHERE t.isOpen = :isOpen "
+                    + "AND (LOWER(t.title) LIKE LOWER(CONCAT('%', :searchTerm, '%')) "
+                    + "OR LOWER(t.id) LIKE LOWER(CONCAT('%', :searchTerm, '%')) "
+                    + "OR LOWER(t.client.name) LIKE LOWER(CONCAT('%', :searchTerm, '%')) "
+                    + "OR LOWER(t.user.name) LIKE LOWER(CONCAT('%', :searchTerm, '%')) "
+                    + "OR LOWER(t.category.name) LIKE LOWER(CONCAT('%', :searchTerm, '%')) "
+                    + "OR DATE_FORMAT(t.lastInteration, '%d/%m/%Y') LIKE CONCAT('%', :searchTerm, '%')) "
+    )
+    public Page<Ticket> searchType6(@Param("isOpen") Boolean isOpen, @Param("searchTerm") String searchTerm,Pageable pageable);
 }

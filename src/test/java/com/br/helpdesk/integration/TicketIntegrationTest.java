@@ -302,7 +302,7 @@ public class TicketIntegrationTest {
         newTicket.setLastInteration(new Date());
         newTicket.setUserLastInteration(user);
         
-        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.post("/ticket")                
+        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.post("/ticket/save_without_email_routine")                
                 .content(TestUtil.convertObjectToJsonBytes(newTicket))          
                 .param("user", user.getUserName())
                 .contentType(TestUtil.APPLICATION_JSON_UTF8))

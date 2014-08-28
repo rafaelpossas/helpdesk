@@ -193,7 +193,7 @@ public class UserIntegrationTest {
 
     @Test
     public void testGetByEmail() throws Exception {
-        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get("/user/email/{email}", "ricardo@gmail"))
+        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get("/user/email/{email}", "email@gmail"))
                 .andExpect(MockMvcResultMatchers.status().isOk())//verifica se esta chamando corretamente a url
                 .andExpect(MockMvcResultMatchers.content().contentType(TestUtil.APPLICATION_JSON_UTF8))//verifica se esta retornando um JSON na codifica��o UTF8
                 .andReturn();// retorna um objeto de tipo MvcResult 
@@ -202,7 +202,7 @@ public class UserIntegrationTest {
         JSONObject json = new JSONObject(contentString);//transforma o JSON String para JsonArray
 
         assertThat(json, is(not(IsNull.nullValue())));
-        assertThat(json.getInt("id"), is(1));
+        assertThat(json.getInt("id"), is(5));
     }
 
 }

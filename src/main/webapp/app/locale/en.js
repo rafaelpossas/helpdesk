@@ -186,6 +186,7 @@ translations = {
     OPEN_TICKET: 'Open ticket',
     ONLY_UPLOAD_IMAGES: 'You can only upload image files',
     OPEN_TICKET_TITLE:'open-ticket',
+    OF: 'of',
     //############################################## [ P ] ##############################################//
 
     PASSWORD: 'Password',
@@ -198,6 +199,7 @@ translations = {
     PRIORITY: 'Priority',
     PARTIAL: '(Partial)',
     PRIORITY_CHANGED_FROM: 'Priority changed from ',
+    PAGE: 'Page',
     //############################################## [ Q ] ##############################################//
 
     QUANTITY_OF_CREATED_TICKETS: 'Quantity of created tickets',
@@ -222,6 +224,8 @@ translations = {
     REQUIRED_DESCRIPTION: 'Fill out the description!',
     RESPONSIBLE_CHANGED_FROM: 'Responsible changed from ',
     REOPENING_TICKET: 'Reopening Ticket ...',
+    RECORDS: 'record(s)',
+    NO_RECORDS_TO_DISPLAY: 'No records to display',
     
     //############################################## [ S ] ##############################################//
 
