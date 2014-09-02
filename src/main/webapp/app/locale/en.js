@@ -107,7 +107,7 @@ translations = {
     FORMAT_JUST_DATE: 'Y/m/d',
     FORMAT_EN: 'Y/m/d',    
     FOR: 'for',
-    FORGOT_PASSWORD:'Forgot my password',
+    FORGOT_PASSWORD:'Forgot your password?',
     //############################################## [ G ] ##############################################//
 
     GROUP: 'Grou´p',

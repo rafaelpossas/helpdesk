@@ -50,7 +50,8 @@ Ext.define('Helpdesk.view.login.LoginForm', {
                     name: '_spring_security_remember_me',
                     fieldLabel: translations.REMEMBER,
                     padding:'0 0 10 0',
-                },{
+                },
+                {
                     xtype:'button',                    
                     itemId:'forgotPwdBtn',
                     baseCls:'forgot-password-button',
