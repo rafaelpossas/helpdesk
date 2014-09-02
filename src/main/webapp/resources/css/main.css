@@ -701,3 +701,13 @@
     width: 40px;
     margin-top: -8px !important;
 }
+
+.forgot-password-button{
+    font-weight: bold;
+    border: 0 solid transparent;
+}
+
+.forgot-password-button:hover{
+    cursor:pointer;
+    text-decoration: underline;
+}

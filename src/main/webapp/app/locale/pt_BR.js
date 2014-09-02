@@ -29,6 +29,8 @@ translations = {
     BY: 'Por',
     BUG: 'Bug',
     BROWSE: 'Procurar..',
+    BLANK_VARIABLE:'blank-variable',
+    BLANK_VARIABLE_MESSAGE:'Digite um nome de usuário',
     //############################################## [ C ] ##############################################//
 
     CANCEL: 'Cancelar',
@@ -63,6 +65,8 @@ translations = {
     CHECK_ADDED_INFORMATIONS: 'Verifique as informações adicionadas!',
     CATEGORY_TICKET:'categoria-ticket',
     CHANGED_WITH_SUCCESS: 'Alterado com sucesso',
+    CHANGE_PASSWORD_COMPLETE: 'change-password-complete',
+    CHANGE_PASSWORD_COMPLETE_MESSAGE:'Uma nova senha foi gerada e enviada para o e-mail cadastrado.',
     
     //############################################## [ D ] ##############################################//
 
@@ -102,6 +106,7 @@ translations = {
     FORMAT_JUST_DATE: 'd/m/Y',
     FORMAT_EN: 'Y/m/d',  
     FOR: 'para',
+    FORGOT_PASSWORD:'Esqueci minha senha',
     //############################################## [ G ] ##############################################//
 
     GROUP: 'Grupo',
@@ -123,6 +128,8 @@ translations = {
     IF_CLIENT_NOT_REGISTERED: 'Se o cliente ainda não for cadastrado',
     INFORMATIONS: 'Informações',
     INOVATION: 'Inovação',
+    INVALID_USERNAME:'invalid-username',
+    INVALID_USERNAME_MESSAGE:'Nome de usuário inválido ou inexistente',
     //############################################## [ J ] ##############################################//
 
 
@@ -202,6 +209,7 @@ translations = {
     PARTIAL: '(Parcial)',
     PRIORITY_CHANGED_FROM: 'Prioridade alterada de ',
     PAGE: 'Página',
+    PLEASE_WAIT:'Por favor aguarde',
     //############################################## [ Q ] ##############################################//
 
     QUANTITY_OF_CREATED_TICKETS: 'Quantidade de Tickets Criados',
@@ -227,6 +235,8 @@ translations = {
     RESPONSIBLE_CHANGED_FROM: 'Responsável alterado de ',
     REOPENING_TICKET: 'Reabrindo Ticket ...',
     RECORDS: 'registro(s)',
+    RETRIEVE_PASSWORD:'Recuperar senha',
+    RETRIEVE:'Recuperar',
     
     //############################################## [ S ] ##############################################//
 

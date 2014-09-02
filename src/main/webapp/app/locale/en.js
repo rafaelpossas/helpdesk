@@ -29,6 +29,9 @@ translations = {
     BY: 'By',
     BUG: 'Bug',
     BROWSE: 'Browse..',
+    BLANK_VARIABLE:'blank-variable',    
+    BLANK_VARIABLE_MESSAGE:'Type a valid username',
+    
     //############################################## [ C ] ##############################################//
 
     CANCEL: 'Cancel',
@@ -63,6 +66,8 @@ translations = {
     CHECK_ADDED_INFORMATIONS: 'Check the added informations!',
     CATEGORY_TICKET:'categoria-ticket',
     CHANGED_WITH_SUCCESS: 'Changed with success',
+    CHANGE_PASSWORD_COMPLETE: 'change-password-complete',    
+    CHANGE_PASSWORD_COMPLETE_MESSAGE:'A new password was automatically generated and sent to your e-mail account',
     
     //############################################## [ D ] ##############################################//
 
@@ -102,6 +107,7 @@ translations = {
     FORMAT_JUST_DATE: 'Y/m/d',
     FORMAT_EN: 'Y/m/d',    
     FOR: 'for',
+    FORGOT_PASSWORD:'Forgot my password',
     //############################################## [ G ] ##############################################//
 
     GROUP: 'Grou´p',
@@ -123,6 +129,8 @@ translations = {
     IF_CLIENT_NOT_REGISTERED: 'If client is not registered',
     INFORMATIONS: 'Informations',
     INOVATION: 'Inovation',
+    INVALID_USERNAME:'invalid-username',    
+    INVALID_USERNAME_MESSAGE:'Invalid username',
     //############################################## [ J ] ##############################################//
 
 
@@ -200,6 +208,7 @@ translations = {
     PARTIAL: '(Partial)',
     PRIORITY_CHANGED_FROM: 'Priority changed from ',
     PAGE: 'Page',
+    PLEASE_WAIT:'Please wait',
     //############################################## [ Q ] ##############################################//
 
     QUANTITY_OF_CREATED_TICKETS: 'Quantity of created tickets',
@@ -226,6 +235,8 @@ translations = {
     REOPENING_TICKET: 'Reopening Ticket ...',
     RECORDS: 'record(s)',
     NO_RECORDS_TO_DISPLAY: 'No records to display',
+    RETRIEVE_PASSWORD:'Retrive password',
+    RETRIEVE:'Retrieve',
     
     //############################################## [ S ] ##############################################//
 

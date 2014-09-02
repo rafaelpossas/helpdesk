@@ -8,7 +8,7 @@ Ext.define('Helpdesk.view.login.LoginForm', {
     extend: 'Ext.panel.Panel',
     alias: 'widget.loginform',
     
-    height: 200,
+    height: 225,
     width: 400,
     layout: {
         type: 'fit'
@@ -48,7 +48,13 @@ Ext.define('Helpdesk.view.login.LoginForm', {
                 {
                     xtype: 'checkbox',
                     name: '_spring_security_remember_me',
-                    fieldLabel: translations.REMEMBER
+                    fieldLabel: translations.REMEMBER,
+                    padding:'0 0 10 0',
+                },{
+                    xtype:'button',                    
+                    itemId:'forgotPwdBtn',
+                    baseCls:'forgot-password-button',
+                    text:translations.FORGOT_PASSWORD
                 }
             ],
             dockedItems: [

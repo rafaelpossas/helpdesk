@@ -572,5 +572,72 @@ public class EmailService {
         }
         return listEmails;
     }
+    
+    public void sendEmailPasswordChanged(User user,String language){
+        
+        String html = "";
+        //Define o idioma do email
+        if(language.trim().equals("pt_BR")){
+            html = "<!DOCTYPE html>"
+                + "<html>"
+                    + "<head>"
+                        + "<meta charset='UTF-8\'>"
+                        + "<style>"
+                        + "h1{font-weight: bold;}"
+                        + "pre{color:black;font-size: 15px;font-weight: normal;}"
+                        + "</style>"
+                    + "</head>"
+                    + "<body>"
+                        +"<p> Prezado "+user.getName()+",</p>"
+                        +"<br/>"                       
+                        +"<p> Uma nova senha foi gerada para seu acesso ao sistema.</p>"                        
+                        +"<p> Aconselhamos que altere a mesma para uma de sua preferência pois trata-se de uma senha temporária.</p>"                        
+                        +"<p> Sua nova senha é: "+user.getPassword()+"</p>"
+                        +"<p> Link para acesso: <a href='http://cymosupport.tecnologia.ws/Helpdesk'> http://cymosupport.tecnologia.ws/Helpdesk </a> </p>"
+                        +"<p>Atenciosamente, <br/>Cymo</p>"                        
+                    + "</body>"
+                + "</html>";
+        }else if(language.trim().equals("en")){
+            html = "<!DOCTYPE html>"
+                + "<html>"
+                    + "<head>"
+                        + "<meta charset='UTF-8\'>"
+                        + "<style>"
+                        + "h1{font-weight: bold;}"
+                        + "pre{color:black;font-size: 15px;font-weight: normal;}"
+                        + "</style>"
+                    + "</head>"
+                    + "<body>"
+                        +"<p> Dear "+user.getName()+",</p>"
+                        +"<br/>" 
+                        +"<p> A new password was generated for you access in the system.</p>" 
+                        +"<p> We strongly recommend you to change the password to one of your preference.</p>"                        
+                        +"<p> Your new password is: "+user.getPassword()+"</p>"
+                        +"<p> Link for the access: <a href='http://cymosupport.tecnologia.ws/Helpdesk'> http://cymosupport.tecnologia.ws/Helpdesk </a> </p>"
+                        +"<p>Att, <br/>Cymo</p>"                        
+                    + "</body>"
+                + "</html>";
+        }
+        
+        Session session = getSession();
+        try {
+            
+            Message message = new MimeMessage(session);
+            message.setFrom(new InternetAddress(PROPERTIES.getProperty("mail.user")));
+            message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(user.getEmail()));
+            if(language.trim().equals("pt_BR")){
+                message.setSubject("Alerta de alteração de senha");
+            }else if(language.trim().equals("en")){
+                message.setSubject("Password recovery");
+            }            
+            message.setContent(html, "text/html; charset=utf-8");
+            Transport.send(message);
+            
+        } catch (MessagingException e) {
+        }
+        
+        
+        
+    }
 
 }

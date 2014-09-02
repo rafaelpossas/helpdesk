@@ -55,6 +55,12 @@ Ext.define('Helpdesk.controller.Login', {
             },
             'signinform button#voltar': {
                 click: this.onSignInVoltar
+            },
+            'loginform button#forgotPwdBtn':{
+                click: this.generateRetrievePasswordWindow
+            },
+            '#btnRetrieve':{
+                click: this.generateNewPassword
             }
 
         });
@@ -229,5 +235,76 @@ Ext.define('Helpdesk.controller.Login', {
                 }
             });
         }
+    },
+    
+    generateRetrievePasswordWindow:function(){        
+       
+       var window = Ext.create('Ext.window.Window',{
+           title:translations.RETRIEVE_PASSWORD,
+           width:500,
+           height:75,
+           modal: true,
+           dynamic: true,          
+           items:[
+               {
+                   xtype:'panel',
+                   layout:'hbox',                   
+                   align:'stretch',
+                   height:50,                   
+                   items:[
+                       {
+                           xtype:'label',
+                           text:translations.USER,
+                           padding:'13 5 10 10'
+                       },
+                       {
+                           xtype:'textfield',
+                           itemId:'userNameRetrieveValue',
+                           width:335,
+                           padding:'10 10 10 5'
+                       },
+                       {
+                           xtype:'button',
+                           margin:'10 0 0 0',
+                           itemId:'btnRetrieve',
+                           text:translations.RETRIEVE
+                       }
+                   ]
+               }
+           ]
+           
+       });
+       window.show();
+    },
+    
+    generateNewPassword:function(btn){ 
+        
+        var form = btn.up();        
+        var userName = form.down('textfield#userNameRetrieveValue').getValue();        
+        
+        if(form.down('textfield#userNameRetrieveValue').getValue() !== ''){
+            form.setLoading(translations.PLEASE_WAIT);
+            Ext.Ajax.request({
+                url:'login/reset-password',            
+                method:'GET',            
+                params:{
+                    username: userName,
+                    language: localStorage.getItem('user-lang')
+                },
+                success: function(o) {
+                    var decodedString = Ext.decode(o.responseText);        
+                    form.setLoading(false,false);                
+                    if(decodedString.status === translations.CHANGE_PASSWORD_COMPLETE){
+                        Ext.Msg.alert(translations.INFORMATION, translations.CHANGE_PASSWORD_COMPLETE_MESSAGE);
+                        form.up().close();
+                    }else if(decodedString.status === translations.INVALID_USERNAME){
+                        Ext.Msg.alert(translations.INFORMATION, translations.INVALID_USERNAME_MESSAGE);
+                    }              
+                }                     
+            });
+        }else{
+            Ext.Msg.alert(translations.INFORMATION, translations.BLANK_VARIABLE_MESSAGE);
+        }
     }
+    
 });
