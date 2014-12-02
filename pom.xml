@@ -352,7 +352,7 @@
         </repository>
     </repositories>
     <build>
-        <finalName>Helpdesk</finalName>
+        <finalName>ROOT</finalName>
         <plugins>
             <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>
