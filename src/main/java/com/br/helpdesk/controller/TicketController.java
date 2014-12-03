@@ -422,7 +422,7 @@ public class TicketController {
     public @ResponseBody List<DashboardValue> getValuesDashboard() {
         
         List<DashboardValue> valores = new ArrayList<DashboardValue>(); 
-        /*
+        
         List<User>users = userService.findAll();
         Iterable<Category> categories = categoryService.findAll();
         List<Ticket>tickets = ticketService.findAll();       
@@ -531,7 +531,7 @@ public class TicketController {
                 valores.add(valor);
             }
         }
-        */
+        
         return valores;
     }   
 }
