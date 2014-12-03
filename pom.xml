@@ -6,7 +6,7 @@
     <artifactId>Helpdesk</artifactId>
     <packaging>war</packaging>
     <version>1.0-SNAPSHOT</version>
-    <name>ROOT</name>
+    <name>Helpdesk</name>
 
     <properties>
         <spring.version>3.2.3.RELEASE</spring.version>
@@ -352,7 +352,7 @@
         </repository>
     </repositories>
     <build>
-        <finalName>ROOT</finalName>
+        <finalName>Helpdesk</finalName>
         <plugins>
             <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>
