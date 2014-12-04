@@ -15,7 +15,7 @@
         <script src="<s:url value="/resources"/>/js/jquery-2.1.1.min.js"></script>
         <script src="<s:url value="/resources"/>/js/jquery.form.min.js"></script>
         <!-- Framework -->
-        <script src="<s:url value="/extjs"/>/ext-all-dev.js"></script>
+        <script src="<s:url value="/extjs"/>/ext-all.js"></script>
         <!-- Locales -->
         <script charset="UTF-8" src="<s:url value="/app"/>/locale/locale.js"></script>
         <!-- CSS -->
