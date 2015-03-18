@@ -15,7 +15,8 @@ Ext.define('Helpdesk.view.settings.Settings', {
         'Helpdesk.view.user.Users',
         'Helpdesk.view.category.Category',
         'Helpdesk.view.client.Client',
-        'Helpdesk.view.priority.Priority'
+        'Helpdesk.view.priority.Priority',
+        'Helpdesk.view.emailconfig.EmailConfig'
     ],
     items: [
         {
@@ -44,6 +45,9 @@ Ext.define('Helpdesk.view.settings.Settings', {
                 },
                 {
                     xtype: 'priority'
+                },
+                {
+                    xtype: 'emailconfig'
                 }
             ]
         }

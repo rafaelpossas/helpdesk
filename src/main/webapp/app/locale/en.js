@@ -85,6 +85,8 @@ translations = {
 
     EDIT: 'Edit',
     EMAIL: 'E-Mail',
+    EMAIL_CONFIGURATIONS: 'Email Configurations',
+    EMAIL_CONFIGURE: 'Configure Email',
     ENGLISH: 'English',
     ENTER: 'Enter',
     ENABLE: 'Enable',
@@ -131,6 +133,7 @@ translations = {
     INOVATION: 'Inovation',
     INVALID_USERNAME:'invalid-username',    
     INVALID_USERNAME_MESSAGE:'Invalid username',
+    IMAP: 'IMAP',
     //############################################## [ J ] ##############################################//
 
 
@@ -241,7 +244,7 @@ translations = {
     //############################################## [ S ] ##############################################//
 
     SAVE: 'Save',
-    SAVED_WITH_SUCCESS: 'save with success',
+    SAVED_WITH_SUCCESS: 'Save with success',
     SAVING: 'Saving...',
     SAVING_REPLY: 'Saving reply..',
     SAVING_TICKET: 'Saving ticket..',
@@ -269,6 +272,7 @@ translations = {
     SHOW_ALL: '(Show all)',
     SITUATION: 'Situation',
     STATUS_TICKET:'status-ticket',
+    SMTP: 'SMTP',
     //############################################## [ T ] ##############################################//
 
     TICKETS: 'Tickets',

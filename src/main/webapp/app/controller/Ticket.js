@@ -257,7 +257,7 @@ Ext.define('Helpdesk.controller.Ticket', {
         var mainView = this.getTicketView();
         var form = button.up('form#ticketMainView');
         var record = button.up('form#ticketMainView').getRecord();
-        mainView.setLoading('Salvando...');
+        mainView.setLoading(translations.SAVING);
         if (form.down('combobox#priorityTicket').getValue() === null || form.down('combobox#priorityTicket').getValue() === '') {
             var priorityIndex = Ext.StoreMgr.lookup(form.down('combobox#priorityTicket').getStore()).findExact('name', translations.NO_PRIORITY);
             var priorityRecord = Ext.StoreMgr.lookup(form.down('combobox#priorityTicket').getStore()).getAt(priorityIndex);
@@ -882,9 +882,13 @@ Ext.define('Helpdesk.controller.Ticket', {
                       
             //text passos para reproduzir o erro            
             ticketView.down('label#tktSteps').text = ticket.stepsTicket;
+            
             //passos pra reproduzir com a formatação original (quebra de linha, etc)
             var steps = '<pre>' + ticket.stepsTicket + '</pre>';
-            ticketView.down('label#tktSteps').update(steps);
+            //ticketView.down('label#tktSteps').update('afusaufhusafhuas fuash ufahosuf huasfhsahouf housafho saohf housaf huosahf osahufhousafhouasfohsahufoh safhuoasohf ohsafhsafhsahofhosafhosahof');
+            
+            ticketView.down('label#tktSteps').update(steps);            
+            //ticketView.down('label#tktSteps').update('<pre>' + steps + '</pre>');
 
             //Remove todas as respostas do panel            
             ticketView.down('panel#tktAnswers').removeAll(true);

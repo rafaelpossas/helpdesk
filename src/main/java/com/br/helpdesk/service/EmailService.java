@@ -7,6 +7,7 @@ package com.br.helpdesk.service;
 
 import com.Consts;
 import com.br.helpdesk.controller.TicketAnswerController;
+import com.br.helpdesk.model.EmailConfig;
 import com.br.helpdesk.model.Ticket;
 import com.br.helpdesk.model.TicketAnswer;
 import com.br.helpdesk.model.User;
@@ -15,8 +16,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import javax.mail.Address;
 import javax.mail.Flags;
 import javax.mail.Folder;
@@ -30,7 +29,6 @@ import javax.mail.Store;
 import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
-import javax.mail.internet.MimeMultipart;
 import javax.mail.search.FlagTerm;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -46,7 +44,8 @@ public class EmailService {
     public static int EMAIL_NEW_ANSWER = 1;
     public static int EMAIL_CHANGES = 2;
 
-    public static Properties PROPERTIES = EmailPropertiesLoader.propertiesLoader();
+    public Properties PROPERTIES;
+    //public static Properties PROPERTIES = EmailPropertiesLoader.propertiesLoader();
 
     @Autowired
     private UserService userService;
@@ -57,7 +56,10 @@ public class EmailService {
 
     @Autowired
     private TicketAnswerController answerController;
-    
+
+    @Autowired
+    private EmailConfigService emailConfigService;
+
     /**
      * Return the primary text content of the message.
      */
@@ -104,58 +106,81 @@ public class EmailService {
         return null;
     }
 
-    private Session getSession() {        
+    private Session getSession() {
+        setEmailProperties();
         Session session = Session.getDefaultInstance(PROPERTIES, new javax.mail.Authenticator() {
             @Override
             protected PasswordAuthentication getPasswordAuthentication() {
-                return new PasswordAuthentication(PROPERTIES.getProperty("mail.user"), PROPERTIES.getProperty("mail.password"));
+                return new PasswordAuthentication(PROPERTIES.getProperty(Consts.USER_EMAIL), PROPERTIES.getProperty(Consts.MAIL_PASSWORD));
             }
         });
         return session;
     }
 
-    public void sendEmail(Ticket ticket, Ticket newTicket, TicketAnswer answer, User userAnswer, List<String> listEmailsTo, Integer sendType){
+    public void setEmailProperties() {
+        PROPERTIES = new Properties();
+
+        EmailConfig emailConfig = emailConfigService.findById(1L);
+        PROPERTIES.put(Consts.SMTP_HOST, emailConfig.getSmtpHost());
+        PROPERTIES.put(Consts.SOCKET_FACTORY_PORT, emailConfig.getSocketFactoryPort());
+        PROPERTIES.put(Consts.AUTH, emailConfig.getAuth());
+        PROPERTIES.put(Consts.SMTP_PORT, emailConfig.getSmtpPort());
+        PROPERTIES.put(Consts.USER_EMAIL, emailConfig.getUserEmail());
+        PROPERTIES.put(Consts.MAIL_PASSWORD, emailConfig.getPassword());
+        PROPERTIES.put(Consts.IMAP, emailConfig.getImap());
+        PROPERTIES.put(Consts.MAIL_IMAPS, Consts.IMAPS);
+        PROPERTIES.put(Consts.FOLDER, Consts.INBOX);
+        PROPERTIES.put(Consts.SOCKET_FACTORY_CLASS, Consts.SOCKET_FACTORY_CLASS_VALUE);
+    }
+
+    public void sendEmail(Ticket olderTicket, Ticket newTicket, TicketAnswer answer, User userAnswer, List<String> listEmailsTo, Integer sendType) {
         Session session = getSession();
         String emails = getCorrectAdress(listEmailsTo);
-        try {
+        Store store = null;
+        try {      
+            // Set the store depending on the parameter flag value
+            store = session.getStore(PROPERTIES.getProperty(Consts.MAIL_IMAPS));                      
+            //VALORES DO SERVIDOR
+            store.connect(PROPERTIES.getProperty(Consts.IMAP), PROPERTIES.getProperty(Consts.USER_EMAIL), PROPERTIES.getProperty(Consts.MAIL_PASSWORD));
+        
             Message message = new MimeMessage(session);
-            message.setFrom(new InternetAddress(PROPERTIES.getProperty("mail.user")));
-            message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(emails));
+            message.setFrom(new InternetAddress(PROPERTIES.getProperty(Consts.USER_EMAIL)));
+            message.setRecipients(Message.RecipientType.BCC, InternetAddress.parse(emails));
             Long ticketId = 0L;
             String ticketTitle = "";
             String subjectString = "";
             String contentString = "";
-            if(ticket != null){
-                ticketId = ticket.getId();
-                ticketTitle = ticket.getTitle();
+
+            if (newTicket != null) {
+                ticketId = newTicket.getId();
+                ticketTitle = newTicket.getTitle();
             }
-            
-            if(sendType == Consts.TICKET_NEW){
-                subjectString = "Novo Ticket #"+ticketId+"#: "+ticketTitle;
-                contentString = contentNewTicket(ticket);
-            }
-            else if(sendType == Consts.TICKET_EDIT){
-                subjectString = "Atualização do Ticket #"+ticketId+"#: "+ticketTitle;
-                contentString = contentEditTicket(ticket, newTicket);
-            }
-            else if(sendType == Consts.TICKET_NEW_ANSWER){
-                subjectString = "Nova Resposta ao Ticket #"+answer.getTicket().getId()+"#: "+answer.getTicket().getTitle();
+
+            if (sendType == Consts.TICKET_NEW) {
+                subjectString = "Novo Ticket #" + ticketId + "#: " + ticketTitle;
+                contentString = contentNewTicket(newTicket);
+            } else if (sendType == Consts.TICKET_EDIT) {
+                if (olderTicket != null) {
+                    subjectString = "Atualização do Ticket #" + ticketId + "#: " + ticketTitle;
+                    contentString = contentEditTicket(olderTicket, newTicket);
+                }
+            } else if (sendType == Consts.TICKET_NEW_ANSWER) {
+                subjectString = "Nova Resposta ao Ticket #" + answer.getTicket().getId() + "#: " + answer.getTicket().getTitle();
                 contentString = contentNewAnswer(answer, userAnswer.getName());
-            }
-            else if(sendType == Consts.TICKET_CLOSE){
-                subjectString = "Encerramento do Ticket #"+ticketId+"#: "+ticketTitle;
+            } else if (sendType == Consts.TICKET_CLOSE) {
+                subjectString = "Encerramento do Ticket #" + ticketId + "#: " + ticketTitle;
                 contentString = contentCloseTicket(ticketId, ticketTitle);
-            }
-            else if(sendType == Consts.TICKET_OPEN){
-                subjectString = "Reabertura do Ticket #"+ticketId+"#: "+ticketTitle;
+            } else if (sendType == Consts.TICKET_OPEN) {
+                subjectString = "Reabertura do Ticket #" + ticketId + "#: " + ticketTitle;
                 contentString = contentOpenTicket(ticketId, ticketTitle);
             }
             message.setSubject(subjectString);
             message.setContent(contentString, "text/html; charset=utf-8");
-            
+
             Transport.send(message);
 
-        } catch (MessagingException e) {}
+        } catch (MessagingException e) {
+        }
     }
 
     private String contentNewTicket(Ticket ticket) {
@@ -163,8 +188,8 @@ public class EmailService {
         String categoria = ticket.getCategory().getName();
         String observacoes = ticket.getDescription();
         String passos = ticket.getStepsTicket();
-        
-        String html = Consts.REPLY_ABOVE_THIS_LINE+"<!DOCTYPE html>"
+
+        String html = Consts.REPLY_ABOVE_THIS_LINE + "<!DOCTYPE html>"
                 + "<html>"
                 + "<head>"
                 + "<meta charset='UTF-8\'>"
@@ -235,7 +260,7 @@ public class EmailService {
         if (olderTicket.getResponsible() != null) {
             olderResponsible = olderTicket.getResponsible().getName();
         }
-        if(olderTicket.getStepsTicket() != null){
+        if (olderTicket.getStepsTicket() != null) {
             olderSteps = olderTicket.getStepsTicket();
         }
 
@@ -251,7 +276,7 @@ public class EmailService {
         if (newTicket.getResponsible() != null) {
             newResponsible = newTicket.getResponsible().getName();
         }
-        if(newTicket.getStepsTicket() != null){
+        if (newTicket.getStepsTicket() != null) {
             newSteps = newTicket.getStepsTicket();
         }
 
@@ -338,10 +363,10 @@ public class EmailService {
     }
 
     private String contentNewAnswer(TicketAnswer answer, String userName) {
-        long idTicket = answer.getTicket().getId(); 
-        String nameTicket = answer.getTicket().getDescription(); 
+        long idTicket = answer.getTicket().getId();
+        String nameTicket = answer.getTicket().getDescription();
         String description = answer.getDescription();
-        String html = Consts.REPLY_ABOVE_THIS_LINE+"<!DOCTYPE html>"
+        String html = Consts.REPLY_ABOVE_THIS_LINE + "<!DOCTYPE html>"
                 + "<html>"
                 + "<head>"
                 + "<meta charset='UTF-8\'>"
@@ -380,7 +405,7 @@ public class EmailService {
     }
 
     private String contentCloseTicket(long idTicket, String nameTicket) {
-        String html = Consts.REPLY_ABOVE_THIS_LINE+"<!DOCTYPE html>"
+        String html = Consts.REPLY_ABOVE_THIS_LINE + "<!DOCTYPE html>"
                 + "<html>"
                 + "<head>"
                 + "<meta charset='UTF-8\'>"
@@ -404,9 +429,9 @@ public class EmailService {
                 + "</html>";
         return html;
     }
-    
+
     private String contentOpenTicket(long idTicket, String nameTicket) {
-        String html = Consts.REPLY_ABOVE_THIS_LINE+"<!DOCTYPE html>"
+        String html = Consts.REPLY_ABOVE_THIS_LINE + "<!DOCTYPE html>"
                 + "<html>"
                 + "<head>"
                 + "<meta charset='UTF-8\'>"
@@ -430,7 +455,7 @@ public class EmailService {
                 + "</html>";
         return html;
     }
-    
+
     public String getCorrectAdress(List<String> listEmails) {
         String emails = "";
         for (int i = 0; i < listEmails.size(); i++) {
@@ -451,13 +476,13 @@ public class EmailService {
         Store store = null;
         try {
             // Set the store depending on the parameter flag value
-            store = session.getStore(PROPERTIES.getProperty("mail.imaps"));
+            store = session.getStore(PROPERTIES.getProperty(Consts.MAIL_IMAPS));
             // Set the server depending on the parameter flag value            
             //VALORES DO SERVIDOR
-            store.connect(PROPERTIES.getProperty("mail.imap.gmail"), PROPERTIES.getProperty("mail.user"), PROPERTIES.getProperty("mail.password"));
+            store.connect(PROPERTIES.getProperty(Consts.IMAP), PROPERTIES.getProperty(Consts.USER_EMAIL), PROPERTIES.getProperty(Consts.MAIL_PASSWORD));
 
             // Get the Inbox folder
-            Folder inbox = store.getFolder(PROPERTIES.getProperty("mail.folder"));
+            Folder inbox = store.getFolder(PROPERTIES.getProperty(Consts.FOLDER));
             // Set the mode to the read-write mode
             inbox.open(Folder.READ_WRITE);
 
@@ -502,62 +527,96 @@ public class EmailService {
             }
             store.close();
         } catch (Exception e) {
-            if(store != null){
+            if (store != null) {
                 store.close();
             }
             e.printStackTrace();
         }
     }
 
-    public List<String> getListEmailsToSend(Ticket ticket, Ticket newTicket, TicketAnswer ticketAnswer) {
+    public List<String> getListEmailsToSend(Ticket olderTicket, Ticket newTicket, TicketAnswer ticketAnswer) {
         List<String> listEmails = new ArrayList<String>();
         User userAnswer;
+
         User userTicket;
+
         User userResponsible;
-        User userTicketNew;
         User userResponsibleNew;
-        
-        if (ticket != null) {
-            userTicket = ticket.getUser();
-            userResponsible = ticket.getResponsible();
-            
-            listEmails.add(userTicket.getEmail());
-            if(userResponsible == null){
-                listEmails.addAll(getAdminEmails());
-            }
-            else{
-                listEmails.add(userResponsible.getEmail());
-            }  
-        }
-        if (newTicket != null) {
-            userTicketNew = newTicket.getUser();
-            userResponsibleNew = newTicket.getResponsible();
-            
-            listEmails.add(userTicketNew.getEmail());
-            if(userResponsibleNew == null){
-                listEmails.addAll(getAdminEmails());
-            }
-            else{
-                listEmails.add(userResponsibleNew.getEmail());
-            }
-        }
-        else if (ticketAnswer != null) {
+
+        if (ticketAnswer != null) {
+            // usuario que enviou a resposta.
             userAnswer = ticketAnswer.getUser();
+            // usuario que criou o ticket.
             userTicket = ticketAnswer.getTicket().getUser();
+            // usuario responsavel pelo ticket.
             userResponsible = ticketAnswer.getTicket().getResponsible();
-            
-            listEmails.add(userAnswer.getEmail());
-            listEmails.add(userTicket.getEmail());
-            if(userResponsible == null){
+
+            // se for email para uma nova resposta.
+            if (userAnswer != null) {
+                if (userTicket != null) {
+                    // verifica se não foi o usuario que criou o ticket que enviou a resposta.
+                    if (!userAnswer.getId().equals(userTicket.getId())) {
+                        // valida email do usuário que criou o ticket.
+                        if (userTicket.getEmail() != null && !(userTicket.getEmail().equals(""))) {
+                            listEmails.add(userTicket.getEmail());
+                        }
+                    }
+                }
+                if (userResponsible != null) {
+                    // verifica se não foi o responsável do ticket que mandou a resposta.
+                    if (!userAnswer.getId().equals(userResponsible.getId())) {
+                        // valida email do responsável do ticket.
+                        if (userResponsible.getEmail() != null && !(userResponsible.getEmail().equals(""))) {
+                            listEmails.add(userResponsible.getEmail());
+                        }
+                    }
+                }
+            }
+        } else {
+            // se for email para novo ticket ou mudanças em ticket antigo.
+
+            // se for edição de ticket.
+            if (olderTicket != null) {
+
+                // usuario criador do ticket.
+                userTicket = olderTicket.getUser();
+                // usuario responsavel antes da edicao do ticket.
+                userResponsible = olderTicket.getResponsible();
+                // usuario responsavel apos a edicao do ticket.
+                userResponsibleNew = newTicket.getResponsible();
+
+                if (userTicket != null) {
+                    // validando email do usuario.
+                    if (userTicket.getEmail() != null && !(userTicket.getEmail().equals(""))) {
+                        listEmails.add(userTicket.getEmail());
+                    }
+                }
+
+                if (userResponsible != null) {
+                    // valida o email do responsável do ticket.
+                    if (userResponsible.getEmail() != null && !(userResponsible.getEmail().equals(""))) {
+                        listEmails.add(userResponsible.getEmail());
+                    }
+                    if (userResponsibleNew != null) {
+                        // verifica se não manteve o mesmo responsavel do ticket.
+                        if (!userResponsibleNew.getId().equals(userResponsible.getId())) {
+                            listEmails.add(userResponsibleNew.getEmail());
+                        }
+                    }
+                } else if (userResponsibleNew != null) {
+                    // valida o email do novo responsável do ticket.
+                    if (userResponsibleNew.getEmail() != null && !(userResponsibleNew.getEmail().equals(""))) {
+                        listEmails.add(userResponsibleNew.getEmail());
+                    }
+                }
+            } else if (newTicket != null) {
+                // caso seja novo ticket, mandar email a todos os administradores.
                 listEmails.addAll(getAdminEmails());
             }
-            else{
-                listEmails.add(userResponsible.getEmail());
-            }            
         }
-        
         return listEmails;
     }
+
     /**
      * @author andresulivam
      *
@@ -568,76 +627,73 @@ public class EmailService {
         List<String> listEmails = new ArrayList<String>();
         List<User> listAdmin = userService.findByUserAdmin();
         for (User admin : listAdmin) {
-            listEmails.add(admin.getEmail());
+            if (admin.getEmail() != null && !(admin.getEmail().equals(""))) {
+                listEmails.add(admin.getEmail());
+            }
         }
         return listEmails;
     }
-    
-    public void sendEmailPasswordChanged(User user,String language){
-        
+
+    public void sendEmailPasswordChanged(User user, String language) {
+
         String html = "";
         //Define o idioma do email
-        if(language.trim().equals("pt_BR")){
+        if (language.trim().equals("pt_BR")) {
             html = "<!DOCTYPE html>"
-                + "<html>"
+                    + "<html>"
                     + "<head>"
-                        + "<meta charset='UTF-8\'>"
-                        + "<style>"
-                        + "h1{font-weight: bold;}"
-                        + "pre{color:black;font-size: 15px;font-weight: normal;}"
-                        + "</style>"
+                    + "<meta charset='UTF-8\'>"
+                    + "<style>"
+                    + "h1{font-weight: bold;}"
+                    + "pre{color:black;font-size: 15px;font-weight: normal;}"
+                    + "</style>"
                     + "</head>"
                     + "<body>"
-                        +"<p> Prezado "+user.getName()+",</p>"
-                        +"<br/>"                       
-                        +"<p> Uma nova senha foi gerada para seu acesso ao sistema.</p>"                        
-                        +"<p> Aconselhamos que altere a mesma para uma de sua preferência pois trata-se de uma senha temporária.</p>"                        
-                        +"<p> Sua nova senha é: "+user.getPassword()+"</p>"
-                        +"<p> Link para acesso: <a href='http://cymosupport.tecnologia.ws/Helpdesk'> http://cymosupport.tecnologia.ws/Helpdesk </a> </p>"
-                        +"<p>Atenciosamente, <br/>Cymo</p>"                        
+                    + "<p> Prezado " + user.getName() + ",</p>"
+                    + "<br/>"
+                    + "<p> Uma nova senha foi gerada para seu acesso ao sistema.</p>"
+                    + "<p> Aconselhamos que altere a mesma para uma de sua preferência pois trata-se de uma senha temporária.</p>"
+                    + "<p> Sua nova senha é: " + user.getPassword() + "</p>"
+                    + "<p> Link para acesso: <a href='http://cymosupport.tecnologia.ws/Helpdesk'> http://cymosupport.tecnologia.ws/Helpdesk </a> </p>"
+                    + "<p>Atenciosamente, <br/>Cymo</p>"
                     + "</body>"
-                + "</html>";
-        }else if(language.trim().equals("en")){
+                    + "</html>";
+        } else if (language.trim().equals("en")) {
             html = "<!DOCTYPE html>"
-                + "<html>"
+                    + "<html>"
                     + "<head>"
-                        + "<meta charset='UTF-8\'>"
-                        + "<style>"
-                        + "h1{font-weight: bold;}"
-                        + "pre{color:black;font-size: 15px;font-weight: normal;}"
-                        + "</style>"
+                    + "<meta charset='UTF-8\'>"
+                    + "<style>"
+                    + "h1{font-weight: bold;}"
+                    + "pre{color:black;font-size: 15px;font-weight: normal;}"
+                    + "</style>"
                     + "</head>"
                     + "<body>"
-                        +"<p> Dear "+user.getName()+",</p>"
-                        +"<br/>" 
-                        +"<p> A new password was generated for you access in the system.</p>" 
-                        +"<p> We strongly recommend you to change the password to one of your preference.</p>"                        
-                        +"<p> Your new password is: "+user.getPassword()+"</p>"
-                        +"<p> Link for the access: <a href='http://cymosupport.tecnologia.ws/Helpdesk'> http://cymosupport.tecnologia.ws/Helpdesk </a> </p>"
-                        +"<p>Att, <br/>Cymo</p>"                        
+                    + "<p> Dear " + user.getName() + ",</p>"
+                    + "<br/>"
+                    + "<p> A new password was generated for you access in the system.</p>"
+                    + "<p> We strongly recommend you to change the password to one of your preference.</p>"
+                    + "<p> Your new password is: " + user.getPassword() + "</p>"
+                    + "<p> Link for the access: <a href='http://cymosupport.tecnologia.ws/Helpdesk'> http://cymosupport.tecnologia.ws/Helpdesk </a> </p>"
+                    + "<p>Att, <br/>Cymo</p>"
                     + "</body>"
-                + "</html>";
+                    + "</html>";
         }
-        
+
         Session session = getSession();
         try {
-            
             Message message = new MimeMessage(session);
-            message.setFrom(new InternetAddress(PROPERTIES.getProperty("mail.user")));
+            message.setFrom(new InternetAddress(PROPERTIES.getProperty(Consts.USER_EMAIL)));
             message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(user.getEmail()));
-            if(language.trim().equals("pt_BR")){
+            if (language.trim().equals("pt_BR")) {
                 message.setSubject("Alerta de alteração de senha");
-            }else if(language.trim().equals("en")){
+            } else if (language.trim().equals("en")) {
                 message.setSubject("Password recovery");
-            }            
+            }
             message.setContent(html, "text/html; charset=utf-8");
             Transport.send(message);
-            
+
         } catch (MessagingException e) {
         }
-        
-        
-        
     }
-
 }

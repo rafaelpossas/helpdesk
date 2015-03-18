@@ -84,6 +84,8 @@ translations = {
 
     EDIT: 'Editar',
     EMAIL: 'E-Mail',
+    EMAIL_CONFIGURATIONS: 'Configurações do Email',
+    EMAIL_CONFIGURE: 'Configurar Email',
     ENGLISH: 'Inglês',
     ENTER: 'Entrar',
     ENABLE: 'Habilitado',
@@ -130,6 +132,7 @@ translations = {
     INOVATION: 'Inovação',
     INVALID_USERNAME:'invalid-username',
     INVALID_USERNAME_MESSAGE:'Nome de usuário inválido ou inexistente',
+    IMAP: 'IMAP',
     //############################################## [ J ] ##############################################//
 
 
@@ -193,7 +196,6 @@ translations = {
     OPEN_TO: 'Em aberto',
     OPEN_TICKET: 'Abrir ticket', 
     ONLY_UPLOAD_IMAGES: 'Você só pode fazer upload de imagens',
-    OPEN_TICKET: 'Abrir ticket',
     OPEN_TICKET_TITLE:'open-ticket',
     OF: 'de',
     //############################################## [ P ] ##############################################//
@@ -241,7 +243,7 @@ translations = {
     //############################################## [ S ] ##############################################//
 
     SAVE: 'Salvar',
-    SAVED_WITH_SUCCESS: 'salvo(a) com sucesso',
+    SAVED_WITH_SUCCESS: 'Salvo(a) com sucesso',
     SAVING: 'Salvando...',
     SAVING_REPLY: 'Salvando resposta..',
     SAVING_TICKET: 'Salvando ticket..',
@@ -269,6 +271,7 @@ translations = {
     SHOW_ALL: '(Mostrar todas)',
     SITUATION: 'Situação',
     STATUS_TICKET:'status-ticket',
+    SMTP: 'SMTP',
     //############################################## [ T ] ##############################################//
 
     TICKETS: 'Tickets',

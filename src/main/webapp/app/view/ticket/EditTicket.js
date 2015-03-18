@@ -139,13 +139,14 @@ Ext.define('Helpdesk.view.ticket.EditTicket', {
                             items: [
                                 {
                                     xtype: 'text',
-                                    text: translations.TICKET_PROBLEM_STEPS,
+                                    text: translations.STEPS_DESCRIPTION,
                                     baseCls: 'description-ticket-bold'
                                 },
                                 {
                                     xtype: 'label',
                                     itemId: 'tktSteps',
-                                    baseCls: 'description-ticket'
+                                    width: 750,
+                                    baseCls: 'steps-ticket'
                                 }
                             ]
                         }
@@ -300,7 +301,7 @@ Ext.define('Helpdesk.view.ticket.EditTicket', {
                             items: [
                                 {
                                     xtype: 'text',
-                                    text: translations.TICKET_PROBLEM_STEPS,
+                                    text: translations.STEPS_DESCRIPTION,
                                     baseCls: 'description-ticket-bold'
                                 },
                                 {

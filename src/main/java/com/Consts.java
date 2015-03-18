@@ -75,4 +75,18 @@ public class Consts {
     public static Integer TICKET_NEW_ANSWER = 2;
     public static Integer TICKET_CLOSE = 3;
     public static Integer TICKET_OPEN = 4;
+    
+    public static String SMTP_HOST = "mail.smtp.host";
+    public static String SOCKET_FACTORY_PORT = "mail.smtp.socketFactory.port";
+    public static String SOCKET_FACTORY_CLASS = "mail.smtp.socketFactory.class";
+    public static String SOCKET_FACTORY_CLASS_VALUE = "javax.net.ssl.SSLSocketFactory";    
+    public static String AUTH = "mail.smtp.auth";
+    public static String SMTP_PORT = "mail.smtp.port";
+    public static String USER_EMAIL = "mail.user";
+    public static String MAIL_PASSWORD = "mail.password";
+    public static String MAIL_IMAPS = "mail.imaps";
+    public static String IMAPS = "imaps";
+    public static String IMAP = "mail.imap.gmail";
+    public static String FOLDER = "mail.folder";
+    public static String INBOX = "Inbox";
 }

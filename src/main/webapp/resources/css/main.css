@@ -381,7 +381,7 @@
 .description-ticket{    
     font-size: 15px;
     overflow:auto;
-    white-space: pre-line;
+    white-space: pre-line;    
 }
 .description-ticket-bold{
     font-weight: bold;
@@ -656,8 +656,7 @@
     padding: 10px 0 5px 10px !important;
 }
 
-.answer-format{
-    
+.answer-format{    
     overflow:auto;
     white-space: pre-line;
 }
@@ -709,4 +708,11 @@
 .forgot-password-button:hover{
     cursor:pointer;
     text-decoration: underline;
+}
+
+.steps-ticket{    
+    font-size: 15px;
+    display: block; 
+    float: left;
+    word-wrap: break-word !important;
 }
