@@ -283,56 +283,69 @@ public class TicketController {
 
     @RequestMapping(value = {"", "/{id}"}, method = {RequestMethod.POST, RequestMethod.PUT}, params = {"user"})
     @ResponseBody
-    public Ticket save(@RequestBody Ticket ticket, @RequestParam(value = "user") String username) throws IOException {
+    public Ticket save(@RequestBody Ticket newTicket, @RequestParam(value = "user") String username) throws IOException {
         User user = userService.findByUserName(username);
         List<File> filesToSave = attachmentsService.getAttachmentsFromUser(username);
 
         List<String> emails = new ArrayList<String>();
         Ticket olderTicket = null;
 
-        if (!(ticket.getId() == null)) {
-            olderTicket = ticketService.findById(ticket.getId());
+        // verificando se é edição ou novo ticket.
+        if (newTicket.getId() != null) {
+            // buscando o ticket já existente no banco.
+            olderTicket = ticketService.findById(newTicket.getId());
         } else {
-            ticket.setStartDate(new Date());
+            // como novo ticket, é necessário instanciar a data de início do ticket.
+            newTicket.setStartDate(new Date());
         }
 
-        if (ticket.getPriority() == null) {
-            //buscando 'sem prioridade'
+        if (newTicket.getPriority() == null) {
+            //buscando a prioridade do banco de dados: 'Sem prioridade'
             Priority priority = priorityService.findById(1L);
-            ticket.setPriority(priority);
+            newTicket.setPriority(priority);
         }
+        
         //buscando novamente a categoria no banco porque o valor do 'name' está vindo do extjs com o valor de translations
-        Category category = categoryService.findById(ticket.getCategory().getId());
-        ticket.setCategory(category);
-        if (olderTicket == null) {            
-            ticket.setLastInteration(ticket.getStartDate());
-            ticket.setUserLastInteration(ticket.getUser());
+        Category category = categoryService.findById(newTicket.getCategory().getId());       
+        newTicket.setCategory(category);
+        
+        if (olderTicket == null) {
+            // se é novo ticket.
+            newTicket.setLastInteration(newTicket.getStartDate());
+            newTicket.setUserLastInteration(newTicket.getUser());
         }
-        ticket = ticketService.save(ticket);
+        
+        newTicket = ticketService.save(newTicket);
 
-        if (olderTicket != null) {            
-            changesTicketController.save(olderTicket, ticket, user);
+        if (olderTicket != null) {     
+            // se é edição de um ticket, salvar qual foi a mudança.
+            changesTicketController.save(olderTicket, newTicket, user);
         }
 
+        // salvando anexos do ticket.
         Attachments attachment = null;
         for (File file : filesToSave) {
             attachment = new Attachments();
             attachment.setName(file.getName());
             attachment.setByteArquivo(attachmentsService.getBytesFromFile(file));
-            attachment.setTicket(ticket);
+            attachment.setTicket(newTicket);
             attachmentsService.save(attachment);
             file.delete();
         }
 
-        emails = emailService.getListEmailsToSend(olderTicket, ticket, null);
+        // buscando para quais emails que receberão a notificação.
+        emails = emailService.getListEmailsToSend(olderTicket, newTicket, null);
+        
         if (emails.size() > 0) {
+            Integer tipo;
             if (olderTicket != null) {
-                emailService.sendEmail(olderTicket, ticket, null,null,emails,Consts.TICKET_EDIT); //EDIT
+                tipo = Consts.TICKET_EDIT;
             } else {
-                emailService.sendEmail(ticket, null, null,null,emails,Consts.TICKET_NEW); //NEW
+                tipo = Consts.TICKET_NEW;
             }
+            emailService.sendEmail(olderTicket, newTicket, null,null,emails,tipo); //NEW
         }
-        return ticket;
+        return newTicket;
     }
 
     @RequestMapping(value = {"/save_without_email_routine", "/save_without_email_routine/{id}"}, method = {RequestMethod.POST, RequestMethod.PUT}, params = {"user"})

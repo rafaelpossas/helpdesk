@@ -8,6 +8,7 @@
 <input type="hidden" name="email" id="client" value="<%=request.getAttribute("email")%>">
 <html>
     <head>
+        <title>Help-Desk - Procymo</title>
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
         <script type="text/javascript">
             var homeURL = '${ctx}';

@@ -29,7 +29,8 @@ Ext.application({
         'TicketAnswer',
         'Dashboard',
         'Priority',
-        'Reports'
+        'Reports',
+        'EmailConfig'
     ],
     enableRouter: true,
     routes: {

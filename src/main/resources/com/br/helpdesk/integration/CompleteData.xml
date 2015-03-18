@@ -1,5 +1,9 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <dataset>
+    
+    <Email_Config id="1" smtp_host="host.gmail" socket_factory_port="465" auth="true" 
+                      smtp_port="465" user_email="teste@gmail.com" password="1234" imap="imap.gmail"/>
+        
     <Client id="1" name="Cymo Tecnologia em Gestão"/>
     <Client id="2" name="Cymo"/>
     <Client id="3" name="Tecnologia"/>

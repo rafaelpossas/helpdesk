@@ -21,7 +21,7 @@ Ext.define('Helpdesk.Globals',{
     settings_category_view: 1,
     settings_client_view: 2,
     settings_priority_view: 3,
-    
+    settings_emailconfig_view: 4,
     
     perfil_detalhes_view:0,
     perfil_senha_view:1,

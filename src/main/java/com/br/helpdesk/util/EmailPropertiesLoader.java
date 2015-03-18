@@ -12,9 +12,7 @@ package com.br.helpdesk.util;
 */
 
 import java.io.File;
-import java.net.URL;
 import java.io.FileInputStream;
-import java.io.InputStream;
 import java.net.URL;
 import java.util.Properties;
 
@@ -37,7 +35,7 @@ public class EmailPropertiesLoader {
            //Leio o fileInputStream recuperando assim o mapa contendo chaves e valores
            prop.load(fileInputStream);
            //Fecho o fileInputStream
-           
+
            fileInputStream.close();           
        } catch (Exception e) {
            //Trato possíveis exceções

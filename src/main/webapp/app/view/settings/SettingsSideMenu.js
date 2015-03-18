@@ -36,7 +36,8 @@ Ext.define('Helpdesk.view.settings.SettingsSideMenu', {
             itemId: 'priority'
         },
         {
-            xtype: 'tbfill'  
+            text: translations.EMAIL_CONFIGURE,
+            itemId: 'emailconfig'
         }
     ]
 });
