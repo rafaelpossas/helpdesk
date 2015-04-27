@@ -38,6 +38,10 @@ Ext.define('Helpdesk.view.settings.SettingsSideMenu', {
         {
             text: translations.EMAIL_CONFIGURE,
             itemId: 'emailconfig'
+        },
+        {
+            text: translations.SEND_EMAIL,
+            itemId: 'sendemail'
         }
     ]
 });

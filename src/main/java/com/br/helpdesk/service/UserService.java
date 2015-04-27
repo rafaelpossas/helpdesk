@@ -48,7 +48,8 @@ public class UserService {
         user = (User) removePassword(null, user);
         return user;
     }
-    public User findByUserNameWithPassword(String userName){
+
+    public User findByUserNameWithPassword(String userName) {
         User user = repository.findByUserName(userName);
         return user;
     }
@@ -78,12 +79,13 @@ public class UserService {
     }
 
     /**
-     * Remover o atributo de password dos usuário para retornar a requisição. <br>
+     * Remover o atributo de password dos usuário para retornar a requisição.
+     * <br>
      * Recebe uma lista de usuários ou um usuário apenas.
-     * 
+     *
      * @param list
      * @param user
-     * @return 
+     * @return
      */
     public Object removePassword(List<User> list, User user) {
         // caso seja uma lista de usuário, retira a senha de todos e retorna a lista
@@ -98,5 +100,10 @@ public class UserService {
             return user;
         }
         return null;
+    }
+
+    public List<User> findByGroupClient(List<Long> idClients) {
+        List<User> list = repository.findByGroupClient(idClients);
+        return list;
     }
 }

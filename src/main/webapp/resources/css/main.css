@@ -183,12 +183,17 @@
     color:#337fed !important;
     cursor: pointer;
 }
+
 .grid-style-row .x-grid-cell-inner{
     overflow: hidden;
     padding: 10px;
     white-space: nowrap;
     font-size:13px !important;
+}
 
+.grid-email-style-row {
+    overflow: hidden;
+    font-size:13px !important;
 }
 
 .grid-style-header .x-column-header-inner{
@@ -198,7 +203,6 @@
     font-size:15px !important;
     font-weight:bold !important;
     overflow: hidden;
-
     white-space: nowrap;
 }
 

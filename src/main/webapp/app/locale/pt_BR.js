@@ -67,7 +67,7 @@ translations = {
     CHANGED_WITH_SUCCESS: 'Alterado com sucesso',
     CHANGE_PASSWORD_COMPLETE: 'change-password-complete',
     CHANGE_PASSWORD_COMPLETE_MESSAGE:'Uma nova senha foi gerada e enviada para o e-mail cadastrado.',
-    
+    CLEAR: 'Limpar',
     //############################################## [ D ] ##############################################//
 
     DELETE: 'Remover',
@@ -99,6 +99,8 @@ translations = {
     EVOLUTION_TICKETS_BY_USER: 'Evolução dos tickets pelo usuário',
     ESTIMATED_TIME_CHANGED_FROM: 'Prazo estimado alterado de ',
     EXPIRED: 'Expirado?',
+    EMAIL_SENT_SUCCESS: 'Email enviado com sucesso!',
+    EMAIL_SENT_FAILED: 'Email não enviado - Falha!',
     //############################################## [ F ] ##############################################//
 
     FIRST_TIME_REQUESTING_SERVICE: 'Solicitando Atendimento pela primeira vez?',
@@ -133,6 +135,8 @@ translations = {
     INVALID_USERNAME:'invalid-username',
     INVALID_USERNAME_MESSAGE:'Nome de usuário inválido ou inexistente',
     IMAP: 'IMAP',
+    INSERT_IMAGE: 'Inserir Imagem',
+    INSERT_IMAGE_ON_BODY_EMAIL: 'Inserir imagem no corpo do email.',
     //############################################## [ J ] ##############################################//
 
 
@@ -168,6 +172,7 @@ translations = {
     MONTH_10: 'Outubro',
     MONTH_11: 'Novembro',
     MONTH_12: 'Dezembro',
+    MESSAGE: 'Mensagem',
     //############################################## [ N ] ##############################################//
 
     NAME: 'Nome',
@@ -264,6 +269,9 @@ translations = {
     SEE_FULL_REPORT: '(Ver relatório completo)',
     SEARCH: 'Busca',
     SERVICE: 'Serviço',
+    SEND: 'Enviar',
+    SEND_EMAIL: 'Enviar Email',
+    SENDING_EMAIL: 'Enviando Email',
     SEE: 'Ver',
     SELECT_A_CLIENT: 'Selecione um cliente',
     SELECT_A_USER: 'Selecione um usuário',
@@ -272,6 +280,7 @@ translations = {
     SITUATION: 'Situação',
     STATUS_TICKET:'status-ticket',
     SMTP: 'SMTP',
+    SELECTED: 'Selecionados',
     //############################################## [ T ] ##############################################//
 
     TICKETS: 'Tickets',

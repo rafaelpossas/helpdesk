@@ -68,7 +68,7 @@ translations = {
     CHANGED_WITH_SUCCESS: 'Changed with success',
     CHANGE_PASSWORD_COMPLETE: 'change-password-complete',    
     CHANGE_PASSWORD_COMPLETE_MESSAGE:'A new password was automatically generated and sent to your e-mail account',
-    
+    CLEAR: 'Clear',
     //############################################## [ D ] ##############################################//
 
     DELETE: 'Delete',
@@ -100,6 +100,8 @@ translations = {
     EVOLUTION_TICKETS_BY_USER: 'Evolution tickets by user',
     ESTIMATED_TIME_CHANGED_FROM: 'Estimated time changed from ',
     EXPIRED: 'Expired?',
+    EMAIL_SENT_SUCCESS: 'Email sent with success!',
+    EMAIL_SENT_FAILED: 'Email not sent - Failed!',
     //############################################## [ F ] ##############################################//
 
     FIRST_TIME_REQUESTING_SERVICE: 'Ordering Service for the first time?',
@@ -134,6 +136,8 @@ translations = {
     INVALID_USERNAME:'invalid-username',    
     INVALID_USERNAME_MESSAGE:'Invalid username',
     IMAP: 'IMAP',
+    INSERT_IMAGE: 'Insert Image',
+    INSERT_IMAGE_ON_BODY_EMAIL: 'Insert image on email\'s body.',
     //############################################## [ J ] ##############################################//
 
 
@@ -169,6 +173,7 @@ translations = {
     MONTH_10: 'October',
     MONTH_11: 'November',
     MONTH_12: 'December',
+    MESSAGE: 'Message',
     //############################################## [ N ] ##############################################//
 
     NAME: 'Name',
@@ -265,6 +270,9 @@ translations = {
     SEE_FULL_REPORT: '(See full report)',
     SEARCH: 'Search',
     SERVICE: 'Service',
+    SEND: 'Send',
+    SEND_EMAIL: 'Send Email',
+    SENDING_EMAIL: 'Sending Email',
     SEE: 'See',
     SELECT_A_CLIENT: 'Select a client',
     SELECT_A_USER: 'Select a user',
@@ -273,6 +281,7 @@ translations = {
     SITUATION: 'Situation',
     STATUS_TICKET:'status-ticket',
     SMTP: 'SMTP',
+    SELECTED: 'Selected',
     //############################################## [ T ] ##############################################//
 
     TICKETS: 'Tickets',
