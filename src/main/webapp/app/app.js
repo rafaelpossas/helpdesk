@@ -30,7 +30,8 @@ Ext.application({
         'Dashboard',
         'Priority',
         'Reports',
-        'EmailConfig'
+        'EmailConfig',
+        'SendEmail'
     ],
     enableRouter: true,
     routes: {

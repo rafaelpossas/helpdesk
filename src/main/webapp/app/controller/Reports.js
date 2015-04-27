@@ -505,6 +505,7 @@ Ext.define('Helpdesk.controller.Reports', {
      * Formata o painel de destaques atuais baseado na tela enviada por parâmentro (type) e o result (json).
      * 
      * @param {type} result
+     * @param {type} type
      * @returns {undefined}
      */
     formatHighlightCurrentByScreen: function(result, type) {
@@ -742,6 +743,7 @@ Ext.define('Helpdesk.controller.Reports', {
      * @author andresulivam
      * 
      * Requisição ao servidor para o Json para preencher o datagrid de consolidados por mês na tela de relatórios de clientes.
+     * @param {type} inicial
      * @returns {undefined}
      */
     getGridConsolidatedPerMonthClient: function(inicial) {
@@ -762,7 +764,7 @@ Ext.define('Helpdesk.controller.Reports', {
      * @author andresulivam
      * 
      * Requisição ao servidor para o json com os dados para o datagrid de relatório de usuário.
-     * 
+     * @param {type} inicial
      * @returns {undefined}
      */
     getGridConsolidatedPerMonthUser: function(inicial) {

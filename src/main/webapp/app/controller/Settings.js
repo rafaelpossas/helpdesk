@@ -3,7 +3,11 @@
  */
 Ext.define('Helpdesk.controller.Settings', {
     extend: 'Ext.app.Controller',
-    views: ['Helpdesk.view.settings.Settings', 'Helpdesk.view.user.Users', 'Helpdesk.view.category.Category', 'Helpdesk.view.client.Client'],
+    views: ['Helpdesk.view.settings.Settings', 
+        'Helpdesk.view.user.Users', 
+        'Helpdesk.view.category.Category', 
+        'Helpdesk.view.client.Client'
+    ],
     init: function () {
         this.control({
             'settingssidemenu button': {
@@ -41,8 +45,8 @@ Ext.define('Helpdesk.controller.Settings', {
             selector: 'priority > prioritygrid'
         },
         {
-            ref: 'emailConfigForm',
-            selector: 'emailconfig > emailconfigform'
+            ref: 'clientGridPanelEmail',
+            selector: 'sendemail > sendemailform > clientgridcheckbox'
         }
     ],
     index: function () {
@@ -75,6 +79,11 @@ Ext.define('Helpdesk.controller.Settings', {
             this.getSettingsCardPanel().getLayout().setActiveItem(Helpdesk.Globals.settings_emailconfig_view);
             this.getEmailConfig();
         }
+        else if (btn.itemId === 'sendemail')
+        {
+            this.getSettingsCardPanel().getLayout().setActiveItem(Helpdesk.Globals.settings_sendemail_view);
+            this.getSendEmail();
+        }
     },
     getUsers: function () {
         this.getUsersPanel().getStore().load();
@@ -92,8 +101,12 @@ Ext.define('Helpdesk.controller.Settings', {
         this.getPriorityPanel().getStore().load();
         this.setPressedButton('priority');
     },
-    getEmailConfig: function () {        
-        this.setPressedButton('configemail');        
+    getEmailConfig: function () {  
+        this.setPressedButton('emailconfig');        
+    },
+    getSendEmail: function () {     
+        this.getClientGridPanelEmail().getStore().load();
+        this.setPressedButton('sendemail');        
     },
     setPressedButton: function (buttonID) {
         var buttons = this.getSettingsSideMenu().items.items;

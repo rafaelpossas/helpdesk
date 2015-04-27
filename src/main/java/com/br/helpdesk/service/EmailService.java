@@ -137,12 +137,12 @@ public class EmailService {
         Session session = getSession();
         String emails = getCorrectAdress(listEmailsTo);
         Store store = null;
-        try {      
+        try {
             // Set the store depending on the parameter flag value
-            store = session.getStore(PROPERTIES.getProperty(Consts.MAIL_IMAPS));                      
+            store = session.getStore(PROPERTIES.getProperty(Consts.MAIL_IMAPS));
             //VALORES DO SERVIDOR
             store.connect(PROPERTIES.getProperty(Consts.IMAP), PROPERTIES.getProperty(Consts.USER_EMAIL), PROPERTIES.getProperty(Consts.MAIL_PASSWORD));
-        
+
             Message message = new MimeMessage(session);
             message.setFrom(new InternetAddress(PROPERTIES.getProperty(Consts.USER_EMAIL)));
             message.setRecipients(Message.RecipientType.BCC, InternetAddress.parse(emails));
@@ -695,5 +695,42 @@ public class EmailService {
 
         } catch (MessagingException e) {
         }
+    }
+
+    public void sendEmailByScreenConfiguration(String subject, String messageUser, List<String> listEmails) throws MessagingException {
+        Session session = getSession();
+        String emails = getCorrectAdress(listEmails);
+        Store store = null;
+        // Set the store depending on the parameter flag value
+        store = session.getStore(PROPERTIES.getProperty(Consts.MAIL_IMAPS));
+        //VALORES DO SERVIDOR
+        store.connect(PROPERTIES.getProperty(Consts.IMAP), PROPERTIES.getProperty(Consts.USER_EMAIL), PROPERTIES.getProperty(Consts.MAIL_PASSWORD));
+
+        Message message = new MimeMessage(session);
+        message.setFrom(new InternetAddress(PROPERTIES.getProperty(Consts.USER_EMAIL)));
+        message.setRecipients(Message.RecipientType.BCC, InternetAddress.parse(emails));
+        message.setSubject(subject);
+        message.setContent(setMessageOnMessageSentByHelpdesk(messageUser), "text/html; charset=utf-8");
+
+        Transport.send(message);
+    }
+
+    public String setMessageOnMessageSentByHelpdesk(String message) {
+        String html = "<!DOCTYPE html>"
+                + "<html>"
+                + "<head>"
+                + "<meta charset='UTF-8\'>"
+                + "</head>"
+                + "<body>"
+                + "<h1> MENSAGEM HELPDESK - CYMO </h1>"
+                + "<br>"
+                + message
+                + "<br>"
+                + "<h4>"
+                + "Cymo Tecnologia em Gestão"
+                + "</h4>"
+                + "</body>"
+                + "</html>";
+        return html;
     }
 }
