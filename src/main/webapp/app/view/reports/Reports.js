@@ -14,7 +14,6 @@ Ext.define('Helpdesk.view.reports.Reports', {
         'Helpdesk.view.reports.ReportsExportData',
         'Helpdesk.view.reports.ReportsSideMenu'
     ],
-    flex: 1,
     layout: {
         type: 'border'
     },

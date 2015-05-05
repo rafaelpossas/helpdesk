@@ -17,16 +17,39 @@ Ext.define('Helpdesk.store.SendEmails', {
         });
         this.callParent([config]);
     },
-    sendEmail: function(callbackfunction, subject, message, groupClient, scope) {
-        console.log('store');
+    sendEmail: function(callbackfunction, subject, message, groupClient, scope) {        
         $.ajax({
-            type: 'GET',
+            type: 'POST',
             data: {
                 subject: subject,
                 message: message,
                 groupClient: groupClient
             },
             url: 'sendemail',
-            success: Ext.bind(callbackfunction, scope)});
+            success: Ext.bind(callbackfunction, scope)
+        });
+    },
+    getJsonEmailUsers: function(callbackfunction, groupClient, scope) {        
+        $.ajax({
+            type: 'POST',
+            data: {
+                groupClient: groupClient
+            },
+            url: 'sendemail',
+            success: Ext.bind(callbackfunction, scope)
+        });
+    },
+    sendEmailSingle: function(callbackfunction, subject, message, emailUser, id) {
+        $.ajax({
+            type: 'POST',
+            data: {
+                subject: subject,
+                message: message,
+                emailUser: emailUser,
+                id: id
+            },
+            url: 'sendemail',
+            success: Ext.bind(callbackfunction)
+        });
     }
 });

@@ -351,6 +351,7 @@ Ext.define('Helpdesk.controller.Reports', {
      * @author andresulivam
      * 
      * Requisição ao servidor para o Json para preencher o datagrid de consolidados por mês na tela de relatórios de categoria.
+     * @param {type} inicial
      * @returns {undefined}
      */
     getGridConsolidatedPerMonth: function(inicial) {

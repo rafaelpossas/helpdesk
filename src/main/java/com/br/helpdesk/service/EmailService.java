@@ -722,7 +722,6 @@ public class EmailService {
                 + "<meta charset='UTF-8\'>"
                 + "</head>"
                 + "<body>"
-                + "<h1> MENSAGEM HELPDESK - CYMO </h1>"
                 + "<br>"
                 + message
                 + "<br>"

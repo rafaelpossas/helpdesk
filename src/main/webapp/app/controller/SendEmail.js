@@ -10,10 +10,10 @@ Ext.define('Helpdesk.controller.SendEmail', {
     init: function () {
         this.control({
             'sendemail button#sendEmails': {
-                click: this.onButtonClickSendEmails
+                click: this.onClickButtonSendEmails
             },
             'sendemail button#clear': {
-                click: this.onButtonClickClearForm
+                click: this.onClickButtonClearForm
             },
             'sendemailform filefield#insertImage': {
                 change: this.onButtonInsertImageClick
@@ -42,48 +42,108 @@ Ext.define('Helpdesk.controller.SendEmail', {
         }
     ],
     /**
-     * Enviar emails.
+     * Método quando o usuário clicar no botão enviar os emails. <br>
+     * Cria uma requisição ao servidor que retorne todos os usuários dos clientes selecionados.
+     * 
+     * @author André Sulivam
+     * @param {type} button
+     * @param {type} e
+     * @param {type} option
+     * @returns {undefined}
+     */
+    onClickButtonSendEmails: function (button, e, option) {
+        var store = this.getSendEmailsStore();
+        var groupClient = this.getJsonClientsSelected();
+        store.getJsonEmailUsers(this.onBackGetJsonEmailUsers, groupClient, this);
+    },
+    /**
+     * Método que converte os clientes selecionados no grid para o formato de JSON.
+     * 
+     * @author André Sulivam
+     * @returns {String}
+     */
+    getJsonClientsSelected: function () {
+        var form = this.getEmailForm();
+        var clientsSelected = form.down('clientgridcheckbox').getSelectionModel().getSelection();
+        var arrayClient = new Array();
+        for (var i = 0; i < clientsSelected.length; i++) {
+            arrayClient[i] = new Number(clientsSelected[i].data.id);
+        }
+        var groupClient = JSON.stringify(arrayClient);
+        return groupClient;
+    },
+    /**
+     * Callback da requisição dos usuários dos clientes selecionados.
+     * 
+     * @author André Sulivam
+     * @param {type} result
+     * @returns {undefined}
+     */
+    onBackGetJsonEmailUsers: function (result) {
+        if (result !== null) {
+            var jsonObj = $.parseJSON('[' + result + ']');
+            this.createWindowWithUsersEmail(jsonObj);
+        }
+    },
+    /**
+     * Método que cria a Window que receberá o JSON dos usuários dos clientes selecionados. <br>
+     * 
+     * @author André Sulivam
+     * @param {type} jsonObj
+     * @returns {undefined}
+     */
+    createWindowWithUsersEmail: function (jsonObj) {
+        var store = new Ext.data.ArrayStore({
+            extend: 'Helpdesk.store.BasicStore',
+            id: 0,
+            fields: ['id', 'name', 'client', 'email', 'status', 'message'],
+            data: jsonObj
+        });
+        Ext.define('DynamicModel', {
+            extend: 'Ext.data.Model',
+            fields: ['id', 'name', 'client', 'email', 'status', 'message']
+        });
+        store.loadData([], false);
+        for (var i = 0; i < jsonObj.length; i++) {
+            var record = Ext.ModelManager.create(jsonObj[i], 'DynamicModel');
+            store.add(record);
+        }
+
+        var form = this.getEmailForm();
+        var subject = form.down('#subject').value;
+        var message = form.down('#htmleditormessage').value;
+
+        var window = Ext.create('Helpdesk.view.sendemail.SendEmailUsersWindow');
+
+        // atualizando store do grid dentro da windows.        
+        var panel = window.items.items[0];
+        panel.bindStore(store);
+
+        window.subject = subject;
+        window.message = message;
+        window.show();
+    },
+    /**
+     * Método para limpar todos os campos do formulário de envio de email.
+     * 
+     * @author André Sulivam
      * @param {type} button
      * @param {type} e
      * @param {type} options
      * @returns {undefined}
      */
-    onButtonClickSendEmails: function (button, e, options) {
-        var sendEmail = this.getSendEmail();
-        sendEmail.setLoading(translations.SENDING_EMAIL);
-
+    onClickButtonClearForm: function (button, e, options) {
         var form = this.getEmailForm();
-
-        var subject = form.down('#subject').value;
-        var message = form.down('#htmleditormessage').value;
-        var clientsSelected = form.down('clientgridcheckbox').getSelectionModel().getSelection();
-        var arrayClient = new Array();
-
-        for (var i = 0; i < clientsSelected.length; i++) {
-            arrayClient[i] = new Number(clientsSelected[i].data.id);
-        }
-
-        var groupClient = JSON.stringify(arrayClient);
-
-        var store = this.getSendEmailsStore();
-        store.sendEmail(this.onBackSendEmails, subject, message, groupClient, this);
-    },
-    onButtonClickClearForm: function(button, e, options){
-        var form = this.getEmailForm();
-
         form.down('#subject').setValue("");
         form.down('#htmleditormessage').setValue("");
         form.down('clientgridcheckbox').getSelectionModel().deselectAll();
     },
-    onBackSendEmails: function (result) {
-        var sendEmail = this.getSendEmail();
-        sendEmail.setLoading(false);
-        if (result === true) {
-            Ext.Msg.alert(translations.INFORMATION, translations.EMAIL_SENT_SUCCESS);
-        } else {
-            Ext.Msg.alert(translations.INFORMATION, translations.EMAIL_SENT_FAILED);
-        }
-    },
+    /**
+     * Inserir imagem no texto. (Não finalizada)
+     * 
+     * @author André Sulivam
+     * @returns {undefined}
+     */
     onButtonInsertImageClick: function () {
         var fileField = this.getEmailForm().down('#insertImage');
         var form = this.getEmailForm();
@@ -105,6 +165,13 @@ Ext.define('Helpdesk.controller.SendEmail', {
         reader.readAsBinaryString(fileSelected);
         console.log(reader);
     },
+    /**
+     * Verifica a cada alteração no formulário se todos os campos obrigatórios foram preenchidos e
+     * habilita o botão de enviar email caso estejam preenchidos.
+     * 
+     * @author André Sulivam
+     * @returns {undefined}
+     */
     onCheckEnableButtonSend: function () {
         var form = this.getEmailForm();
 
