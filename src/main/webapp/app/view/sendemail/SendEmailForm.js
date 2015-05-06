@@ -22,21 +22,21 @@ Ext.define('Helpdesk.view.sendemail.SendEmailForm', {
             fieldLabel: translations.SUBJECT,
             id: 'subject'
         },
-        {
-            xtype: 'filefield',
-            regex: /^.*(\.tiff)|(\.jpg)|(\.jpeg)|(\.gif)|(\.jpe)|(\.tif)|(\.png)$/i,
-            allowBlank: true,
-            buttonOnly: true,
-            margin: '0 0 0 105',
-            buttonText: translations.INSERT_IMAGE,
-            buttonConfig: {
-                id: 'buttonBrowser',
-                iconCls: 'icon_image_16',
-                tooltip: '<b>' + translations.INSERT_IMAGE + '</b><br>' + translations.INSERT_IMAGE_ON_BODY_EMAIL
-            },
-            id: 'insertImage',
-            iconCls: 'icon_image_16'
-        },
+//        {
+//            xtype: 'filefield',
+//            regex: /^.*(\.tiff)|(\.jpg)|(\.jpeg)|(\.gif)|(\.jpe)|(\.tif)|(\.png)$/i,
+//            allowBlank: true,
+//            buttonOnly: true,
+//            margin: '0 0 0 105',
+//            buttonText: translations.INSERT_IMAGE,
+//            buttonConfig: {
+//                id: 'buttonBrowser',
+//                iconCls: 'icon_image_16',
+//                tooltip: '<b>' + translations.INSERT_IMAGE + '</b><br>' + translations.INSERT_IMAGE_ON_BODY_EMAIL
+//            },
+//            id: 'insertImage',
+//            iconCls: 'icon_image_16'
+//        },
         {
             xtype: 'htmleditor',
             fieldLabel: translations.MESSAGE,

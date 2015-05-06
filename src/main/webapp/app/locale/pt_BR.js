@@ -68,6 +68,7 @@ translations = {
     CHANGE_PASSWORD_COMPLETE: 'change-password-complete',
     CHANGE_PASSWORD_COMPLETE_MESSAGE:'Uma nova senha foi gerada e enviada para o e-mail cadastrado.',
     CLEAR: 'Limpar',
+    CANCELED_BY_USER: 'Cancelado pelo usuário',
     //############################################## [ D ] ##############################################//
 
     DELETE: 'Remover',
@@ -83,7 +84,7 @@ translations = {
     //############################################## [ E ] ##############################################//
 
     EDIT: 'Editar',
-    EMAIL: 'E-Mail',
+    EMAIL: 'E-mail',
     EMAIL_CONFIGURATIONS: 'Configurações do Email',
     EMAIL_CONFIGURE: 'Configurar Email',
     ENGLISH: 'Inglês',
@@ -137,6 +138,7 @@ translations = {
     IMAP: 'IMAP',
     INSERT_IMAGE: 'Inserir Imagem',
     INSERT_IMAGE_ON_BODY_EMAIL: 'Inserir imagem no corpo do email.',
+    INFO: 'Info',
     //############################################## [ J ] ##############################################//
 
 
@@ -190,6 +192,7 @@ translations = {
     NO_DEADLINE_DEFINED: 'Sem prazo estimado',
     NUMBER_OF_TICKETS: 'Número de tickets',
     NO_RECORDS_TO_DISPLAY: 'Nenhum registro para visualizar',
+    NOT_SENT: 'Não enviado',
     //############################################## [ O ] ##############################################//
 
     OPENED: 'Aberto',
@@ -281,6 +284,7 @@ translations = {
     STATUS_TICKET:'status-ticket',
     SMTP: 'SMTP',
     SELECTED: 'Selecionados',
+    SENT: 'Enviado',
     //############################################## [ T ] ##############################################//
 
     TICKETS: 'Tickets',
@@ -324,6 +328,7 @@ translations = {
     TICKET_OPENED: 'Ticket aberto',
     TICKET_REOPENED: 'Ticket reaberto',
     TICKET_PENT: 'Ticket encerrado',
+    TO_SEND: 'A enviar..',
     //############################################## [ U ] ##############################################//
 
     UPDATED_WITH_SUCCESS: 'atualizado(a) com sucesso',

@@ -150,3 +150,15 @@
 .clear_16{
     background-image:url('../img/clear_16.png') !important;
 }
+
+.close_16{
+    background-image:url('../img/close_16.png') !important;
+}
+
+.info_16{
+    background-image:url('../img/info_16.png') !important;
+}
+
+.info_32{
+    background-image:url('../img/info_32.png') !important;
+}

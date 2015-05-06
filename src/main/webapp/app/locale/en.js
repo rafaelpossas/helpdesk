@@ -69,6 +69,7 @@ translations = {
     CHANGE_PASSWORD_COMPLETE: 'change-password-complete',    
     CHANGE_PASSWORD_COMPLETE_MESSAGE:'A new password was automatically generated and sent to your e-mail account',
     CLEAR: 'Clear',
+    CANCELED_BY_USER: 'Canceled by user',
     //############################################## [ D ] ##############################################//
 
     DELETE: 'Delete',
@@ -84,7 +85,7 @@ translations = {
     //############################################## [ E ] ##############################################//
 
     EDIT: 'Edit',
-    EMAIL: 'E-Mail',
+    EMAIL: 'E-mail',
     EMAIL_CONFIGURATIONS: 'Email Configurations',
     EMAIL_CONFIGURE: 'Configure Email',
     ENGLISH: 'English',
@@ -138,6 +139,7 @@ translations = {
     IMAP: 'IMAP',
     INSERT_IMAGE: 'Insert Image',
     INSERT_IMAGE_ON_BODY_EMAIL: 'Insert image on email\'s body.',
+    INFO: 'Info',
     //############################################## [ J ] ##############################################//
 
 
@@ -190,6 +192,7 @@ translations = {
     NO_PRIORITY: 'No priority',
     NO_DEADLINE_DEFINED: 'No deadline defined',
     NUMBER_OF_TICKETS: 'Number of tickets',
+    NOT_SENT: 'Not sent',
     //############################################## [ O ] ##############################################//
 
     OPENED: 'Opened',
@@ -282,6 +285,7 @@ translations = {
     STATUS_TICKET:'status-ticket',
     SMTP: 'SMTP',
     SELECTED: 'Selected',
+    SENT: 'Sent',
     //############################################## [ T ] ##############################################//
 
     TICKETS: 'Tickets',
@@ -324,6 +328,7 @@ translations = {
     TICKET_OPENED: 'Ticket opened',
     TICKET_REOPENED: 'Ticket reopened',
     TICKET_PENT: 'Ticket pent',
+    TO_SEND: 'To send..',
     //############################################## [ U ] ##############################################//
 
     UPDATED_WITH_SUCCESS: 'updated with success',

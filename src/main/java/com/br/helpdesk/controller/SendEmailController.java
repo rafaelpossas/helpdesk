@@ -5,13 +5,10 @@
  */
 package com.br.helpdesk.controller;
 
-import com.br.helpdesk.model.User;
 import com.br.helpdesk.service.EmailService;
+import com.br.helpdesk.service.SendEmailService;
 import com.br.helpdesk.service.UserService;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import javax.mail.MessagingException;
 import javax.persistence.EntityNotFoundException;
 import javax.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,57 +27,47 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 public class SendEmailController {
 
     @Autowired
-    private EmailService emailService;
+    private SendEmailService sendEmailService;
 
-    public void setEmailService(EmailService service) {
-        this.emailService = service;
-    }
-
-    @Autowired
-    private UserService userService;
-
-    public void setUserService(UserService service) {
-        this.userService = service;
-    }
-
-    @RequestMapping(method = RequestMethod.GET, params = {"subject", "message", "groupClient"})
+    /**
+     * Método que retorna um Json com dados do usuários baseado no id dos
+     * clientes enviados <br>
+     * como parâmetro.<br>
+     * O Json possui o seguinte formato:<br>
+     * {id:'1',name:'name1', client:'cliente1', status:'status1',<br>
+     * email:'email1'},<br>
+     * {id:'2',name:'name2', client:'cliente2', status:'status2',<br>
+     * email:'email2'},<br>
+     * {id:'3',name:'name3', client:'cliente3', status:'status3',<br>
+     * email:'email3'}
+     *
+     * @author André Sulivam
+     * @param groupClient
+     * @return
+     */
+    @RequestMapping(method = RequestMethod.POST, params = {"groupClient"})
     public @ResponseBody
-    Boolean sendEmail(@RequestParam(value = "subject") String subject,
-            @RequestParam(value = "message") String message,
-            @RequestParam(value = "groupClient") String groupClient) {
-
-        List<Long> idClients = convertStringIdClientsToListLong(groupClient);
-        List<User> users = userService.findByGroupClient(idClients);
-        try {
-            if (users.size() > 0) {
-                List<String> listEmails = new ArrayList<String>();
-                for (User user : users) {
-                    if (user.getEmail() != null && !(user.getEmail().equals(""))) {
-                        listEmails.add(user.getEmail());
-                    }
-                }
-                emailService.sendEmailByScreenConfiguration(subject, message, listEmails);
-            }
-            return true;
-        } catch (MessagingException e) {
-            return false;
-        }
+    String geJsonEmails(@RequestParam(value = "groupClient") String groupClient) {
+        return sendEmailService.getJsonEmails(groupClient);
     }
 
-    public List<Long> convertStringIdClientsToListLong(String groupClient) {
-        List<Long> idClients = new ArrayList<Long>();
-        if (groupClient != null && !groupClient.equals("")) {
-            idClients = new ArrayList<Long>();
-            groupClient = groupClient.replace("[", "");
-            groupClient = groupClient.replace("]", "");
-            String[] ids = groupClient.split(",");
-            if (ids.length > 0) {
-                for (String id : ids) {
-                    idClients.add(Long.parseLong(id));
-                }
-            }
-        }
-        return idClients;
+    /**
+     * Método para enviar email da tela de configurações ao usuário.
+     *
+     * @author André Sulivam
+     * @param subject
+     * @param message
+     * @param emailUser
+     * @param id
+     * @return
+     */
+    @RequestMapping(method = RequestMethod.POST, params = {"subject", "message", "emailUser", "id"})
+    public @ResponseBody
+    String sendEmailSingle(@RequestParam(value = "subject") String subject,
+            @RequestParam(value = "message") String message,
+            @RequestParam(value = "emailUser") String emailUser,
+            @RequestParam(value = "id") Long id) {
+        return sendEmailService.sendEmailSingle(subject, message, emailUser, id);
     }
 
     /**

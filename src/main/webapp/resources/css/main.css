@@ -720,3 +720,7 @@
     float: left;
     word-wrap: break-word !important;
 }
+
+.label-info-send-email{
+    font-size: 15px;
+}

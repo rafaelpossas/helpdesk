@@ -31,7 +31,8 @@ Ext.application({
         'Priority',
         'Reports',
         'EmailConfig',
-        'SendEmail'
+        'SendEmail',
+        'SendEmailUsersWindow'
     ],
     enableRouter: true,
     routes: {
