@@ -23,7 +23,7 @@ Ext.define('Helpdesk.store.SendEmails', {
             data: {
                 groupClient: JSON.stringify(groupClient)
             },
-            url: 'email/client',
+            url: '/email/client',
             success: Ext.bind(callbackfunction, scope)
         });
     },
@@ -36,7 +36,7 @@ Ext.define('Helpdesk.store.SendEmails', {
                 emailUser: emailUser,
                 id: id
             },
-            url: 'email',
+            url: '/email',
             success: Ext.bind(callbackfunction)
         });
     }
