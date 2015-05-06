@@ -66,8 +66,8 @@ public class SendEmailService {
     /**
      * Método para criar uma lista com os ids dos clientes. <br>
      * A alteração ocorre da seguinte forma: <br>
-     * Recebe-se uma string com o seguinte formato: [1,3,5,6,8] e retorna uma
-     * list com os ids.
+     * Recebe-se um json com o seguinte formato: [{"id":"1"},{"id":"2"},{"id":"3"}] e retorna uma
+     * list de Long com os ids.
      *
      * @param groupClient
      * @return
@@ -77,11 +77,17 @@ public class SendEmailService {
         List<Long> idClients = new ArrayList<Long>();
         if (groupClient != null && !groupClient.equals("")) {
             idClients = new ArrayList<Long>();
-            groupClient = groupClient.replace("[", "");
-            groupClient = groupClient.replace("]", "");
-            String[] ids = groupClient.split(",");
-            if (ids.length > 0) {
-                for (String id : ids) {
+            groupClient = groupClient.replace("[", ""); // {"id":"1"},{"id":"2"},{"id":"3"}]
+            groupClient = groupClient.replace("]", ""); // {"id":"1"},{"id":"2"},{"id":"3"}
+            String[] dados = groupClient.split(","); // [0]{"id":"1"}, [1]{"id":"2"}, [2]{"id":"3"}
+            String[] valor;
+            String id;
+            if(dados.length > 0){
+                for (String dado : dados) {
+                    valor = dado.split(":");// [0]{"id" [1]"1"}
+                    id = valor[1]; // "1"}
+                    id = id.replace("\"",""); // 1}
+                    id = id.replace("}", ""); // 1
                     idClients.add(Long.parseLong(id));
                 }
             }
