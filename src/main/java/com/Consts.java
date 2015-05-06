@@ -75,6 +75,8 @@ public class Consts {
     public static Integer TICKET_NEW_ANSWER = 2;
     public static Integer TICKET_CLOSE = 3;
     public static Integer TICKET_OPEN = 4;
+    public static String  TO_SEND = "TO_SEND";
+    public static String  ID = "id";
     
     public static String SMTP_HOST = "mail.smtp.host";
     public static String SOCKET_FACTORY_PORT = "mail.smtp.socketFactory.port";

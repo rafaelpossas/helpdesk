@@ -65,17 +65,15 @@ Ext.define('Helpdesk.controller.SendEmail', {
     getJsonClientsSelected: function () {
         var form = this.getEmailForm();
         var clientsSelected = form.down('clientgridcheckbox').getSelectionModel().getSelection();
-        var jsonResult = '[';
+        var arrayCliente = [];
         for (var i = 0; i < clientsSelected.length; i++) {
-            if(i!==0){
-                jsonResult += ',';
-            }
-            jsonResult += '{';
-            jsonResult += '\"id\":\"'+clientsSelected[i].data.id+"\"";
-            jsonResult += '}';
+            var cliente = {
+                id: clientsSelected[i].data.id,
+                name: clientsSelected[i].data.name
+            };
+            arrayCliente.push(cliente);
         }
-        jsonResult += ']';
-        return jsonResult;
+        return arrayCliente;
     },
     /**
      * Callback da requisição dos usuários dos clientes selecionados.

@@ -5,9 +5,7 @@
  */
 package com.br.helpdesk.controller;
 
-import com.br.helpdesk.service.EmailService;
 import com.br.helpdesk.service.SendEmailService;
-import com.br.helpdesk.service.UserService;
 import java.io.IOException;
 import javax.persistence.EntityNotFoundException;
 import javax.servlet.http.HttpServletResponse;
@@ -23,7 +21,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 @Controller
-@RequestMapping("/sendemail")
+@RequestMapping("/email")
 public class SendEmailController {
 
     @Autowired
@@ -45,9 +43,9 @@ public class SendEmailController {
      * @param groupClient
      * @return
      */
-    @RequestMapping(method = RequestMethod.POST, params = {"groupClient"})
+    @RequestMapping(value="/client",method = RequestMethod.POST)
     public @ResponseBody
-    String geJsonEmails(@RequestParam(value = "groupClient") String groupClient) {
+    String geJsonEmails(@RequestParam(value="groupClient") String groupClient) {
         return sendEmailService.getJsonEmails(groupClient);
     }
 
@@ -61,7 +59,7 @@ public class SendEmailController {
      * @param id
      * @return
      */
-    @RequestMapping(method = RequestMethod.POST, params = {"subject", "message", "emailUser", "id"})
+    @RequestMapping(method = RequestMethod.POST)
     public @ResponseBody
     String sendEmailSingle(@RequestParam(value = "subject") String subject,
             @RequestParam(value = "message") String message,

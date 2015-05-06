@@ -5,11 +5,13 @@
  */
 package com.br.helpdesk.service;
 
+import com.Consts;
 import com.br.helpdesk.model.User;
 import java.util.ArrayList;
 import java.util.List;
 import javax.annotation.Resource;
 import javax.mail.MessagingException;
+import org.json.JSONArray;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -55,7 +57,7 @@ public class SendEmailService {
                     resultado += "{\"id\":\"" + users.get(i).getId()
                             + "\",\"name\":\"" + users.get(i).getName()
                             + "\",\"client\":\"" + users.get(i).getClient().getName()
-                            + "\",\"status\":\"" + "TO_SEND"
+                            + "\",\"status\":\"" + Consts.TO_SEND
                             + "\",\"email\":\"" + users.get(i).getEmail() + "\"}";
                 }
             }
@@ -76,20 +78,11 @@ public class SendEmailService {
     public List<Long> convertStringIdClientsToListLong(String groupClient) {
         List<Long> idClients = new ArrayList<Long>();
         if (groupClient != null && !groupClient.equals("")) {
-            idClients = new ArrayList<Long>();
-            groupClient = groupClient.replace("[", ""); // {"id":"1"},{"id":"2"},{"id":"3"}]
-            groupClient = groupClient.replace("]", ""); // {"id":"1"},{"id":"2"},{"id":"3"}
-            String[] dados = groupClient.split(","); // [0]{"id":"1"}, [1]{"id":"2"}, [2]{"id":"3"}
-            String[] valor;
-            String id;
-            if(dados.length > 0){
-                for (String dado : dados) {
-                    valor = dado.split(":");// [0]{"id" [1]"1"}
-                    id = valor[1]; // "1"}
-                    id = id.replace("\"",""); // 1}
-                    id = id.replace("}", ""); // 1
-                    idClients.add(Long.parseLong(id));
-                }
+            JSONArray clientsJson = new JSONArray(groupClient);
+            String id = "";
+            for (int i = 0; i < clientsJson.length(); i++) {
+                id = clientsJson.getJSONObject(i).get(Consts.ID).toString();
+                idClients.add(Long.parseLong(id));
             }
         }
         return idClients;
