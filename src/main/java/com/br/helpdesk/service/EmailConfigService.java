@@ -25,4 +25,8 @@ public class EmailConfigService{
     public EmailConfig findById(Long codigo) {
         return repository.findOne(codigo);
     }    
+    
+    public EmailConfig findByMarketingSmtpHost(String marketingSmtpHost) {
+        return repository.findByMarketingSmtpHost(marketingSmtpHost);
+    }  
 }

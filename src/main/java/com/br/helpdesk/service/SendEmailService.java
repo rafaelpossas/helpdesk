@@ -108,8 +108,10 @@ public class SendEmailService {
             resultado += "\",\"status\":\"SENT"  
                     + "\",\"message\":\"\"}";
         } catch (MessagingException e) {
+            String error = e.getMessage();
+            error = error.replace("\n", "");
             resultado += "\",\"status\":\"ERROR"
-                    + "\",\"message\":\"" + e.getMessage() + "\"}";
+                    + "\",\"message\":\"" + error + "\"}";
         }
         return resultado;
     }

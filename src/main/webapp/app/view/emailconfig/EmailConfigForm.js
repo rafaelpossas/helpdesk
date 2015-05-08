@@ -12,17 +12,12 @@ Ext.define('Helpdesk.view.emailconfig.EmailConfigForm', {
         type: 'column'
     },
     requires: ['Helpdesk.store.EmailConfigs'],
-    stores: ['EmailConfigs'],
-    constructor: function (config) {
-        this.param = config.param; // get your param value from the config object
-        config.store = Ext.create('Helpdesk.store.EmailConfigs', {}); // Blank Configuration needs to be passed in order to trigger the constructor call of the class
-        this.callParent(arguments);
-    },
     border: 0,
     items: [
         {
             xtype: 'fieldset',
             title: translations.EMAIL_CONFIGURATIONS,
+            id: 'defaultSet',
             width: 400,
             height: 140,
             defaults: {
@@ -52,7 +47,7 @@ Ext.define('Helpdesk.view.emailconfig.EmailConfigForm', {
                     xtype: 'hiddenfield',
                     name: 'smtpPort',
                     id: 'hiddensmtpport'
-                },
+                },                
                 {
                     fieldLabel: translations.SMTP,
                     name: 'smtpHost',
@@ -73,6 +68,39 @@ Ext.define('Helpdesk.view.emailconfig.EmailConfigForm', {
                     fieldLabel: translations.PASSWORD,
                     name: 'password',
                     itemId: 'password'
+                }
+            ]
+        },
+        {
+            xtype: 'fieldset',
+            title: translations.EMAIL_CONFIGURATIONS_MARKETING,
+            width: 400,
+            id: 'marketingSet',
+            height: 140,
+            margin: '0 0 0 50',
+            defaults: {
+                beforeLabelTextTpl: Helpdesk.util.Util.required,
+                xtype: 'textfield',
+                allowBlank: false,
+                labelWidth: 60,
+                anchor: '100%'
+            },
+            items: [
+                {
+                    fieldLabel: translations.SMTP,
+                    name: 'marketingSmtpHost',
+                    itemId: 'marketingSmtpHost'
+                },
+                {
+                    fieldLabel: translations.EMAIL,
+                    name: 'marketingUserEmail',
+                    itemId: 'marketingUserEmail'
+                },
+                {
+                    inputType: 'password',
+                    fieldLabel: translations.PASSWORD,
+                    name: 'marketingPassword',
+                    itemId: 'marketingPassword'
                 }
             ]
         }
