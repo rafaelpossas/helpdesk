@@ -7,7 +7,7 @@ Ext.define('Helpdesk.view.emailconfig.EmailConfig', {
     extend: 'Ext.panel.Panel',
     alias: 'widget.emailconfig',
     layout: {
-        type: 'fit'
+        type: 'hbox'
     },
     requires: ['Helpdesk.view.emailconfig.EmailConfigForm'],
     border: 0,

@@ -47,7 +47,21 @@ public class EmailConfig implements Serializable {
     @Basic
     @Column(name = "IMAP")
     private String imap;
+    
+    // ----------Configurações de email Marketing----------------------------*/
+    @Basic
+    @Column(name = "MARKETING_SMTP_HOST")
+    private String marketingSmtpHost;
+     
+    @Basic
+    @Column(name = "MARKETING_USER_EMAIL")
+    private String marketingUserEmail;
 
+    @Basic
+    @Column(name = "MARKETING_PASSWORD")
+    private String marketingPassword;
+    // -----------------------------------------------------------------------*/
+    
     public Long getId() {
         return id;
     }
@@ -110,6 +124,30 @@ public class EmailConfig implements Serializable {
 
     public void setImap(String imap) {
         this.imap = imap;
+    }
+
+    public String getMarketingSmtpHost() {
+        return marketingSmtpHost;
+    }
+
+    public void setMarketingSmtpHost(String marketingSmtpHost) {
+        this.marketingSmtpHost = marketingSmtpHost;
+    }
+
+    public String getMarketingUserEmail() {
+        return marketingUserEmail;
+    }
+
+    public void setMarketingUserEmail(String marketingUserEmail) {
+        this.marketingUserEmail = marketingUserEmail;
+    }
+
+    public String getMarketingPassword() {
+        return marketingPassword;
+    }
+
+    public void setMarketingPassword(String marketingPassword) {
+        this.marketingPassword = marketingPassword;
     }
 
 }

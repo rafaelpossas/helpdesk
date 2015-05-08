@@ -13,7 +13,10 @@ Ext.define('Helpdesk.model.EmailConfig',{
        {name: 'smtpPort'},
        {name: 'userEmail'},
        {name: 'password'},
-       {name: 'imap'}
+       {name: 'imap'},
+       {name: 'marketingSmtpHost'},
+       {name: 'marketingUserEmail'},
+       {name: 'marketingPassword'}
    ]
 });
 

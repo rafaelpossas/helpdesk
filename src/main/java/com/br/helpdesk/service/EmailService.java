@@ -11,12 +11,12 @@ import com.br.helpdesk.model.EmailConfig;
 import com.br.helpdesk.model.Ticket;
 import com.br.helpdesk.model.TicketAnswer;
 import com.br.helpdesk.model.User;
-import com.br.helpdesk.util.EmailPropertiesLoader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 import javax.mail.Address;
+import javax.mail.Authenticator;
 import javax.mail.Flags;
 import javax.mail.Folder;
 import javax.mail.Message;
@@ -117,6 +117,17 @@ public class EmailService {
         return session;
     }
 
+    private Session getSessionMarketing() {
+        setEmailProperties();
+        Session session = Session.getDefaultInstance(PROPERTIES, new javax.mail.Authenticator() {
+            @Override
+            protected PasswordAuthentication getPasswordAuthentication() {
+                return new PasswordAuthentication(PROPERTIES.getProperty(Consts.MARKETING_USER_EMAIL), PROPERTIES.getProperty(Consts.MARKETING_MAIL_PASSWORD));
+            }
+        });
+        return session;
+    }
+
     public void setEmailProperties() {
         PROPERTIES = new Properties();
 
@@ -131,6 +142,12 @@ public class EmailService {
         PROPERTIES.put(Consts.MAIL_IMAPS, Consts.IMAPS);
         PROPERTIES.put(Consts.FOLDER, Consts.INBOX);
         PROPERTIES.put(Consts.SOCKET_FACTORY_CLASS, Consts.SOCKET_FACTORY_CLASS_VALUE);
+        PROPERTIES.put(Consts.MARKETING_SMTP_HOST, emailConfig.getMarketingSmtpHost());
+        PROPERTIES.put(Consts.MARKETING_USER_EMAIL, emailConfig.getMarketingUserEmail());
+        PROPERTIES.put(Consts.MARKETING_MAIL_PASSWORD, emailConfig.getMarketingPassword());
+        PROPERTIES.put(Consts.MAIL_TRANSPORT_PROTOCOL, Consts.SMTP);
+        PROPERTIES.put(Consts.MAIL_SMTP_STARTTLS_ENABLE, Consts.TRUE);
+        PROPERTIES.put(Consts.MAIL_SMTP_SOCKETFACTORY_FALLBACK, Consts.FALSE);
     }
 
     public void sendEmail(Ticket olderTicket, Ticket newTicket, TicketAnswer answer, User userAnswer, List<String> listEmailsTo, Integer sendType) {
@@ -698,13 +715,12 @@ public class EmailService {
     }
 
     public void sendEmailByScreenConfiguration(String subject, String messageUser, List<String> listEmails) throws MessagingException {
-        Session session = getSession();
+        boolean debug = false;
+
+        Authenticator auth = new SMTPAuthenticator();        
+        Session session = Session.getInstance(PROPERTIES, auth);
+        session.setDebug(debug);
         String emails = getCorrectAdress(listEmails);
-        Store store = null;
-        // Set the store depending on the parameter flag value
-        store = session.getStore(PROPERTIES.getProperty(Consts.MAIL_IMAPS));
-        //VALORES DO SERVIDOR
-        store.connect(PROPERTIES.getProperty(Consts.IMAP), PROPERTIES.getProperty(Consts.USER_EMAIL), PROPERTIES.getProperty(Consts.MAIL_PASSWORD));
 
         Message message = new MimeMessage(session);
         message.setFrom(new InternetAddress(PROPERTIES.getProperty(Consts.USER_EMAIL)));
@@ -726,10 +742,25 @@ public class EmailService {
                 + message
                 + "<br>"
                 + "<h4>"
-                + "Cymo Tecnologia em Gestão"
+                + "Cymo - Gestão e Perfomance"
                 + "</h4>"
                 + "</body>"
                 + "</html>";
         return html;
     }
+    
+    	/**
+	* SimpleAuthenticator is used to do simple authentication
+	* when the SMTP server requires it.
+	*/
+	private class SMTPAuthenticator extends javax.mail.Authenticator
+	{
+	    public PasswordAuthentication getPasswordAuthentication()
+	    {                
+	        String username = PROPERTIES.getProperty(Consts.MARKETING_USER_EMAIL);
+	        String password = PROPERTIES.getProperty(Consts.MARKETING_MAIL_PASSWORD);
+	        return new PasswordAuthentication(username, password);
+	    }
+	}
+
 }

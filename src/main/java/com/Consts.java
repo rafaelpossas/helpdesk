@@ -91,4 +91,17 @@ public class Consts {
     public static String IMAP = "mail.imap.gmail";
     public static String FOLDER = "mail.folder";
     public static String INBOX = "Inbox";
+    
+    public static String MARKETING_SMTP_HOST = "mail.marketing.smtp.host";
+    public static String MARKETING_USER_EMAIL = "mail.marketing.user";
+    public static String MARKETING_MAIL_PASSWORD = "mail.marketing.password";
+    public static String MAIL_TRANSPORT_PROTOCOL = "mail.transport.protocol";
+    public static String MAIL_SMTP_USER = "mail.smtp.user";
+    public static String MAIL_SMTP_STARTTLS_ENABLE = "mail.smtp.starttls.enable";
+    public static String MAIL_SMTP_SOCKETFACTORY_FALLBACK = "mail.smtp.socketFactory.fallback";
+    
+    public static String FALSE = "false";
+    public static String TRUE = "true";
+    
+    public static String SMTP = "smtp";
 }

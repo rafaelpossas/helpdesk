@@ -12,6 +12,8 @@ import org.springframework.data.repository.CrudRepository;
  *
  * @author André Sulivam
  */
-public interface EmailConfigRepository extends CrudRepository<EmailConfig,Long>{
-    
+public interface EmailConfigRepository extends CrudRepository<EmailConfig, Long> {
+
+    EmailConfig findByMarketingSmtpHost(String marketingSmtpHost);
+
 }

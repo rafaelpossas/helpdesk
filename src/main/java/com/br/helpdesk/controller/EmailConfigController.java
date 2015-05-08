@@ -46,6 +46,16 @@ public class EmailConfigController {
         }
         return emailconfig;
     }
+    
+    @RequestMapping(value = "/marketingsmtphost/{marketingsmtphost}", method = RequestMethod.GET)
+    public @ResponseBody
+    EmailConfig findByMarketingSmtpHost(@PathVariable String marketingsmtphost) throws EntityNotFoundException {
+        EmailConfig emailconfig = emailconfigService.findByMarketingSmtpHost(marketingsmtphost);
+        if (emailconfig == null) {
+            throw new EntityNotFoundException();
+        }
+        return emailconfig;
+    }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
     public @ResponseBody

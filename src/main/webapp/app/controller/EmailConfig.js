@@ -43,7 +43,7 @@ Ext.define('Helpdesk.controller.EmailConfig', {
      */
     onGetEmailConfig: function () {
         var emailConfig = this.getEmailConfig();
-        var storeEmailConfig = emailConfig.down('#emailconfigformpanel').store;
+        var storeEmailConfig = this.getEmailConfigsStore();
         var scope = this;
         emailConfig.setLoading(translations.LOADING);
         storeEmailConfig.findById(function (result) {
@@ -53,6 +53,7 @@ Ext.define('Helpdesk.controller.EmailConfig', {
     },
     /**
      * Método para quando se clicar no botão salvar as configurações de email.
+     * 
      * @author André Sulivam
      * @param {type} button
      * @param {type} e
@@ -64,7 +65,7 @@ Ext.define('Helpdesk.controller.EmailConfig', {
         var form = emailConfig.down('#emailconfigformpanel');
         var record = form.getRecord();
         var values = form.getValues();
-        var store = form.store;
+        var store = this.getEmailConfigsStore();
         record.set(values);
         store.add(record);
 
@@ -79,24 +80,35 @@ Ext.define('Helpdesk.controller.EmailConfig', {
     /**
      * Método para habilitar ou desabilitar o botão Salvar das configurações de email. <br>
      * O teste é baseado nos campos a serem preenchidos. Se houver algum texto vazio, o botão é desabilitado.
+     * 
      * @author André Sulivam
      * @returns {undefined}
      */
     onCheckEnableButtonSave: function () {
         var emailConfig = this.getEmailConfig();
-        var form = emailConfig.down('#emailconfigformpanel');
+        var formPrincipal = emailConfig.down('#emailconfigformpanel');
 
-        var smtpText = form.down().down('#smtpHost').value;
-        var imap = form.down().down('#imap').value;
-        var userEmail = form.down().down('#userEmail').value;
-        var password = form.down().down('#password').value;
+        var smtpText = formPrincipal.down().down('#smtpHost').value;
+        var imap = formPrincipal.down().down('#imap').value;
+        var userEmail = formPrincipal.down().down('#userEmail').value;
+        var password = formPrincipal.down().down('#password').value;        
+        var marketingSmtpText = formPrincipal.down('#marketingSet').down('#marketingSmtpHost').value;
+        var marketingUserEmail = formPrincipal.down('#marketingSet').down('#marketingUserEmail').value;
+        var marketingPassword = formPrincipal.down('#marketingSet').down('#marketingPassword').value;
 
-        var disableButton = (smtpText === "" || imap === "" || userEmail === "" || password === "");
+        var disableButton = (smtpText === "" 
+                || imap === "" 
+                || userEmail === ""
+                || password === ""
+                || marketingSmtpText === "" 
+                || marketingUserEmail === ""
+                || marketingPassword === "");        
         this.disableButtonSave(disableButton);
     },
     /**
      * Método que é chamado pelo callback da função de find das configurações de email. <br>
      * Método preenche os campos do form com o resultado da pesquisa.
+     * 
      * @author André Sulivam
      * @param {type} record
      * @returns {undefined}
@@ -104,8 +116,8 @@ Ext.define('Helpdesk.controller.EmailConfig', {
     onFillFormEmailConfig: function (record) {
         if (record !== null) {
             var emailConfig = this.getEmailConfig();
-            var form = emailConfig.down('#emailconfigformpanel');
-            form.loadRecord(record);
+            var formPrincipal = emailConfig.down('#emailconfigformpanel');  
+            formPrincipal.loadRecord(record);         
             this.disableButtonSave(false);
             emailConfig.setLoading(false);
         }
