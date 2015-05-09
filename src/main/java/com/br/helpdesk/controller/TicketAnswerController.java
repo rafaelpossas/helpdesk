@@ -21,6 +21,7 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import javax.mail.MessagingException;
 import javax.persistence.EntityNotFoundException;
 import javax.servlet.http.HttpServletResponse;
 import org.json.JSONObject;
@@ -91,7 +92,7 @@ public class TicketAnswerController {
 
     @RequestMapping(value = {"", "/{id}"}, method = {RequestMethod.PUT, RequestMethod.POST})
     @ResponseBody
-    public TicketAnswer save(@RequestBody String ticketAnwString) throws ParseException, IOException {
+    public TicketAnswer save(@RequestBody String ticketAnwString) throws ParseException, IOException,MessagingException {
 
         JSONObject jSONObject = new JSONObject(ticketAnwString);
 
@@ -101,7 +102,7 @@ public class TicketAnswerController {
         return saveNewAnswer(ticketId, userId, respostaString);
     }
 
-    public TicketAnswer saveNewAnswer(Long idTicket, Long userId, String answerDescription) throws ParseException, IOException {
+    public TicketAnswer saveNewAnswer(Long idTicket, Long userId, String answerDescription) throws ParseException, IOException,MessagingException {
 
         List<String> emails = new ArrayList<String>();
 

@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import javax.mail.MessagingException;
 import javax.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -247,7 +248,7 @@ public class TicketController {
 
     @RequestMapping(value = {"close-ticket/{id}"}, method = {RequestMethod.PUT})
     @ResponseBody
-    public Ticket closeTicket(@RequestBody Ticket ticket, @RequestParam(value = "user") String username) {
+    public Ticket closeTicket(@RequestBody Ticket ticket, @RequestParam(value = "user") String username) throws MessagingException {
         User user = userService.findByUserName(username);
         Ticket olderTicket = ticketService.findById(ticket.getId());
         ticket.setIsOpen(false);
@@ -269,7 +270,7 @@ public class TicketController {
 
     @RequestMapping(value = {"open-ticket/{id}"}, method = {RequestMethod.PUT})
     @ResponseBody
-    public Ticket openTicket(@RequestBody Ticket ticket, @RequestParam(value = "user") String username) {        
+    public Ticket openTicket(@RequestBody Ticket ticket, @RequestParam(value = "user") String username) throws MessagingException {        
         User user = userService.findByUserName(username);
 
         Ticket olderTicket = ticketService.findById(ticket.getId());
@@ -294,7 +295,7 @@ public class TicketController {
 
     @RequestMapping(value = {"", "/{id}"}, method = {RequestMethod.POST, RequestMethod.PUT}, params = {"user"})
     @ResponseBody
-    public Ticket save(@RequestBody Ticket newTicket, @RequestParam(value = "user") String username) throws IOException {
+    public Ticket save(@RequestBody Ticket newTicket, @RequestParam(value = "user") String username) throws IOException,MessagingException {
         User user = userService.findByUserName(username);
         List<File> filesToSave = attachmentsService.getAttachmentsFromUser(username);
 

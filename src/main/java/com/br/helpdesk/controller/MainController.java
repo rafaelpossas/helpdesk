@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import javax.annotation.Resource;
+import javax.mail.MessagingException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.json.JSONObject;
@@ -148,7 +149,7 @@ public class MainController {
     
     @RequestMapping(value="/login/reset-password", params = {"username","language"}, method = RequestMethod.GET,produces = "application/json;charset=UTF-8")
     public @ResponseBody         
-    String retrievePassword(@RequestParam(value = "username") String username,@RequestParam(value = "language") String language, HttpServletResponse response) throws UnsupportedEncodingException {
+    String retrievePassword(@RequestParam(value = "username") String username,@RequestParam(value = "language") String language, HttpServletResponse response) throws UnsupportedEncodingException,MessagingException {
         
         List<User>users = userService.findAll();
         String result = "";
