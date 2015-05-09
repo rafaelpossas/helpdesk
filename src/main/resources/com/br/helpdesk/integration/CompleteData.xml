@@ -1,9 +1,9 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <dataset>
     
-    <Email_Config id="1" smtp_host="host.gmail" socket_factory_port="465" auth="true" 
-                      smtp_port="465" user_email="teste@gmail.com" password="1234" imap="imap.gmail"
-                    marketing_smtp_host="marketingsmtphost" marketing_user_email="testemarketing@gmail.com" marketing_password="1234marketing"/>
+    <Email_Config id="1" smtp_host="smtp.gmail.com" socket_factory_port="465" auth="true" 
+                      smtp_port="465" user_email="procymo@cymo.com.br" password="123mudar" imap="imap.gmail.com"
+                      marketing_smtp_host="smtp.sendgrid.net" marketing_user_email="procymo" marketing_password="cymotecnologia2011"/>
     
         
     <Client id="1" name="Cymo Tecnologia em Gestão"/>

@@ -136,7 +136,9 @@ public class TicketAnswerController {
         emails = emailService.getListEmailsToSend(null, null, answer);
         
         if(emails.size()>0){
-            emailService.sendEmail(null,null,answer, userAnswer, emails,Consts.TICKET_NEW_ANSWER);
+            String subjectString = "Nova Resposta ao Ticket #" + answer.getTicket().getId() + "#: " + answer.getTicket().getTitle();
+            String contentString = emailService.contentNewAnswer(answer, userAnswer.getName());
+            emailService.sendEmail(emails,subjectString,contentString,Consts.DEFAULT);
         }
 
         return answer;

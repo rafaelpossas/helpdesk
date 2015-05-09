@@ -253,12 +253,16 @@ public class TicketController {
         ticket.setIsOpen(false);
         ticket.setEndDate(Calendar.getInstance().getTime());
         ticket = ticketService.save(ticket);
+        Long ticketId = ticket.getId();
+        String ticketTitle = ticket.getTitle();
         if (olderTicket != null) {
             changesTicketController.save(olderTicket, ticket, user);
         }
         List<String> emails = emailService.getListEmailsToSend(olderTicket, ticket, null);
         if (emails.size() > 0) {
-            emailService.sendEmail(olderTicket, null, null, null, emails, Consts.TICKET_CLOSE);
+            String subjectString = "Encerramento do Ticket #" + ticketId + "#: " + ticketTitle;
+            String contentString = emailService.contentCloseTicket(ticketId, ticketTitle);
+            emailService.sendEmail(emails,subjectString,contentString, Consts.DEFAULT);
         }
         return ticket;
     }
@@ -267,16 +271,23 @@ public class TicketController {
     @ResponseBody
     public Ticket openTicket(@RequestBody Ticket ticket, @RequestParam(value = "user") String username) {        
         User user = userService.findByUserName(username);
+
         Ticket olderTicket = ticketService.findById(ticket.getId());
         ticket.setIsOpen(true);
         ticket.setEndDate(null);
         ticket = ticketService.save(ticket);
+        Long ticketId = ticket.getId();
+        String ticketTitle = ticket.getTitle();
+        
         if (olderTicket != null) {
             changesTicketController.save(olderTicket, ticket, user);
         }
         List<String> emails = emailService.getListEmailsToSend(olderTicket, ticket, null);
         if (emails.size() > 0) {
-            emailService.sendEmail(olderTicket, null, null, null, emails, Consts.TICKET_OPEN);
+                
+            String subjectString = "Reabertura do Ticket #" + ticketId + "#: " + ticketTitle;
+            String contentString = emailService.contentOpenTicket(ticketId, ticketTitle);
+            emailService.sendEmail(emails,subjectString,contentString, Consts.DEFAULT);
         }
         return ticket;
     }
@@ -335,15 +346,18 @@ public class TicketController {
 
         // buscando para quais emails que receberão a notificação.
         emails = emailService.getListEmailsToSend(olderTicket, newTicket, null);
-        
+        String subjectString;
+        String contentString;
         if (emails.size() > 0) {
-            Integer tipo;
             if (olderTicket != null) {
-                tipo = Consts.TICKET_EDIT;
+                subjectString = "Atualização do Ticket #" + olderTicket.getId() + "#: " + olderTicket.getTitle();
+                contentString = emailService.contentEditTicket(olderTicket, newTicket);
+               
             } else {
-                tipo = Consts.TICKET_NEW;
+                subjectString = "Novo Ticket #" + newTicket.getId() + "#: " + newTicket.getTitle();
+                contentString = emailService.contentNewTicket(newTicket);
             }
-            emailService.sendEmail(olderTicket, newTicket, null,null,emails,tipo); //NEW
+            emailService.sendEmail(emails,subjectString,contentString,Consts.DEFAULT); //NEW
         }
         return newTicket;
     }

@@ -142,7 +142,7 @@ public class EmailConfigIntegrationTest {
     
     @Test
     public void testFindByMarketingSmtpHost() throws Exception {
-        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get("/emailconfig/marketingsmtphost/{marketingsmtphost}", "marketingsmtphost"))
+        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get("/emailconfig/marketingsmtphost/{marketingsmtphost}", "smtp.sendgrid.net"))
                 .andExpect(MockMvcResultMatchers.status().isOk())//verifica se o retorno � ok 
                 .andExpect(MockMvcResultMatchers.content().contentType(TestUtil.APPLICATION_JSON_UTF8))//verifica se esta retornando um JSON na codifica��o UTF8;  
                 .andReturn();
@@ -152,6 +152,6 @@ public class EmailConfigIntegrationTest {
 
         //verificando se o objeto possui os dados esperados
         assertThat(jsonObject.get("id").toString(), is("1"));
-        assertThat(jsonObject.getString("marketingSmtpHost"), is("marketingsmtphost"));
+        assertThat(jsonObject.getString("marketingSmtpHost"), is("smtp.sendgrid.net"));
     }
 }

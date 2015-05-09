@@ -104,4 +104,6 @@ public class Consts {
     public static String TRUE = "true";
     
     public static String SMTP = "smtp";
+    public static String MARKETING = "marketing";
+    public static String DEFAULT = "default";
 }

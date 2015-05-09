@@ -106,101 +106,68 @@ public class EmailService {
         return null;
     }
 
-    private Session getSession() {
-        setEmailProperties();
+    private Session getSession(String type) {
+        setEmailProperties(type);
         Session session = Session.getDefaultInstance(PROPERTIES, new javax.mail.Authenticator() {
             @Override
             protected PasswordAuthentication getPasswordAuthentication() {
-                return new PasswordAuthentication(PROPERTIES.getProperty(Consts.USER_EMAIL), PROPERTIES.getProperty(Consts.MAIL_PASSWORD));
+                String username = PROPERTIES.getProperty(Consts.USER_EMAIL);
+                String password = PROPERTIES.getProperty(Consts.MAIL_PASSWORD);
+                return new PasswordAuthentication(username,password);
             }
         });
         return session;
     }
 
-    private Session getSessionMarketing() {
-        setEmailProperties();
-        Session session = Session.getDefaultInstance(PROPERTIES, new javax.mail.Authenticator() {
-            @Override
-            protected PasswordAuthentication getPasswordAuthentication() {
-                return new PasswordAuthentication(PROPERTIES.getProperty(Consts.MARKETING_USER_EMAIL), PROPERTIES.getProperty(Consts.MARKETING_MAIL_PASSWORD));
-            }
-        });
-        return session;
-    }
 
-    public void setEmailProperties() {
+    public void setEmailProperties(String type) {
         PROPERTIES = new Properties();
-
         EmailConfig emailConfig = emailConfigService.findById(1L);
-        PROPERTIES.put(Consts.SMTP_HOST, emailConfig.getSmtpHost());
+        if(type.equals(Consts.MARKETING)){
+            PROPERTIES.put(Consts.SMTP_HOST, emailConfig.getMarketingSmtpHost());
+            PROPERTIES.put(Consts.USER_EMAIL, emailConfig.getMarketingUserEmail());
+            PROPERTIES.put(Consts.MAIL_PASSWORD, emailConfig.getMarketingPassword());
+        }else{
+            PROPERTIES.put(Consts.SMTP_HOST, emailConfig.getSmtpHost());
+            PROPERTIES.put(Consts.USER_EMAIL, emailConfig.getUserEmail());
+            PROPERTIES.put(Consts.MAIL_PASSWORD, emailConfig.getPassword());
+            PROPERTIES.put(Consts.IMAP, emailConfig.getImap());
+            PROPERTIES.put(Consts.MAIL_IMAPS, Consts.IMAPS);
+            PROPERTIES.put(Consts.FOLDER, Consts.INBOX);
+
+        }
+        
         PROPERTIES.put(Consts.SOCKET_FACTORY_PORT, emailConfig.getSocketFactoryPort());
         PROPERTIES.put(Consts.AUTH, emailConfig.getAuth());
         PROPERTIES.put(Consts.SMTP_PORT, emailConfig.getSmtpPort());
-        PROPERTIES.put(Consts.USER_EMAIL, emailConfig.getUserEmail());
-        PROPERTIES.put(Consts.MAIL_PASSWORD, emailConfig.getPassword());
-        PROPERTIES.put(Consts.IMAP, emailConfig.getImap());
-        PROPERTIES.put(Consts.MAIL_IMAPS, Consts.IMAPS);
-        PROPERTIES.put(Consts.FOLDER, Consts.INBOX);
         PROPERTIES.put(Consts.SOCKET_FACTORY_CLASS, Consts.SOCKET_FACTORY_CLASS_VALUE);
-        PROPERTIES.put(Consts.MARKETING_SMTP_HOST, emailConfig.getMarketingSmtpHost());
-        PROPERTIES.put(Consts.MARKETING_USER_EMAIL, emailConfig.getMarketingUserEmail());
-        PROPERTIES.put(Consts.MARKETING_MAIL_PASSWORD, emailConfig.getMarketingPassword());
         PROPERTIES.put(Consts.MAIL_TRANSPORT_PROTOCOL, Consts.SMTP);
         PROPERTIES.put(Consts.MAIL_SMTP_STARTTLS_ENABLE, Consts.TRUE);
         PROPERTIES.put(Consts.MAIL_SMTP_SOCKETFACTORY_FALLBACK, Consts.FALSE);
+
     }
 
-    public void sendEmail(Ticket olderTicket, Ticket newTicket, TicketAnswer answer, User userAnswer, List<String> listEmailsTo, Integer sendType) {
-        Session session = getSession();
+    public void sendEmail(List<String> listEmailsTo,String subject,String content,String serverType) throws MessagingException {
+        Session session = getSession(serverType);
         String emails = getCorrectAdress(listEmailsTo);
         Store store = null;
         try {
-            // Set the store depending on the parameter flag value
-            store = session.getStore(PROPERTIES.getProperty(Consts.MAIL_IMAPS));
-            //VALORES DO SERVIDOR
-            store.connect(PROPERTIES.getProperty(Consts.IMAP), PROPERTIES.getProperty(Consts.USER_EMAIL), PROPERTIES.getProperty(Consts.MAIL_PASSWORD));
-
             Message message = new MimeMessage(session);
             message.setFrom(new InternetAddress(PROPERTIES.getProperty(Consts.USER_EMAIL)));
             message.setRecipients(Message.RecipientType.BCC, InternetAddress.parse(emails));
-            Long ticketId = 0L;
-            String ticketTitle = "";
-            String subjectString = "";
-            String contentString = "";
 
-            if (newTicket != null) {
-                ticketId = newTicket.getId();
-                ticketTitle = newTicket.getTitle();
-            }
-
-            if (sendType == Consts.TICKET_NEW) {
-                subjectString = "Novo Ticket #" + ticketId + "#: " + ticketTitle;
-                contentString = contentNewTicket(newTicket);
-            } else if (sendType == Consts.TICKET_EDIT) {
-                if (olderTicket != null) {
-                    subjectString = "Atualização do Ticket #" + ticketId + "#: " + ticketTitle;
-                    contentString = contentEditTicket(olderTicket, newTicket);
-                }
-            } else if (sendType == Consts.TICKET_NEW_ANSWER) {
-                subjectString = "Nova Resposta ao Ticket #" + answer.getTicket().getId() + "#: " + answer.getTicket().getTitle();
-                contentString = contentNewAnswer(answer, userAnswer.getName());
-            } else if (sendType == Consts.TICKET_CLOSE) {
-                subjectString = "Encerramento do Ticket #" + ticketId + "#: " + ticketTitle;
-                contentString = contentCloseTicket(ticketId, ticketTitle);
-            } else if (sendType == Consts.TICKET_OPEN) {
-                subjectString = "Reabertura do Ticket #" + ticketId + "#: " + ticketTitle;
-                contentString = contentOpenTicket(ticketId, ticketTitle);
-            }
-            message.setSubject(subjectString);
-            message.setContent(contentString, "text/html; charset=utf-8");
+            message.setSubject(subject);
+            message.setContent(content, "text/html; charset=utf-8");
 
             Transport.send(message);
 
         } catch (MessagingException e) {
+            e.printStackTrace();
+            throw e;
         }
     }
 
-    private String contentNewTicket(Ticket ticket) {
+    public String contentNewTicket(Ticket ticket) {
         String assunto = ticket.getTitle();
         String categoria = ticket.getCategory().getName();
         String observacoes = ticket.getDescription();
@@ -253,7 +220,7 @@ public class EmailService {
         return html;
     }
 
-    private String contentEditTicket(Ticket olderTicket, Ticket newTicket) {
+    public String contentEditTicket(Ticket olderTicket, Ticket newTicket) {
         String olderCategoryName = Consts.NO_CATEGORY;
         String newCategoryName = Consts.NO_CATEGORY;
         String olderEstimatedTime = Consts.NO_ESTIMATED_TIME;
@@ -379,7 +346,7 @@ public class EmailService {
         return html;
     }
 
-    private String contentNewAnswer(TicketAnswer answer, String userName) {
+    public String contentNewAnswer(TicketAnswer answer, String userName) {
         long idTicket = answer.getTicket().getId();
         String nameTicket = answer.getTicket().getDescription();
         String description = answer.getDescription();
@@ -421,7 +388,7 @@ public class EmailService {
         return html;
     }
 
-    private String contentCloseTicket(long idTicket, String nameTicket) {
+    public String contentCloseTicket(long idTicket, String nameTicket) {
         String html = Consts.REPLY_ABOVE_THIS_LINE + "<!DOCTYPE html>"
                 + "<html>"
                 + "<head>"
@@ -447,7 +414,7 @@ public class EmailService {
         return html;
     }
 
-    private String contentOpenTicket(long idTicket, String nameTicket) {
+    public String contentOpenTicket(long idTicket, String nameTicket) {
         String html = Consts.REPLY_ABOVE_THIS_LINE + "<!DOCTYPE html>"
                 + "<html>"
                 + "<head>"
@@ -489,7 +456,7 @@ public class EmailService {
      */
     public void readEmails() throws MessagingException {
         // Create the session        
-        Session session = getSession();
+        Session session = getSession(Consts.DEFAULT);
         Store store = null;
         try {
             // Set the store depending on the parameter flag value
@@ -651,7 +618,7 @@ public class EmailService {
         return listEmails;
     }
 
-    public void sendEmailPasswordChanged(User user, String language) {
+    public void sendEmailPasswordChanged(User user, String language) throws MessagingException {
 
         String html = "";
         //Define o idioma do email
@@ -697,38 +664,20 @@ public class EmailService {
                     + "</html>";
         }
 
-        Session session = getSession();
-        try {
-            Message message = new MimeMessage(session);
-            message.setFrom(new InternetAddress(PROPERTIES.getProperty(Consts.USER_EMAIL)));
-            message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(user.getEmail()));
-            if (language.trim().equals("pt_BR")) {
-                message.setSubject("Alerta de alteração de senha");
-            } else if (language.trim().equals("en")) {
-                message.setSubject("Password recovery");
-            }
-            message.setContent(html, "text/html; charset=utf-8");
-            Transport.send(message);
-
-        } catch (MessagingException e) {
+        Session session = getSession(Consts.DEFAULT);
+        List<String> emails = new ArrayList<String>();
+        emails.add(user.getEmail());
+        String subject = "";
+        if (language.trim().equals("pt_BR")) {
+            subject = "Alerta de alteração de senha";
+        } else if (language.trim().equals("en")) {
+            subject = "Password recovery";
         }
+        sendEmail(emails, subject, html, Consts.DEFAULT);
     }
 
     public void sendEmailByScreenConfiguration(String subject, String messageUser, List<String> listEmails) throws MessagingException {
-        boolean debug = false;
-
-        Authenticator auth = new SMTPAuthenticator();        
-        Session session = Session.getInstance(PROPERTIES, auth);
-        session.setDebug(debug);
-        String emails = getCorrectAdress(listEmails);
-
-        Message message = new MimeMessage(session);
-        message.setFrom(new InternetAddress(PROPERTIES.getProperty(Consts.USER_EMAIL)));
-        message.setRecipients(Message.RecipientType.BCC, InternetAddress.parse(emails));
-        message.setSubject(subject);
-        message.setContent(setMessageOnMessageSentByHelpdesk(messageUser), "text/html; charset=utf-8");
-
-        Transport.send(message);
+        sendEmail(listEmails, subject, messageUser, Consts.MARKETING);
     }
 
     public String setMessageOnMessageSentByHelpdesk(String message) {
@@ -749,18 +698,5 @@ public class EmailService {
         return html;
     }
     
-    	/**
-	* SimpleAuthenticator is used to do simple authentication
-	* when the SMTP server requires it.
-	*/
-	private class SMTPAuthenticator extends javax.mail.Authenticator
-	{
-	    public PasswordAuthentication getPasswordAuthentication()
-	    {                
-	        String username = PROPERTIES.getProperty(Consts.MARKETING_USER_EMAIL);
-	        String password = PROPERTIES.getProperty(Consts.MARKETING_MAIL_PASSWORD);
-	        return new PasswordAuthentication(username, password);
-	    }
-	}
 
 }
