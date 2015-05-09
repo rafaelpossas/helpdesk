@@ -81,7 +81,7 @@ public class EmailConfigIntegrationTest {
 
         //verificando se o objeto possui os dados esperados
         assertThat(jsonObject.get("id").toString(), is("1"));
-        assertThat(jsonObject.getString("smtpHost"), is("host.gmail"));
+        assertThat(jsonObject.getString("smtpHost"), is("smtp.gmail.com"));
     }
 
     @Test
@@ -140,18 +140,4 @@ public class EmailConfigIntegrationTest {
         assertThat(jsonObject.getString("smtpHost"), is("New Config Email"));
     }
     
-    @Test
-    public void testFindByMarketingSmtpHost() throws Exception {
-        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get("/emailconfig/marketingsmtphost/{marketingsmtphost}", "smtp.sendgrid.net"))
-                .andExpect(MockMvcResultMatchers.status().isOk())//verifica se o retorno � ok 
-                .andExpect(MockMvcResultMatchers.content().contentType(TestUtil.APPLICATION_JSON_UTF8))//verifica se esta retornando um JSON na codifica��o UTF8;  
-                .andReturn();
-
-        String contentString = mvcResult.getResponse().getContentAsString();//recebe o retorno da fun��o
-        JSONObject jsonObject = new JSONObject(contentString);//transforma o JSON String para JsonObject
-
-        //verificando se o objeto possui os dados esperados
-        assertThat(jsonObject.get("id").toString(), is("1"));
-        assertThat(jsonObject.getString("marketingSmtpHost"), is("smtp.sendgrid.net"));
-    }
 }

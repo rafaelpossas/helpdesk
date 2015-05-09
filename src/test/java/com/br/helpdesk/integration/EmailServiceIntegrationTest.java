@@ -41,11 +41,5 @@ public class EmailServiceIntegrationTest {
     @Autowired
     private EmailService emailService;
     
-    @Test
-    public void sendEmailMarketingTest() throws MessagingException{
-        List<String> emails = new ArrayList<String>();
-        emails.add("rafael.possas@cymo.com.br");
-        emailService.sendEmail(emails, "Teste", "Ola, isto é um email de teste", Consts.MARKETING);
-    }
     
 }
