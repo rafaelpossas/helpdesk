@@ -106,4 +106,6 @@ public class Consts {
     public static String SMTP = "smtp";
     public static String MARKETING = "marketing";
     public static String DEFAULT = "default";
+    
+    public static String CYMO_GESTAO_PERFOMANCE = "CYMO - Gestão e Perfomance";
 }

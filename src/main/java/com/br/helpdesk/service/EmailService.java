@@ -16,7 +16,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 import javax.mail.Address;
-import javax.mail.Authenticator;
 import javax.mail.Flags;
 import javax.mail.Folder;
 import javax.mail.Message;
@@ -40,12 +39,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class EmailService {
 
-    public static int EMAIL_NEW_TICKET = 0;
-    public static int EMAIL_NEW_ANSWER = 1;
-    public static int EMAIL_CHANGES = 2;
-
     public Properties PROPERTIES;
-    //public static Properties PROPERTIES = EmailPropertiesLoader.propertiesLoader();
 
     @Autowired
     private UserService userService;
@@ -102,7 +96,6 @@ public class EmailService {
                 }
             }
         }
-
         return null;
     }
 
@@ -113,30 +106,28 @@ public class EmailService {
             protected PasswordAuthentication getPasswordAuthentication() {
                 String username = PROPERTIES.getProperty(Consts.USER_EMAIL);
                 String password = PROPERTIES.getProperty(Consts.MAIL_PASSWORD);
-                return new PasswordAuthentication(username,password);
+                return new PasswordAuthentication(username, password);
             }
         });
         return session;
     }
 
-
     public void setEmailProperties(String type) {
         PROPERTIES = new Properties();
         EmailConfig emailConfig = emailConfigService.findById(1L);
-        if(type.equals(Consts.MARKETING)){
+        
+        if (type.equals(Consts.MARKETING)) {
             PROPERTIES.put(Consts.SMTP_HOST, emailConfig.getMarketingSmtpHost());
             PROPERTIES.put(Consts.USER_EMAIL, emailConfig.getMarketingUserEmail());
             PROPERTIES.put(Consts.MAIL_PASSWORD, emailConfig.getMarketingPassword());
-        }else{
+        } else {
             PROPERTIES.put(Consts.SMTP_HOST, emailConfig.getSmtpHost());
             PROPERTIES.put(Consts.USER_EMAIL, emailConfig.getUserEmail());
             PROPERTIES.put(Consts.MAIL_PASSWORD, emailConfig.getPassword());
             PROPERTIES.put(Consts.IMAP, emailConfig.getImap());
             PROPERTIES.put(Consts.MAIL_IMAPS, Consts.IMAPS);
             PROPERTIES.put(Consts.FOLDER, Consts.INBOX);
-
         }
-        
         PROPERTIES.put(Consts.SOCKET_FACTORY_PORT, emailConfig.getSocketFactoryPort());
         PROPERTIES.put(Consts.AUTH, emailConfig.getAuth());
         PROPERTIES.put(Consts.SMTP_PORT, emailConfig.getSmtpPort());
@@ -144,83 +135,51 @@ public class EmailService {
         PROPERTIES.put(Consts.MAIL_TRANSPORT_PROTOCOL, Consts.SMTP);
         PROPERTIES.put(Consts.MAIL_SMTP_STARTTLS_ENABLE, Consts.TRUE);
         PROPERTIES.put(Consts.MAIL_SMTP_SOCKETFACTORY_FALLBACK, Consts.FALSE);
-
     }
 
-    public void sendEmail(List<String> listEmailsTo,String subject,String content,String serverType) throws MessagingException {
+    public void sendEmail(List<String> listEmailsTo, String subject, String content, String serverType) throws MessagingException {
         Session session = getSession(serverType);
         String emails = getCorrectAdress(listEmailsTo);
-        Store store = null;
         try {
             Message message = new MimeMessage(session);
             message.setFrom(new InternetAddress(PROPERTIES.getProperty(Consts.USER_EMAIL)));
             message.setRecipients(Message.RecipientType.BCC, InternetAddress.parse(emails));
-
             message.setSubject(subject);
             message.setContent(content, "text/html; charset=utf-8");
 
             Transport.send(message);
-
         } catch (MessagingException e) {
             e.printStackTrace();
-            throw e;
         }
     }
 
+    /**
+     * Body do email a ser enviado quando um novo ticket é criado.
+     * 
+     * @author André Sulivam
+     * @param ticket
+     * @return 
+     */
     public String contentNewTicket(Ticket ticket) {
-        String assunto = ticket.getTitle();
-        String categoria = ticket.getCategory().getName();
-        String observacoes = ticket.getDescription();
-        String passos = ticket.getStepsTicket();
-
-        String html = Consts.REPLY_ABOVE_THIS_LINE + "<!DOCTYPE html>"
-                + "<html>"
-                + "<head>"
-                + "<meta charset='UTF-8\'>"
-                + "<style>"
-                + "h1{font-weight: bold;}"
-                + "pre{color:black;font-size: 15px;font-weight: normal;}"
-                + "</style>"
-                + "</head>"
-                + "<body>"
-                + "<h1> NOVO TICKET CRIADO </h1>"
-                + "<HR>"
-                + "<table>"
-                + "<tr>"
-                + "<th><h3>ASSUNTO:&nbsp;</h3></th>"
-                + "<th><pre>" + assunto + "</pre></th>"
-                + "</tr>"
-                + "</table>"
-                + "<HR>"
-                + "<table>"
-                + "<tr>"
-                + "<th><h3>CATEGORIA:&nbsp;</h3></th>"
-                + "<th><pre>" + categoria + "</pre></th>"
-                + "</tr>"
-                + "</table>"
-                + "<HR>"
-                + "<table>"
-                + "<tr>"
-                + "<th><h3>PASSOS PARA REPRODUZIR:&nbsp;</h3></th>"
-                + "<th><pre>" + passos + "</pre></th>"
-                + "</tr>"
-                + "</table>"
-                + "<HR>"
-                + "<table>"
-                + "<tr>"
-                + "<th><h3>OBSERVAÇÕES:&nbsp;</h3></th>"
-                + "<th><pre>" + observacoes + "</pre></th>"
-                + "</tr>"
-                + "</table>"
-                + "<h4>"
-                + "Cymo Tecnologia em Gestão"
-                + "</h4>"
-                + "</body>"
-                + "</html> --#";
-        return html;
+        String fullEmail = Consts.REPLY_ABOVE_THIS_LINE + contentDefaultEmailTop()
+                + "<b>"+ticket.getUser().getName()+"</b> criou o ticket n. <b>"+ticket.getId()+" \""+ticket.getTitle()+"\"</b> na categoria <b>"+ticket.getCategory().getName()+"</b>:"
+                + "<br><br>"
+                + ticket.getDescription()
+                + "<br>"
+                + contentDefaultEmailBot();
+        return fullEmail;
     }
 
+    /**
+     * Body do email a ser enviado quando um ticket for editado.
+     * 
+     * @author André Sulivam
+     * @param olderTicket
+     * @param newTicket
+     * @return 
+     */
     public String contentEditTicket(Ticket olderTicket, Ticket newTicket) {
+
         String olderCategoryName = Consts.NO_CATEGORY;
         String newCategoryName = Consts.NO_CATEGORY;
         String olderEstimatedTime = Consts.NO_ESTIMATED_TIME;
@@ -247,7 +206,6 @@ public class EmailService {
         if (olderTicket.getStepsTicket() != null) {
             olderSteps = olderTicket.getStepsTicket();
         }
-
         if (newTicket.getCategory() != null) {
             newCategoryName = newTicket.getCategory().getName();
         }
@@ -264,182 +222,95 @@ public class EmailService {
             newSteps = newTicket.getStepsTicket();
         }
 
-        String html = "<!DOCTYPE html>"
-                + "<html>"
-                + "<head>"
-                + "<meta charset='UTF-8\'>"
-                + "<style>"
-                + "h1{font-weight: bold;}"
-                + "pre{color:black;font-size: 15px;font-weight: normal;}"
-                + "</style>"
-                + "</head>"
-                + "<body>"
-                + "<h1> TICKET EDITADO </h1>"
-                + "<HR>"
-                + "<table>"
-                + "<tr>"
-                + "<th><h3>TICKET:&nbsp;</h3></th>"
-                + "<th><pre>" + "#" + newTicket.getId() + " - " + newTicket.getDescription() + "</pre></th>"
-                + "</tr>"
-                + "</table>"
-                + "<HR>"
-                + "<table>"
-                + "<tr>"
-                + "<th><h3>CATEGORIA ANTIGA:&nbsp;</h3></th>"
-                + "<th><pre>" + olderCategoryName + "</pre></th>"
-                + "</tr>"
-                + "<tr>"
-                + "<th><h3>CATEGORIA NOVA:&nbsp;</h3></th>"
-                + "<th><pre>" + newCategoryName + "</pre></th>"
-                + "</tr>"
-                + "</table>"
-                + "<HR>"
-                + "<table>"
-                + "<tr>"
-                + "<th><h3>PRAZO ANTIGO:&nbsp;</h3></th>"
-                + "<th><pre>" + olderEstimatedTime + "</pre></th>"
-                + "</tr>"
-                + "<tr>"
-                + "<th><h3>PRAZO NOVO:&nbsp;</h3></th>"
-                + "<th><pre>" + newEstimatedTime + "</pre></th>"
-                + "</tr>"
-                + "</table>"
-                + "<HR>"
-                + "<table>"
-                + "<tr>"
-                + "<th><h3>PRIORIDADE ANTIGA:&nbsp;</h3></th>"
-                + "<th><pre>" + olderPriority + "</pre></th>"
-                + "</tr>"
-                + "<tr>"
-                + "<th><h3>PRIORIDADE NOVA:&nbsp;</h3></th>"
-                + "<th><pre>" + newPriority + "</pre></th>"
-                + "</tr>"
-                + "</table>"
-                + "<HR>"
-                + "<table>"
-                + "<tr>"
-                + "<th><h3>RESPONSÁVEL ANTIGO:&nbsp;</h3></th>"
-                + "<th><pre>" + olderResponsible + "</pre></th>"
-                + "</tr>"
-                + "<tr>"
-                + "<th><h3>RESPONSÁVEL NOVO:&nbsp;</h3></th>"
-                + "<th><pre>" + newResponsible + "</pre></th>"
-                + "</tr>"
-                + "</table>"
-                + "<HR>"
-                + "<table>"
-                + "<tr>"
-                + "<th><h3>PASSOS PARA REPRODUÇÃO ANTIGO:&nbsp;</h3></th>"
-                + "<th><pre>" + olderSteps + "</pre></th>"
-                + "</tr>"
-                + "<tr>"
-                + "<th><h3>PASSOS PARA REPRODUÇÃO NOVO:&nbsp;</h3></th>"
-                + "<th><pre>" + newSteps + "</pre></th>"
-                + "</tr>"
-                + "</table>"
-                + "<h4>"
-                + "Cymo Tecnologia em Gestão"
-                + "</h4>"
-                + "</body>"
-                + "</html>";
+        boolean changeCategory = !(olderCategoryName.equals(newCategoryName));
+        boolean changeEstimateTime = !(olderEstimatedTime.equals(newEstimatedTime));
+        boolean changePriority = !(olderPriority.equals(newPriority));
+        boolean changeResponsible = !(olderResponsible.equals(newResponsible));
+        boolean changeSteps = !(olderSteps.equals(newSteps));
 
-        return html;
+        String fullEmail = Consts.REPLY_ABOVE_THIS_LINE + contentDefaultEmailTop()
+                + "O ticket n. <b>"+olderTicket.getId()+" \""+olderTicket.getTitle()+"\"</b> "+"foi editado:<br>";
+
+        if (changeCategory) {
+            fullEmail += "<br>Categoria passou de: <b>"+olderCategoryName+"</b> para: <b>"+newCategoryName+"</b>";
+        }
+        if (changeEstimateTime) {
+            fullEmail += "<br>Prazo estimado passou de: <b>"+olderEstimatedTime+"</b> para: <b>"+newEstimatedTime+"</b>";
+        }
+        if (changePriority) {
+            fullEmail += "<br>Prioridade passou de: <b>"+olderPriority+"</b></b> para: <b>"+newPriority+"</b>";
+        }
+        if (changeResponsible) {
+            fullEmail += "<br>Responsável passou de: <b>"+olderResponsible+"</b> para: <b>"+newResponsible+"</b>";
+        }
+        if(changeSteps) {
+            fullEmail += "<br>Passos para reproduzir o erro passou de: <b>"+olderSteps+"</b> para: <b>"+newSteps+"</b>";
+        }
+
+        fullEmail += "<br>"+contentDefaultEmailBot();
+        return fullEmail;
     }
 
+    /**
+     * Body do email a ser enviado quando uma nova resposta for gerada.
+     * 
+     * @author André Sulivam
+     * @param answer
+     * @param userName
+     * @return 
+     */
     public String contentNewAnswer(TicketAnswer answer, String userName) {
         long idTicket = answer.getTicket().getId();
-        String nameTicket = answer.getTicket().getDescription();
         String description = answer.getDescription();
-        String html = Consts.REPLY_ABOVE_THIS_LINE + "<!DOCTYPE html>"
-                + "<html>"
-                + "<head>"
-                + "<meta charset='UTF-8\'>"
-                + "<style>"
-                + "h1{font-weight: bold;}"
-                + "pre{color:black;font-size: 15px;font-weight: normal;}"
-                + "</style>"
-                + "</head>"
-                + "<body>"
-                + "<h1> NOVA RESPOSTA CRIADA </h1>"
-                + "<table>"
-                + "<tr>"
-                + "<th><h3>TICKET:&nbsp;</h3></th>"
-                + "<th><pre>" + "#" + idTicket + " - " + nameTicket + "</pre></th>"
-                + "</tr>"
-                + "</table>"
-                + "<table>"
-                + "<tr>"
-                + "<th><h3>CRIADA POR:&nbsp;</h3></th>"
-                + "<th><pre>" + userName + "</pre></th>"
-                + "</tr>"
-                + "</table>"
-                + "<table>"
-                + "<tr>"
-                + "<th><h3>RESPOSTA:&nbsp;</h3></th>"
-                + "<th><pre>" + description + "</pre></th>"
-                + "</tr>"
-                + "</table>"
+
+        String fullEmail = Consts.REPLY_ABOVE_THIS_LINE + contentDefaultEmailTop()
+                + "<b>"+answer.getUser().getName()+"</b> respondeu ao ticket n. <b>"+idTicket+" \""+answer.getTicket().getTitle()+"\"</b>:"
+                + "<br><br>"
+                + description
                 + "<br>"
-                + "<h4>"
-                + "Cymo Tecnologia em Gestão"
-                + "</h4>"
-                + "</body>"
-                + "</html>";
-        return html;
+                + contentDefaultEmailBot();
+        return fullEmail;
     }
 
-    public String contentCloseTicket(long idTicket, String nameTicket) {
-        String html = Consts.REPLY_ABOVE_THIS_LINE + "<!DOCTYPE html>"
-                + "<html>"
-                + "<head>"
-                + "<meta charset='UTF-8\'>"
-                + "<style>"
-                + "h1{font-weight: bold;}"
-                + "pre{color:black;font-size: 15px;font-weight: normal;}"
-                + "</style>"
-                + "</head>"
-                + "<body>"
-                + "<h1> TICKET ENCERRADO </h1>"
-                + "<table>"
-                + "<tr>"
-                + "<th><h3>TICKET #" + idTicket + "#: " + nameTicket + "</h3></th>"
-                + "</tr>"
-                + "</table>"
+    /**
+     * Body do email a ser enviado quando um ticket for fechado.
+     * 
+     * @author André Sulivam
+     * @param ticket
+     * @param user
+     * @return 
+     */
+    public String contentCloseTicket(Ticket ticket, User user) {
+        String fullEmail = Consts.REPLY_ABOVE_THIS_LINE + contentDefaultEmailTop()
+                + "<b>"+user.getName()+"</b> encerrou o ticket n. <b>"+ticket.getId()+" \""+ticket.getTitle()+"\"</b>."
                 + "<br>"
-                + "<h4>"
-                + "Cymo Tecnologia em Gestão"
-                + "</h4>"
-                + "</body>"
-                + "</html>";
-        return html;
+                + contentDefaultEmailBot();
+        return fullEmail;
     }
 
-    public String contentOpenTicket(long idTicket, String nameTicket) {
-        String html = Consts.REPLY_ABOVE_THIS_LINE + "<!DOCTYPE html>"
-                + "<html>"
-                + "<head>"
-                + "<meta charset='UTF-8\'>"
-                + "<style>"
-                + "h1{font-weight: bold;}"
-                + "pre{color:black;font-size: 15px;font-weight: normal;}"
-                + "</style>"
-                + "</head>"
-                + "<body>"
-                + "<h1> TICKET REABERTO </h1>"
-                + "<table>"
-                + "<tr>"
-                + "<th><h3>TICKET #" + idTicket + "#: " + nameTicket + "</h3></th>"
-                + "</tr>"
-                + "</table>"
+    /**
+     * Body do email a ser enviado quando um ticket for reaberto.
+     * 
+     * @author André Sulivam
+     * @param ticket
+     * @param user
+     * @return 
+     */
+    public String contentReOpenTicket(Ticket ticket, User user) {
+        String fullEmail = Consts.REPLY_ABOVE_THIS_LINE + contentDefaultEmailTop()
+                + "<b>"+user.getName()+"</b> reabriu o ticket n. <b>"+ticket.getId()+" \""+ticket.getTitle()+"\"</b>."
                 + "<br>"
-                + "<h4>"
-                + "Cymo Tecnologia em Gestão"
-                + "</h4>"
-                + "</body>"
-                + "</html>";
-        return html;
+                + contentDefaultEmailBot();
+        return fullEmail;
     }
 
+    /**
+     * Cria um String concatenada com os emails enviados na lista, separados por vírgula.
+     * 
+     * @author André Sulivam
+     * @param listEmails
+     * @return 
+     */
     public String getCorrectAdress(List<String> listEmails) {
         String emails = "";
         for (int i = 0; i < listEmails.size(); i++) {
@@ -518,6 +389,18 @@ public class EmailService {
         }
     }
 
+    /**
+     * Retorna lista de emails de todos os usuários que deverão receber o email. A lista varia pela situação. <br>
+     * Caso seja um novo ticket, a lista será de todos os administradores. <br>
+     * Caso seja edição de ticket, a lista será de todos os usuários envolvidos com aquele ticket. <br>
+     * Caso seja uma nova resposta,  a lista será de todos os usuários envolvidos com aquele ticket. <br>
+     * 
+     * @author André Sulivam
+     * @param olderTicket
+     * @param newTicket
+     * @param ticketAnswer
+     * @return 
+     */
     public List<String> getListEmailsToSend(Ticket olderTicket, Ticket newTicket, TicketAnswer ticketAnswer) {
         List<String> listEmails = new ArrayList<String>();
         User userAnswer;
@@ -618,53 +501,41 @@ public class EmailService {
         return listEmails;
     }
 
+    /**
+     * Body do email a ser enviado quando um usuário solicitar recuperação de senha. 
+     * 
+     * @author Ricardo
+     * @update André Sulivam
+     * @param user
+     * @param language
+     * @throws MessagingException 
+     */
     public void sendEmailPasswordChanged(User user, String language) throws MessagingException {
 
         String html = "";
         //Define o idioma do email
         if (language.trim().equals("pt_BR")) {
-            html = "<!DOCTYPE html>"
-                    + "<html>"
-                    + "<head>"
-                    + "<meta charset='UTF-8\'>"
-                    + "<style>"
-                    + "h1{font-weight: bold;}"
-                    + "pre{color:black;font-size: 15px;font-weight: normal;}"
-                    + "</style>"
-                    + "</head>"
-                    + "<body>"
+            html = contentDefaultEmailTop()
                     + "<p> Prezado " + user.getName() + ",</p>"
                     + "<br/>"
                     + "<p> Uma nova senha foi gerada para seu acesso ao sistema.</p>"
                     + "<p> Aconselhamos que altere a mesma para uma de sua preferência pois trata-se de uma senha temporária.</p>"
-                    + "<p> Sua nova senha é: " + user.getPassword() + "</p>"
+                    + "<p> Sua nova senha é: <b>" + user.getPassword() + "</b></p>"
                     + "<p> Link para acesso: <a href='http://cymosupport.tecnologia.ws/Helpdesk'> http://cymosupport.tecnologia.ws/Helpdesk </a> </p>"
-                    + "<p>Atenciosamente, <br/>Cymo</p>"
-                    + "</body>"
-                    + "</html>";
+                    + "<p>Atenciosamente,</p>"
+                    + contentDefaultEmailBot();
         } else if (language.trim().equals("en")) {
-            html = "<!DOCTYPE html>"
-                    + "<html>"
-                    + "<head>"
-                    + "<meta charset='UTF-8\'>"
-                    + "<style>"
-                    + "h1{font-weight: bold;}"
-                    + "pre{color:black;font-size: 15px;font-weight: normal;}"
-                    + "</style>"
-                    + "</head>"
-                    + "<body>"
+            html = contentDefaultEmailTop()
                     + "<p> Dear " + user.getName() + ",</p>"
                     + "<br/>"
                     + "<p> A new password was generated for you access in the system.</p>"
                     + "<p> We strongly recommend you to change the password to one of your preference.</p>"
-                    + "<p> Your new password is: " + user.getPassword() + "</p>"
+                    + "<p> Your new password is: <b>" + user.getPassword() + "</b></p>"
                     + "<p> Link for the access: <a href='http://cymosupport.tecnologia.ws/Helpdesk'> http://cymosupport.tecnologia.ws/Helpdesk </a> </p>"
-                    + "<p>Att, <br/>Cymo</p>"
-                    + "</body>"
-                    + "</html>";
+                    + "<p>Att,</p>"
+                    + contentDefaultEmailBot();
         }
 
-        Session session = getSession(Consts.DEFAULT);
         List<String> emails = new ArrayList<String>();
         emails.add(user.getEmail());
         String subject = "";
@@ -676,27 +547,53 @@ public class EmailService {
         sendEmail(emails, subject, html, Consts.DEFAULT);
     }
 
-    public void sendEmailByScreenConfiguration(String subject, String messageUser, List<String> listEmails) throws MessagingException {
-        sendEmail(listEmails, subject, messageUser, Consts.MARKETING);
+    /**
+     * Método que recebe o texto escrito na tela de Enviar Email do sistema para os usuários selecionados. 
+     * 
+     * @author André Sulivam
+     * @param subject
+     * @param text
+     * @param listEmails
+     * @throws MessagingException 
+     */
+    public void sendEmailByScreenConfiguration(String subject, String text, List<String> listEmails) throws MessagingException {
+        sendEmail(listEmails, subject, text, Consts.MARKETING);
     }
 
-    public String setMessageOnMessageSentByHelpdesk(String message) {
-        String html = "<!DOCTYPE html>"
+    /**
+     * Content com a parte default superior do email.
+     *
+     * @author André Sulivam
+     * @return
+     */
+    public String contentDefaultEmailTop() {
+        String email = "<!DOCTYPE html>"
                 + "<html>"
                 + "<head>"
                 + "<meta charset='UTF-8\'>"
+                + "<style>"
+                + "pre{color:black;font-size: 15px;font-weight: normal;}"
+                + "</style>"
                 + "</head>"
                 + "<body>"
-                + "<br>"
-                + message
-                + "<br>"
-                + "<h4>"
-                + "Cymo - Gestão e Perfomance"
-                + "</h4>"
-                + "</body>"
-                + "</html>";
-        return html;
+                + "<br><br>";
+        return email;
     }
-    
+
+    /**
+     * Content com a parte default inferior do email.
+     *
+     * @author André Sulivam
+     * @return
+     */
+    public String contentDefaultEmailBot() {
+        String email = "<br>"
+                + "<h4><b>"
+                + Consts.CYMO_GESTAO_PERFOMANCE
+                + "</b></h4>"
+                + "</body>"
+                + "</html> --#";
+        return email;
+    }
 
 }

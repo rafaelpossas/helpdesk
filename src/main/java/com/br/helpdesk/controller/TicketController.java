@@ -262,7 +262,7 @@ public class TicketController {
         List<String> emails = emailService.getListEmailsToSend(olderTicket, ticket, null);
         if (emails.size() > 0) {
             String subjectString = "Encerramento do Ticket #" + ticketId + "#: " + ticketTitle;
-            String contentString = emailService.contentCloseTicket(ticketId, ticketTitle);
+            String contentString = emailService.contentCloseTicket(ticket, user);
             emailService.sendEmail(emails,subjectString,contentString, Consts.DEFAULT);
         }
         return ticket;
@@ -270,7 +270,7 @@ public class TicketController {
 
     @RequestMapping(value = {"open-ticket/{id}"}, method = {RequestMethod.PUT})
     @ResponseBody
-    public Ticket openTicket(@RequestBody Ticket ticket, @RequestParam(value = "user") String username) throws MessagingException {        
+    public Ticket reOpenTicket(@RequestBody Ticket ticket, @RequestParam(value = "user") String username) throws MessagingException {        
         User user = userService.findByUserName(username);
 
         Ticket olderTicket = ticketService.findById(ticket.getId());
@@ -280,15 +280,14 @@ public class TicketController {
         Long ticketId = ticket.getId();
         String ticketTitle = ticket.getTitle();
         
-        if (olderTicket != null) {
-            changesTicketController.save(olderTicket, ticket, user);
-        }
-        List<String> emails = emailService.getListEmailsToSend(olderTicket, ticket, null);
-        if (emails.size() > 0) {
-                
+        List<String> emails = emailService.getListEmailsToSend(olderTicket, ticket, null);        
+
+        changesTicketController.save(olderTicket, ticket, user);
+        
+        if (emails.size() > 0) {                
             String subjectString = "Reabertura do Ticket #" + ticketId + "#: " + ticketTitle;
-            String contentString = emailService.contentOpenTicket(ticketId, ticketTitle);
-            emailService.sendEmail(emails,subjectString,contentString, Consts.DEFAULT);
+            String contentString = emailService.contentReOpenTicket(ticket, user);
+            emailService.sendEmail(emails, subjectString, contentString, Consts.DEFAULT);
         }
         return ticket;
     }
@@ -352,8 +351,7 @@ public class TicketController {
         if (emails.size() > 0) {
             if (olderTicket != null) {
                 subjectString = "Atualização do Ticket #" + olderTicket.getId() + "#: " + olderTicket.getTitle();
-                contentString = emailService.contentEditTicket(olderTicket, newTicket);
-               
+                contentString = emailService.contentEditTicket(olderTicket, newTicket);               
             } else {
                 subjectString = "Novo Ticket #" + newTicket.getId() + "#: " + newTicket.getTitle();
                 contentString = emailService.contentNewTicket(newTicket);
@@ -407,7 +405,6 @@ public class TicketController {
         }
         return ticket;
     }
-
     
     public PageRequest getPageRequest(int limit, int start) {
         int pageSize = limit - start;
@@ -558,8 +555,7 @@ public class TicketController {
                 valor.setCount(countAgent);
                 valores.add(valor);
             }
-        }
-        
+        }        
         return valores;
     }   
 }
