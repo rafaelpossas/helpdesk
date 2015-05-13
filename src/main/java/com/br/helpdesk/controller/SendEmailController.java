@@ -64,7 +64,7 @@ public class SendEmailController {
     String sendEmailSingle(@RequestParam(value = "subject") String subject,
             @RequestParam(value = "message") String message,
             @RequestParam(value = "emailUser") String emailUser,
-            @RequestParam(value = "id") Long id) {
+            @RequestParam(value = "id") Long id) throws Exception{
         return sendEmailService.sendEmailSingle(subject, message, emailUser, id);
     }
 

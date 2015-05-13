@@ -67,7 +67,6 @@ Ext.define('Helpdesk.controller.TicketAnswer', {
                     }
                     else {
                         txtNewAnswer.setLoading(false);
-                        console.info("ERRO UPLOAD FILE");
                     }
                 }
             });
@@ -85,6 +84,12 @@ Ext.define('Helpdesk.controller.TicketAnswer', {
     },
     /**
      * Salva uma nova resposta para o ticket
+     * 
+     * @author André Sulivam
+     * @param {type} button
+     * @param {type} e
+     * @param {type} options
+     * @returns {undefined}
      */
     saveAnswer: function(button, e, options) {
         var scope = this;
@@ -103,7 +108,6 @@ Ext.define('Helpdesk.controller.TicketAnswer', {
             answer.data.userId = Helpdesk.Globals.userLogged.id;
             answer.data.description = form.down('textarea#tktNewAnswer').getValue();
             store.add(answer);
-
             store.proxy.url = 'ticket-answer';
             store.sync({
                 callback: function(result) {
@@ -113,26 +117,21 @@ Ext.define('Helpdesk.controller.TicketAnswer', {
                     scope.addNewAnswerInPanel(answer, panelTktAnswers);
                 }
             });
-
         } else {
             Ext.Msg.alert(translations.INFORMATION, translations.TICKET_ANSWER_EMPTY_WARNING);
         }
     },
     addNewAnswerInPanel: function(answer, panel) {
-
         var scope = this;
-
         var answerStore = this.getTicketAnswersStore();
         answerStore.proxy.url = 'ticket-answer/find-by-ticket/' + answer.data.ticketId;
         answerStore.load({
             callback: function() {
                 panel.removeAll();
-                var ticket = answer.data.ticket;
-                var answersList = scope.getTicketController().formatAnswersPanel(ticket, answerStore.data.items);
                 var ticketView = panel.up().up();
-
+                var ticket = answer.data.ticket;
+                scope.getTicketController().formatAnswersPanel(ticketView, ticket, answerStore.data.items);                
                 scope.getTicketController().resetMultiupload(ticketView);
-                scope.getTicketController().formatAnswerWithFilesAndChanges(ticketView, ticket, answersList);
             }
         });
     }

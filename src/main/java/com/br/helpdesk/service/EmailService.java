@@ -115,7 +115,7 @@ public class EmailService {
     public void setEmailProperties(String type) {
         PROPERTIES = new Properties();
         EmailConfig emailConfig = emailConfigService.findById(1L);
-        
+
         if (type.equals(Consts.MARKETING)) {
             PROPERTIES.put(Consts.SMTP_HOST, emailConfig.getMarketingSmtpHost());
             PROPERTIES.put(Consts.USER_EMAIL, emailConfig.getMarketingUserEmail());
@@ -137,10 +137,10 @@ public class EmailService {
         PROPERTIES.put(Consts.MAIL_SMTP_SOCKETFACTORY_FALLBACK, Consts.FALSE);
     }
 
-    public void sendEmail(List<String> listEmailsTo, String subject, String content, String serverType) throws MessagingException {
-        Session session = getSession(serverType);
-        String emails = getCorrectAdress(listEmailsTo);
+    public void sendEmail(List<String> listEmailsTo, String subject, String content, String serverType) throws Exception {
         try {
+            Session session = getSession(serverType);
+            String emails = getCorrectAdress(listEmailsTo);
             Message message = new MimeMessage(session);
             message.setFrom(new InternetAddress(PROPERTIES.getProperty(Consts.USER_EMAIL)));
             message.setRecipients(Message.RecipientType.BCC, InternetAddress.parse(emails));
@@ -148,21 +148,21 @@ public class EmailService {
             message.setContent(content, "text/html; charset=utf-8");
 
             Transport.send(message);
-        } catch (MessagingException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
     /**
      * Body do email a ser enviado quando um novo ticket é criado.
-     * 
+     *
      * @author André Sulivam
      * @param ticket
-     * @return 
+     * @return
      */
     public String contentNewTicket(Ticket ticket) {
         String fullEmail = Consts.REPLY_ABOVE_THIS_LINE + contentDefaultEmailTop()
-                + "<b>"+ticket.getUser().getName()+"</b> criou o ticket n. <b>"+ticket.getId()+" \""+ticket.getTitle()+"\"</b> na categoria <b>"+ticket.getCategory().getName()+"</b>:"
+                + "<b>" + ticket.getUser().getName() + "</b> criou o ticket n. <b>" + ticket.getId() + " \"" + ticket.getTitle() + "\"</b> na categoria <b>" + ticket.getCategory().getName() + "</b>:"
                 + "<br><br>"
                 + ticket.getDescription()
                 + "<br>"
@@ -172,11 +172,11 @@ public class EmailService {
 
     /**
      * Body do email a ser enviado quando um ticket for editado.
-     * 
+     *
      * @author André Sulivam
      * @param olderTicket
      * @param newTicket
-     * @return 
+     * @return
      */
     public String contentEditTicket(Ticket olderTicket, Ticket newTicket) {
 
@@ -229,42 +229,42 @@ public class EmailService {
         boolean changeSteps = !(olderSteps.equals(newSteps));
 
         String fullEmail = Consts.REPLY_ABOVE_THIS_LINE + contentDefaultEmailTop()
-                + "O ticket n. <b>"+olderTicket.getId()+" \""+olderTicket.getTitle()+"\"</b> "+"foi editado:<br>";
+                + "O ticket n. <b>" + olderTicket.getId() + " \"" + olderTicket.getTitle() + "\"</b> " + "foi editado:<br>";
 
         if (changeCategory) {
-            fullEmail += "<br>Categoria passou de: <b>"+olderCategoryName+"</b> para: <b>"+newCategoryName+"</b>";
+            fullEmail += "<br>Categoria passou de: <b>" + olderCategoryName + "</b> para: <b>" + newCategoryName + "</b>";
         }
         if (changeEstimateTime) {
-            fullEmail += "<br>Prazo estimado passou de: <b>"+olderEstimatedTime+"</b> para: <b>"+newEstimatedTime+"</b>";
+            fullEmail += "<br>Prazo estimado passou de: <b>" + olderEstimatedTime + "</b> para: <b>" + newEstimatedTime + "</b>";
         }
         if (changePriority) {
-            fullEmail += "<br>Prioridade passou de: <b>"+olderPriority+"</b></b> para: <b>"+newPriority+"</b>";
+            fullEmail += "<br>Prioridade passou de: <b>" + olderPriority + "</b></b> para: <b>" + newPriority + "</b>";
         }
         if (changeResponsible) {
-            fullEmail += "<br>Responsável passou de: <b>"+olderResponsible+"</b> para: <b>"+newResponsible+"</b>";
+            fullEmail += "<br>Responsável passou de: <b>" + olderResponsible + "</b> para: <b>" + newResponsible + "</b>";
         }
-        if(changeSteps) {
-            fullEmail += "<br>Passos para reproduzir o erro passou de: <b>"+olderSteps+"</b> para: <b>"+newSteps+"</b>";
+        if (changeSteps) {
+            fullEmail += "<br>Passos para reproduzir o erro passou de: <b>" + olderSteps + "</b> para: <b>" + newSteps + "</b>";
         }
 
-        fullEmail += "<br>"+contentDefaultEmailBot();
+        fullEmail += "<br>" + contentDefaultEmailBot();
         return fullEmail;
     }
 
     /**
      * Body do email a ser enviado quando uma nova resposta for gerada.
-     * 
+     *
      * @author André Sulivam
      * @param answer
      * @param userName
-     * @return 
+     * @return
      */
     public String contentNewAnswer(TicketAnswer answer, String userName) {
         long idTicket = answer.getTicket().getId();
         String description = answer.getDescription();
 
         String fullEmail = Consts.REPLY_ABOVE_THIS_LINE + contentDefaultEmailTop()
-                + "<b>"+answer.getUser().getName()+"</b> respondeu ao ticket n. <b>"+idTicket+" \""+answer.getTicket().getTitle()+"\"</b>:"
+                + "<b>" + answer.getUser().getName() + "</b> respondeu ao ticket n. <b>" + idTicket + " \"" + answer.getTicket().getTitle() + "\"</b>:"
                 + "<br><br>"
                 + description
                 + "<br>"
@@ -274,15 +274,15 @@ public class EmailService {
 
     /**
      * Body do email a ser enviado quando um ticket for fechado.
-     * 
+     *
      * @author André Sulivam
      * @param ticket
      * @param user
-     * @return 
+     * @return
      */
     public String contentCloseTicket(Ticket ticket, User user) {
         String fullEmail = Consts.REPLY_ABOVE_THIS_LINE + contentDefaultEmailTop()
-                + "<b>"+user.getName()+"</b> encerrou o ticket n. <b>"+ticket.getId()+" \""+ticket.getTitle()+"\"</b>."
+                + "<b>" + user.getName() + "</b> encerrou o ticket n. <b>" + ticket.getId() + " \"" + ticket.getTitle() + "\"</b>."
                 + "<br>"
                 + contentDefaultEmailBot();
         return fullEmail;
@@ -290,26 +290,27 @@ public class EmailService {
 
     /**
      * Body do email a ser enviado quando um ticket for reaberto.
-     * 
+     *
      * @author André Sulivam
      * @param ticket
      * @param user
-     * @return 
+     * @return
      */
     public String contentReOpenTicket(Ticket ticket, User user) {
         String fullEmail = Consts.REPLY_ABOVE_THIS_LINE + contentDefaultEmailTop()
-                + "<b>"+user.getName()+"</b> reabriu o ticket n. <b>"+ticket.getId()+" \""+ticket.getTitle()+"\"</b>."
+                + "<b>" + user.getName() + "</b> reabriu o ticket n. <b>" + ticket.getId() + " \"" + ticket.getTitle() + "\"</b>."
                 + "<br>"
                 + contentDefaultEmailBot();
         return fullEmail;
     }
 
     /**
-     * Cria um String concatenada com os emails enviados na lista, separados por vírgula.
-     * 
+     * Cria um String concatenada com os emails enviados na lista, separados por
+     * vírgula.
+     *
      * @author André Sulivam
      * @param listEmails
-     * @return 
+     * @return
      */
     public String getCorrectAdress(List<String> listEmails) {
         String emails = "";
@@ -390,16 +391,19 @@ public class EmailService {
     }
 
     /**
-     * Retorna lista de emails de todos os usuários que deverão receber o email. A lista varia pela situação. <br>
+     * Retorna lista de emails de todos os usuários que deverão receber o email.
+     * A lista varia pela situação. <br>
      * Caso seja um novo ticket, a lista será de todos os administradores. <br>
-     * Caso seja edição de ticket, a lista será de todos os usuários envolvidos com aquele ticket. <br>
-     * Caso seja uma nova resposta,  a lista será de todos os usuários envolvidos com aquele ticket. <br>
-     * 
+     * Caso seja edição de ticket, a lista será de todos os usuários envolvidos
+     * com aquele ticket. <br>
+     * Caso seja uma nova resposta, a lista será de todos os usuários envolvidos
+     * com aquele ticket. <br>
+     *
      * @author André Sulivam
      * @param olderTicket
      * @param newTicket
      * @param ticketAnswer
-     * @return 
+     * @return
      */
     public List<String> getListEmailsToSend(Ticket olderTicket, Ticket newTicket, TicketAnswer ticketAnswer) {
         List<String> listEmails = new ArrayList<String>();
@@ -502,15 +506,16 @@ public class EmailService {
     }
 
     /**
-     * Body do email a ser enviado quando um usuário solicitar recuperação de senha. 
-     * 
+     * Body do email a ser enviado quando um usuário solicitar recuperação de
+     * senha.
+     *
      * @author Ricardo
      * @update André Sulivam
      * @param user
      * @param language
-     * @throws MessagingException 
+     * @throws MessagingException
      */
-    public void sendEmailPasswordChanged(User user, String language) throws MessagingException {
+    public void sendEmailPasswordChanged(User user, String language) throws Exception {
 
         String html = "";
         //Define o idioma do email
@@ -548,15 +553,16 @@ public class EmailService {
     }
 
     /**
-     * Método que recebe o texto escrito na tela de Enviar Email do sistema para os usuários selecionados. 
-     * 
+     * Método que recebe o texto escrito na tela de Enviar Email do sistema para
+     * os usuários selecionados.
+     *
      * @author André Sulivam
      * @param subject
      * @param text
      * @param listEmails
-     * @throws MessagingException 
+     * @throws MessagingException
      */
-    public void sendEmailByScreenConfiguration(String subject, String text, List<String> listEmails) throws MessagingException {
+    public void sendEmailByScreenConfiguration(String subject, String text, List<String> listEmails) throws Exception {
         sendEmail(listEmails, subject, text, Consts.MARKETING);
     }
 

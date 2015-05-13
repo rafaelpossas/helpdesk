@@ -97,8 +97,9 @@ public class SendEmailService {
      * @param emailUser
      * @param id
      * @return
+     * @throws Exception 
      */
-    public String sendEmailSingle(String subject, String message, String emailUser, Long id) {
+    public String sendEmailSingle(String subject, String message, String emailUser, Long id) throws Exception {
         String resultado = "{\"id\":\"" + id
                 + "\",\"email\":\"" + emailUser;
         try {
