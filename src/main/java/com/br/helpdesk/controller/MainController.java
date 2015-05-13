@@ -149,9 +149,8 @@ public class MainController {
     
     @RequestMapping(value="/login/reset-password", params = {"username","language"}, method = RequestMethod.GET,produces = "application/json;charset=UTF-8")
     public @ResponseBody         
-    String retrievePassword(@RequestParam(value = "username") String username,@RequestParam(value = "language") String language, HttpServletResponse response) throws UnsupportedEncodingException,MessagingException {
+    String retrievePassword(@RequestParam(value = "username") String username,@RequestParam(value = "language") String language, HttpServletResponse response) throws UnsupportedEncodingException, Exception {
         
-        List<User>users = userService.findAll();
         String result = "";
         username = username.replace("username=", "");       
         

@@ -18,20 +18,16 @@ import java.io.File;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-import javax.mail.MessagingException;
 import javax.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import javax.servlet.http.HttpServletResponse;
-import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
@@ -111,7 +107,8 @@ public class TicketController {
 
     /**
      * FindAll sem registro de qual usuário fez a requisição.
-     * @return 
+     *
+     * @return
      */
     @RequestMapping(method = RequestMethod.GET)
     public @ResponseBody
@@ -121,8 +118,9 @@ public class TicketController {
 
     /**
      * FindAll com registro do usuário que fez a requisição.
+     *
      * @param username
-     * @return 
+     * @return
      */
     @RequestMapping(value = "/all", method = RequestMethod.GET, params = {"user"})
     public @ResponseBody
@@ -248,7 +246,7 @@ public class TicketController {
 
     @RequestMapping(value = {"close-ticket/{id}"}, method = {RequestMethod.PUT})
     @ResponseBody
-    public Ticket closeTicket(@RequestBody Ticket ticket, @RequestParam(value = "user") String username) throws MessagingException {
+    public Ticket closeTicket(@RequestBody Ticket ticket, @RequestParam(value = "user") String username) throws Exception {
         User user = userService.findByUserName(username);
         Ticket olderTicket = ticketService.findById(ticket.getId());
         ticket.setIsOpen(false);
@@ -263,14 +261,14 @@ public class TicketController {
         if (emails.size() > 0) {
             String subjectString = "Encerramento do Ticket #" + ticketId + "#: " + ticketTitle;
             String contentString = emailService.contentCloseTicket(ticket, user);
-            emailService.sendEmail(emails,subjectString,contentString, Consts.DEFAULT);
+            emailService.sendEmail(emails, subjectString, contentString, Consts.DEFAULT);
         }
         return ticket;
     }
 
     @RequestMapping(value = {"open-ticket/{id}"}, method = {RequestMethod.PUT})
     @ResponseBody
-    public Ticket reOpenTicket(@RequestBody Ticket ticket, @RequestParam(value = "user") String username) throws MessagingException {        
+    public Ticket reOpenTicket(@RequestBody Ticket ticket, @RequestParam(value = "user") String username) throws Exception {
         User user = userService.findByUserName(username);
 
         Ticket olderTicket = ticketService.findById(ticket.getId());
@@ -279,12 +277,12 @@ public class TicketController {
         ticket = ticketService.save(ticket);
         Long ticketId = ticket.getId();
         String ticketTitle = ticket.getTitle();
-        
-        List<String> emails = emailService.getListEmailsToSend(olderTicket, ticket, null);        
+
+        List<String> emails = emailService.getListEmailsToSend(olderTicket, ticket, null);
 
         changesTicketController.save(olderTicket, ticket, user);
-        
-        if (emails.size() > 0) {                
+
+        if (emails.size() > 0) {
             String subjectString = "Reabertura do Ticket #" + ticketId + "#: " + ticketTitle;
             String contentString = emailService.contentReOpenTicket(ticket, user);
             emailService.sendEmail(emails, subjectString, contentString, Consts.DEFAULT);
@@ -294,7 +292,7 @@ public class TicketController {
 
     @RequestMapping(value = {"", "/{id}"}, method = {RequestMethod.POST, RequestMethod.PUT}, params = {"user"})
     @ResponseBody
-    public Ticket save(@RequestBody Ticket newTicket, @RequestParam(value = "user") String username) throws IOException,MessagingException {
+    public Ticket save(@RequestBody Ticket newTicket, @RequestParam(value = "user") String username) throws IOException, Exception {
         User user = userService.findByUserName(username);
         List<File> filesToSave = attachmentsService.getAttachmentsFromUser(username);
 
@@ -315,20 +313,20 @@ public class TicketController {
             Priority priority = priorityService.findById(1L);
             newTicket.setPriority(priority);
         }
-        
+
         //buscando novamente a categoria no banco porque o valor do 'name' está vindo do extjs com o valor de translations
-        Category category = categoryService.findById(newTicket.getCategory().getId());       
+        Category category = categoryService.findById(newTicket.getCategory().getId());
         newTicket.setCategory(category);
-        
+
         if (olderTicket == null) {
             // se é novo ticket.
             newTicket.setLastInteration(newTicket.getStartDate());
             newTicket.setUserLastInteration(newTicket.getUser());
         }
-        
+
         newTicket = ticketService.save(newTicket);
 
-        if (olderTicket != null) {     
+        if (olderTicket != null) {
             // se é edição de um ticket, salvar qual foi a mudança.
             changesTicketController.save(olderTicket, newTicket, user);
         }
@@ -351,12 +349,12 @@ public class TicketController {
         if (emails.size() > 0) {
             if (olderTicket != null) {
                 subjectString = "Atualização do Ticket #" + olderTicket.getId() + "#: " + olderTicket.getTitle();
-                contentString = emailService.contentEditTicket(olderTicket, newTicket);               
+                contentString = emailService.contentEditTicket(olderTicket, newTicket);
             } else {
                 subjectString = "Novo Ticket #" + newTicket.getId() + "#: " + newTicket.getTitle();
                 contentString = emailService.contentNewTicket(newTicket);
             }
-            emailService.sendEmail(emails,subjectString,contentString,Consts.DEFAULT); //NEW
+            emailService.sendEmail(emails, subjectString, contentString, Consts.DEFAULT); //NEW
         }
         return newTicket;
     }
@@ -384,13 +382,13 @@ public class TicketController {
         //buscando novamente a categoria no banco porque o valor do 'name' está vindo do extjs com o valor de translations
         Category category = categoryService.findById(ticket.getCategory().getId());
         ticket.setCategory(category);
-        if (olderTicket == null) {            
+        if (olderTicket == null) {
             ticket.setLastInteration(ticket.getStartDate());
             ticket.setUserLastInteration(ticket.getUser());
         }
         ticket = ticketService.save(ticket);
 
-        if (olderTicket != null) {            
+        if (olderTicket != null) {
             changesTicketController.save(olderTicket, ticket, user);
         }
 
@@ -405,7 +403,7 @@ public class TicketController {
         }
         return ticket;
     }
-    
+
     public PageRequest getPageRequest(int limit, int start) {
         int pageSize = limit - start;
         int page;
@@ -416,19 +414,20 @@ public class TicketController {
         }
         return new PageRequest(page, pageSize);
     }
-    
-    @RequestMapping(value = "/search", method = RequestMethod.GET, params = {"user","searchterm","typesearch","start", "limit"})
-    public @ResponseBody Page<Ticket> getTicketsBySearch( @RequestParam(value = "user") String username,
+
+    @RequestMapping(value = "/search", method = RequestMethod.GET, params = {"user", "searchterm", "typesearch", "start", "limit"})
+    public @ResponseBody
+    Page<Ticket> getTicketsBySearch(@RequestParam(value = "user") String username,
             @RequestParam(value = "searchterm") String searchTerm,
             @RequestParam(value = "typesearch") String typeSearch,
-            @RequestParam(value = "start") int start, 
+            @RequestParam(value = "start") int start,
             @RequestParam(value = "limit") int limit) throws UnsupportedEncodingException {
         PageRequest pageRequest = getPageRequest(limit, start);
-        searchTerm = new String(searchTerm.getBytes(), "UTF-8"); 
+        searchTerm = new String(searchTerm.getBytes(), "UTF-8");
         User user = this.userService.findByUserName(username);
-        return ticketService.searchTickets(user,searchTerm,typeSearch,pageRequest);
+        return ticketService.searchTickets(user, searchTerm, typeSearch, pageRequest);
     }
-    
+
     @ExceptionHandler(EntityNotFoundException.class)
     @ResponseStatus(value = HttpStatus.NOT_FOUND, reason = "Entidade não encontrada")
     public void handleEntityNotFoundException(Exception ex) {
@@ -438,109 +437,110 @@ public class TicketController {
     public void handleDataIntegrityViolationException(DataIntegrityViolationException ex, HttpServletResponse response) throws IOException {
         response.sendError(HttpServletResponse.SC_FORBIDDEN, ex.getMessage());
     }
-    
+
     /**
-     * 
-     * Recebe os valores que geram os gráficos e informações na tela de dashboard     
+     *
+     * Recebe os valores que geram os gráficos e informações na tela de
+     * dashboard
      */
     @RequestMapping(value = "/dashboard-values", method = RequestMethod.GET)
-    public @ResponseBody List<DashboardValue> getValuesDashboard() {
-        
-        List<DashboardValue> valores = new ArrayList<DashboardValue>(); 
-        
-        List<User>users = userService.findAll();
+    public @ResponseBody
+    List<DashboardValue> getValuesDashboard() {
+
+        List<DashboardValue> valores = new ArrayList<DashboardValue>();
+
+        List<User> users = userService.findAll();
         Iterable<Category> categories = categoryService.findAll();
-        List<Ticket>tickets = ticketService.findAll();       
+        List<Ticket> tickets = ticketService.findAll();
         DashboardValue valor;
         int count;
-        
+
         //Recebe os valores de Tickets x Categoria
-        if(categories!=null){            
-            for(Category category:categories){
+        if (categories != null) {
+            for (Category category : categories) {
                 count = 0;
-                for(Ticket ticket:tickets){
-                    if(ticket.getCategory().getId() == category.getId()){
-                        count++;                        
+                for (Ticket ticket : tickets) {
+                    if (ticket.getCategory().getId() == category.getId()) {
+                        count++;
                     }
                 }
                 valor = new DashboardValue();
                 valor.setType("categoria-ticket");
                 valor.setCount(count);
                 valor.setDescription(category.getName());
-                valores.add(valor);                
-            }            
+                valores.add(valor);
+            }
         }
-        
+
         //Recebe os valores dos status dos tickets (Abertos,fechados,sem responsável)
-        int countOpen = 0,countClosed = 0,countNoResp = 0,countOnGoing = 0,countOnGoingNoResp = 0;
-        for(Ticket ticket:tickets){
-            if(ticket.isIsOpen()){
+        int countOpen = 0, countClosed = 0, countNoResp = 0, countOnGoing = 0, countOnGoingNoResp = 0;
+        for (Ticket ticket : tickets) {
+            if (ticket.isIsOpen()) {
                 countOpen++;
-            }else{
+            } else {
                 countClosed++;
             }
-            if(ticket.getResponsible()==null){
+            if (ticket.getResponsible() == null) {
                 countNoResp++;
             }
-            if(ticket.getResponsible()==null && ticket.isIsOpen()== true){
+            if (ticket.getResponsible() == null && ticket.isIsOpen() == true) {
                 countOnGoingNoResp++;
-            }  
-        }    
+            }
+        }
         valor = new DashboardValue();
         valor.setType("status-ticket");
         valor.setDescription("Abertos");
         valor.setCount(countOpen);
         valores.add(valor);
-        
+
         valor = new DashboardValue();
         valor.setType("open-ticket");
         valor.setDescription("Abertos");
         valor.setCount(countOpen);
         valores.add(valor);
-        
+
         valor = new DashboardValue();
         valor.setType("status-ticket");
         valor.setDescription("Fechados");
         valor.setCount(countClosed);
         valores.add(valor);
-        
+
         valor = new DashboardValue();
         valor.setType("status-ticket");
         valor.setDescription("Sem Responsável");
         valor.setCount(countNoResp);
         valores.add(valor);
-        
+
         valor = new DashboardValue();
         valor.setType("no-responsible-open");
         valor.setDescription("Sem Responsável");
         valor.setCount(countOnGoingNoResp);
         valores.add(valor);
-        
+
         //Recebe os valores de Tickets x Usuarios
-        
-        for (User user : users){
+        for (User user : users) {
             count = 0;
             int countAgent = 0;
             int countOpenTickets = 0;
-            for(Ticket ticket:tickets){
-                if(ticket.getUser()!=null && ticket.getUser().getId() == user.getId()){
+            for (Ticket ticket : tickets) {
+                if (ticket.getUser() != null && ticket.getUser().getId() == user.getId()) {
                     count++;
                 }
-                if(ticket.getUser()!=null && ticket.isIsOpen() && ticket.getUser().getId() == user.getId()){
+                if (ticket.getUser() != null && ticket.isIsOpen() && ticket.getUser().getId() == user.getId()) {
                     countOpenTickets++;
                 }
-                if(ticket.getResponsible()!=null && ticket.isIsOpen() && ticket.getResponsible().getId() == user.getId()){
+                if (ticket.getResponsible() != null && ticket.isIsOpen() && ticket.getResponsible().getId() == user.getId()) {
                     countAgent++;
                 }
-            }  
-            if(count>0){
+            }
+            if (count > 0) {
                 valor = new DashboardValue();
                 valor.setType("user-ticket");
                 valor.setDescription(user.getName());
                 valor.setCount(count);
                 valores.add(valor);
             }
-            if(countOpenTickets>0){
+            if (countOpenTickets > 0) {
                 valor = new DashboardValue();
                 valor.setType("user-ticket-open");
                 valor.setDescription(user.getName());
@@ -548,14 +548,14 @@ public class TicketController {
                 valores.add(valor);
             }
             //Recebe os valores de Tickets x Agentes
-            if(countAgent>0){
+            if (countAgent > 0) {
                 valor = new DashboardValue();
                 valor.setType("agent-ticket");
                 valor.setDescription(user.getName());
                 valor.setCount(countAgent);
                 valores.add(valor);
             }
-        }        
+        }
         return valores;
-    }   
+    }
 }

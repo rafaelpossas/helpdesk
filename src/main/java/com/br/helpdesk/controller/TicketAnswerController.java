@@ -21,7 +21,6 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import javax.mail.MessagingException;
 import javax.persistence.EntityNotFoundException;
 import javax.servlet.http.HttpServletResponse;
 import org.json.JSONObject;
@@ -65,14 +64,14 @@ public class TicketAnswerController {
 
     @Autowired
     private TicketService ticketService;
-    
+
     public void setTicketService(TicketService service) {
         this.ticketService = service;
     }
 
     @Autowired
     private UserService userService;
-    
+
     public void setUserService(UserService service) {
         this.userService = service;
     }
@@ -83,7 +82,7 @@ public class TicketAnswerController {
     public void setEmailService(EmailService service) {
         this.emailService = service;
     }
-    
+
     @RequestMapping(method = RequestMethod.GET)
     public @ResponseBody
     Iterable<TicketAnswer> findAll() {
@@ -92,7 +91,7 @@ public class TicketAnswerController {
 
     @RequestMapping(value = {"", "/{id}"}, method = {RequestMethod.PUT, RequestMethod.POST})
     @ResponseBody
-    public TicketAnswer save(@RequestBody String ticketAnwString) throws ParseException, IOException,MessagingException {
+    public TicketAnswer save(@RequestBody String ticketAnwString) throws ParseException, IOException, Exception {
 
         JSONObject jSONObject = new JSONObject(ticketAnwString);
 
@@ -102,7 +101,7 @@ public class TicketAnswerController {
         return saveNewAnswer(ticketId, userId, respostaString);
     }
 
-    public TicketAnswer saveNewAnswer(Long idTicket, Long userId, String answerDescription) throws ParseException, IOException,MessagingException {
+    public TicketAnswer saveNewAnswer(Long idTicket, Long userId, String answerDescription) throws ParseException, IOException, Exception {
 
         List<String> emails = new ArrayList<String>();
 
@@ -118,11 +117,11 @@ public class TicketAnswerController {
         answer.setUser(userAnswer);
         answer.setDateCreation(new Date());
         answer = answerService.save(answer);
-        
+
         ticket.setLastInteration(answer.getDateCreation());
         ticket.setUserLastInteration(answer.getUser());
         ticketService.save(ticket);
-        
+
         Attachments attachment = null;
         for (File file : filesToSave) {
             //file.renameTo(file.getName().replace(username, username));
@@ -133,13 +132,13 @@ public class TicketAnswerController {
             attachmentsService.save(attachment);
             file.delete();
         }
-        
+
         emails = emailService.getListEmailsToSend(null, null, answer);
-        
-        if(emails.size()>0){
+
+        if (emails.size() > 0) {
             String subjectString = "Nova Resposta ao Ticket #" + answer.getTicket().getId() + "#: " + answer.getTicket().getTitle();
             String contentString = emailService.contentNewAnswer(answer, userAnswer.getName());
-            emailService.sendEmail(emails,subjectString,contentString,Consts.DEFAULT);
+            emailService.sendEmail(emails, subjectString, contentString, Consts.DEFAULT);
         }
 
         return answer;
