@@ -30,12 +30,12 @@ Ext.define('Helpdesk.controller.Login', {
             selector: 'capslocktooltip'
         }
     ],
-    init: function() {
+    init: function () {
         this.control({
             'loginform button#submit': {
                 click: this.onSubmit
             },
-            'credentialsexpiredwindow button#submit_credentials':{
+            'credentialsexpiredwindow button#submit_credentials': {
                 click: this.onSubmitCredentials
             },
             'loginform form textfield': {
@@ -56,17 +56,18 @@ Ext.define('Helpdesk.controller.Login', {
             'signinform button#voltar': {
                 click: this.onSignInVoltar
             },
-            'loginform button#forgotPwdBtn':{
+            'loginform button#forgotPwdBtn': {
                 click: this.generateRetrievePasswordWindow
             },
-            '#btnRetrieve':{
+            '#btnRetrieve': {
                 click: this.generateNewPassword
             }
 
         });
 
     },
-    onTextfieldKeyPress: function(field, e, options) {
+    numberUsersCreated: 0,
+    onTextfieldKeyPress: function (field, e, options) {
         var charCode = e.getCharCode();
         if ((e.shiftKey && charCode >= 97 && charCode <= 122) ||
                 (!e.shiftKey && charCode >= 65 && charCode <= 90)) {
@@ -84,53 +85,53 @@ Ext.define('Helpdesk.controller.Login', {
         }
 
     },
-    onTextfieldSpecialKey: function(field, e, options) {
+    onTextfieldSpecialKey: function (field, e, options) {
         if (e.getKey() === e.ENTER) {
             var submitBtn = field.up('form').down('button#submit');// Pega o elemento pai para depois buscar a referência ao botão
             var submitCredencials = Ext.ComponentQuery.query('credentialsexpiredwindow button#submit_credentials')[0];
-            if(submitBtn!== null)
+            if (submitBtn !== null)
                 submitBtn.fireEvent('click', submitBtn, e, options);
-            
-            if(submitCredencials !== null)
+
+            if (submitCredencials !== null)
                 submitCredencials.fireEvent('click', submitCredencials, e, options);
         }
     },
-    onSubmitCredentials: function(button, e, options){
+    onSubmitCredentials: function (button, e, options) {
         var formCredentials = button.up('form');
         var formLogin = Ext.ComponentQuery.query('#mainform')[0];
         var user = formLogin.getForm().findField('username').getValue();
         var newPassword = formCredentials.getForm().findField('new_password').getValue();
         var confirmPassword = formCredentials.getForm().findField('confirm_password').getValue();
-        if(newPassword !== confirmPassword){
+        if (newPassword !== confirmPassword) {
             Ext.Msg.alert(translations.ERROR, translations.PASSWORD_NOT_MATCH);
-        }else{
+        } else {
             formCredentials.getForm().findField('user').setValue(user);
             formCredentials.submit({
-                success: function(obj, action){
+                success: function (obj, action) {
                     Ext.ComponentQuery.query('credentialsexpiredwindow')[0].close();
                     formLogin.getForm().findField('password').setValue(newPassword);
                     var submitButton = Ext.ComponentQuery.query('loginform button#submit')[0];
-                    submitButton.fireEvent('click',submitButton);
+                    submitButton.fireEvent('click', submitButton);
 
                 },
-                failure: function(form,action){
+                failure: function (form, action) {
                     console.log("User Changed Failed");
                 }
             });
         }
 
     },
-    loginSubmit: function(form){
+    loginSubmit: function (form) {
         console.log("loginSubmit");
         var formTopElement = Ext.get(form.getEl()); // Busca pelo elemento superior que representa o componente (Neste caso o PANEL)
         formTopElement.mask(translations.AUTHENTICATING, 'loading'); // Adiciona a máscara de carregamento 
         form.submit({
             method: 'POST',
-            success: function(obj, action) {
+            success: function (obj, action) {
                 formTopElement.unmask(); // Remove máscara de carregamento  
                 window.location.href = "../" + homeURL;
             },
-            failure: function(form, action) {
+            failure: function (form, action) {
                 formTopElement.unmask(); // Remove máscara de carregamento  
                 var obj = Ext.JSON.decode(action.response.responseText);
                 console.log(action);
@@ -139,7 +140,7 @@ Ext.define('Helpdesk.controller.Login', {
                     if (obj.error === 'credentialsexpired' || obj.error === 'accountlocked') {
                         var credentialsExpiredWindow = Ext.create('Helpdesk.view.user.CredentialsExpiredWindow');
                         credentialsExpiredWindow.show();
-                    } else{
+                    } else {
                         if (obj.error === 'badcredentials') {
                             translatedError = translations.BAD_CREDENTIALS;
                         }
@@ -155,12 +156,12 @@ Ext.define('Helpdesk.controller.Login', {
             }
         });
     },
-    onSubmit: function(button, e, options) {
+    onSubmit: function (button, e, options) {
         var form = button.up('form');
         this.loginSubmit(form);
 
     },
-    onButtonClickSignIn: function(button, e, options) {
+    onButtonClickSignIn: function (button, e, options) {
         var win = Ext.create('Ext.window.Window', {
             title: translations.SIGN_IN,
             layout: 'fit',
@@ -177,7 +178,7 @@ Ext.define('Helpdesk.controller.Login', {
         win.down('form').loadRecord(Ext.create('Helpdesk.model.User'));
         win.show();
     },
-    onSignInCriarConta: function(button, e, options) {
+    onSignInCriarConta: function (button, e, options) {
 
         var form = button.up('form');
         var record = form.getRecord();
@@ -190,26 +191,40 @@ Ext.define('Helpdesk.controller.Login', {
         this.getUsersStore().add(record);
         var myscope = this;
         this.getUsersStore().sync({
-            callback: function() {
-                myscope.changeUserStoreProperties(1);
-
-                Ext.Ajax.request({
-                    url: 'j_spring_security_check',
-                    method: 'POST',
-                    params: {
-                        j_username: values.userName,
-                        j_password: values.password
-                    },
-                    success: function(o) {
-                        window.location.href = "../" + homeURL;
-                    }
-                });
+            callback: function (result) {
+                // usuários criados pela tela de login
+                var users = result.events.operationcomplete.listeners[0].scope.data.items;
+                
+                // usuario da ultima tentativa
+                var currentUser = users[myscope.numberUsersCreated];
+                
+                if(currentUser.data.id !== null && currentUser.data.id !== ""){
+                    Ext.Msg.alert(translations.INFORMATION, translations.USER + ' ' + translations.CREATED_WITH_SUCCESS);
+                } else {
+                    Ext.Msg.alert(translations.INFORMATION, translations.USER_NOT_CREATED + '. '+ translations.CHECK_THE_ENTERED_VALUES + '.');
+                }
+                // incrementando o valor da variável de número de usuários criados para o próximo teste.
+                myscope.numberUsersCreated = myscope.numberUsersCreated+1;
+                
+//                myscope.changeUserStoreProperties(1);
+//
+//                Ext.Ajax.request({
+//                    url: 'j_spring_security_check',
+//                    method: 'POST',
+//                    params: {
+//                        j_username: values.userName,
+//                        j_password: values.password
+//                    },
+//                    success: function (o) {
+//                        //window.location.href = "../" + homeURL;
+//                    }
+//                });
             }
         });
 
         form.up('.window').close();
     },
-    onSignInVoltar: function(button, e, options) {
+    onSignInVoltar: function (button, e, options) {
         var form = button.up('form');
         form.up('.window').close();
     },
@@ -217,18 +232,18 @@ Ext.define('Helpdesk.controller.Login', {
      * 0 - Antes de utilizar a store dentro do login
      * 1 - Depois de utilizar a store dentro do login
      */
-    changeUserStoreProperties: function(tipo) {
+    changeUserStoreProperties: function (tipo) {
         if (tipo === 0) {
             this.getUsersStore().proxy.url = "login";
             Ext.override(this.getUsersStore(), {
-                onCreateRecords: function(success, rs, data) {
+                onCreateRecords: function (success, rs, data) {
                 }
             });
         }
         else if (tipo === 1) {
             this.getUsersStore().proxy.url = "user";
             Ext.override(this.getUsersStore(), {
-                onCreateRecords: function(success, rs, data) {
+                onCreateRecords: function (success, rs, data) {
                     if (success) {
                         Ext.Msg.alert(translations.INFORMATION, translations.USER + ' ' + translations.SAVED_WITH_SUCCESS);
                     }
@@ -236,75 +251,73 @@ Ext.define('Helpdesk.controller.Login', {
             });
         }
     },
-    
-    generateRetrievePasswordWindow:function(){        
-       
-       var window = Ext.create('Ext.window.Window',{
-           title:translations.RETRIEVE_PASSWORD,
-           width:500,
-           height:75,
-           modal: true,
-           dynamic: true,          
-           items:[
-               {
-                   xtype:'panel',
-                   layout:'hbox',                   
-                   align:'stretch',
-                   height:50,                   
-                   items:[
-                       {
-                           xtype:'label',
-                           text:translations.USER,
-                           padding:'13 5 10 10'
-                       },
-                       {
-                           xtype:'textfield',
-                           itemId:'userNameRetrieveValue',
-                           width:335,
-                           padding:'10 10 10 5'
-                       },
-                       {
-                           xtype:'button',
-                           margin:'10 0 0 0',
-                           itemId:'btnRetrieve',
-                           text:translations.RETRIEVE
-                       }
-                   ]
-               }
-           ]
-           
-       });
-       window.show();
+    generateRetrievePasswordWindow: function () {
+
+        var window = Ext.create('Ext.window.Window', {
+            title: translations.RETRIEVE_PASSWORD,
+            width: 500,
+            height: 75,
+            modal: true,
+            dynamic: true,
+            items: [
+                {
+                    xtype: 'panel',
+                    layout: 'hbox',
+                    align: 'stretch',
+                    height: 50,
+                    items: [
+                        {
+                            xtype: 'label',
+                            text: translations.USER,
+                            padding: '13 5 10 10'
+                        },
+                        {
+                            xtype: 'textfield',
+                            itemId: 'userNameRetrieveValue',
+                            width: 335,
+                            padding: '10 10 10 5'
+                        },
+                        {
+                            xtype: 'button',
+                            margin: '10 0 0 0',
+                            itemId: 'btnRetrieve',
+                            text: translations.RETRIEVE
+                        }
+                    ]
+                }
+            ]
+
+        });
+        window.show();
     },
-    
-    generateNewPassword:function(btn){ 
-        
-        var form = btn.up();        
-        var userName = form.down('textfield#userNameRetrieveValue').getValue();        
-        
-        if(form.down('textfield#userNameRetrieveValue').getValue() !== ''){
+    generateNewPassword: function (btn) {
+
+        var form = btn.up();
+        var userName = form.down('textfield#userNameRetrieveValue').getValue();
+
+        if (form.down('textfield#userNameRetrieveValue').getValue() !== '') {
             form.setLoading(translations.PLEASE_WAIT);
             Ext.Ajax.request({
-                url:'login/reset-password',            
-                method:'GET',            
-                params:{
+                url: 'login/reset-password',
+                method: 'GET',
+                params: {
                     username: userName,
                     language: localStorage.getItem('user-lang')
                 },
-                success: function(o) {
-                    var decodedString = Ext.decode(o.responseText);        
-                    form.setLoading(false,false);                
-                    if(decodedString.status === translations.CHANGE_PASSWORD_COMPLETE){
+                success: function (o) {
+                    var decodedString = Ext.decode(o.responseText);
+                    form.setLoading(false, false);
+                    if (decodedString.status === translations.CHANGE_PASSWORD_COMPLETE) {
                         Ext.Msg.alert(translations.INFORMATION, translations.CHANGE_PASSWORD_COMPLETE_MESSAGE);
                         form.up().close();
-                    }else if(decodedString.status === translations.INVALID_USERNAME){
+                    } else if (decodedString.status === translations.INVALID_USERNAME) {
                         Ext.Msg.alert(translations.INFORMATION, translations.INVALID_USERNAME_MESSAGE);
-                    }              
-                }                     
+                    }
+                }
             });
-        }else{
+        } else {
             Ext.Msg.alert(translations.INFORMATION, translations.BLANK_VARIABLE_MESSAGE);
         }
     }
-    
+
 });
