@@ -34,6 +34,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import org.springframework.web.bind.annotation.RequestParam;
@@ -288,6 +289,12 @@ public class TicketController {
             emailService.sendEmail(emails, subjectString, contentString, Consts.DEFAULT);
         }
         return ticket;
+    }
+    
+    @RequestMapping(value = {"/{id}"}, method = {RequestMethod.GET})
+    @ResponseBody
+    public Ticket getById(@PathVariable Long id){
+        return ticketService.findById(id);
     }
 
     @RequestMapping(value = {"", "/{id}"}, method = {RequestMethod.POST, RequestMethod.PUT}, params = {"user"})

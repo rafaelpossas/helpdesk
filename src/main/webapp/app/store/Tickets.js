@@ -22,6 +22,12 @@ Ext.define('Helpdesk.store.Tickets', {
         });
         this.callParent([config]);
     },
+   findById: function(id,callbackFunction) {
+        this.load({
+            url: 'ticket/' + id,
+            callback: callbackFunction
+        });
+    },
     onCreateRecords: function(records, operation, success) {
         if (success) {           
             Ext.Msg.alert(translations.INFORMATION, translations.TICKET+' '+translations.SAVED_WITH_SUCCESS);

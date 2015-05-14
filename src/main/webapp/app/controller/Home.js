@@ -70,7 +70,7 @@ Ext.define('Helpdesk.controller.Home', {
             btnTicket.setVisible(true);
             btnReports.setVisible(false);
             this.getMainHeaderSettings().setVisible(false);
-            Ext.Router.redirect('ticket');
+            Ext.Router.redirect('ticket/opened');
         } else {
             btnTicket.setVisible(true);
             btnHome.setVisible(true);
@@ -105,7 +105,12 @@ Ext.define('Helpdesk.controller.Home', {
             });
         }
         else {
-            Ext.Router.redirect(btn.itemId);
+            if(btn.itemId !== 'ticket'){
+                Ext.Router.redirect(btn.itemId);
+            }else{
+                Ext.Router.redirect("ticket/my");
+            }
+            
         }
     }
 });

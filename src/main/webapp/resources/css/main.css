@@ -692,13 +692,13 @@
     padding-bottom: 25px;
 }
 
-.image-profile-asnwer{
+.image-profile-answer{
     margin-top: -8px !important;
     height: 40px;
     width: 40px;
 }
 
-.imagem-default-user{
+.image-default-user{
     content :url('../img/no_image.png') !important;
     height: 40px;
     width: 40px;

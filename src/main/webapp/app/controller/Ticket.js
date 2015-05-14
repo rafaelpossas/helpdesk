@@ -116,53 +116,15 @@ Ext.define('Helpdesk.controller.Ticket', {
             selector: 'ticket'
         },
         {
+            ref: 'ticketGrid',
+            selector: 'ticketgrid'
+        },
+        {
             ref: 'searchBox',
             selector: 'ticket textfield#searchBox'
         }
 
     ],
-    list: function () {
-        this.getCardPanel().getLayout().setActiveItem(Helpdesk.Globals.ticketview);
-        this.getTicketEditContainer().getLayout().setActiveItem(Helpdesk.Globals.ticket_details_view);
-        if (typeof this.getTicketPanel() !== 'undefined') {
-            if (Helpdesk.Globals.userLogged.userGroup.id == Helpdesk.Globals.idAdminGroup) {
-                //Verifica se algum botão já estava marcado e busca os tickets de acordo com a seleção correspondente
-                if (this.getTicketSideMenu().down('#buttonAll').pressed) {
-                    this.getAllTickets();
-                    this.getTicketSideMenu().down('#buttonAll').toggle(true);
-                }
-                else if (this.getTicketSideMenu().down('#buttonMyTickets').pressed) {
-                    this.getMyTickets();
-                    this.getTicketSideMenu().down('#buttonMyTickets').toggle(true);
-                }
-                else if (this.getTicketSideMenu().down('#buttonWithoutResponsible').pressed) {
-                    this.getTicketsWithoutResponsible();
-                    this.getTicketSideMenu().down('#buttonWithoutResponsible').toggle(true);
-                }
-                else if (this.getTicketSideMenu().down('#buttonOpened').pressed) {
-                    this.getTicketsOpened();
-                    this.getTicketSideMenu().down('#buttonOpened').toggle(true);
-                }
-                else if (this.getTicketSideMenu().down('#buttonClosed').pressed) {
-                    this.getTicketsClosed();
-                    this.getTicketSideMenu().down('#buttonClosed').toggle(true);
-                }
-                else {
-                    this.getMyTickets();
-                    this.getTicketSideMenu().down('#buttonMyTickets').toggle(true);
-                }
-            } else {
-                this.getTicketsOpened();
-                this.getTicketSideMenu().down('#buttonOpened').toggle(true);
-            }
-        }
-        else {
-            this.setSideMenuButtonText();
-        }
-        var mainHeader = this.getMainHeader();
-        var btnTicket = mainHeader.down("#ticket");
-        btnTicket.toggle(true);
-    },
     /**
      * Método quando o usuário clicar em Fechar ou Reabrir o ticket.
      * 
@@ -512,6 +474,33 @@ Ext.define('Helpdesk.controller.Ticket', {
         }
 
     },
+    sidemenu: function(params){
+      this.getCardPanel().getLayout().setActiveItem(Helpdesk.Globals.ticketview);
+      this.getTicketCardContainer().getLayout().setActiveItem(Helpdesk.Globals.ticket_datagrid);  
+      this.getMainHeader().down("#ticket").toggle(true);
+      switch(params.type){
+        case 'all':
+            this.getTicketSideMenu().down('#buttonAll').toggle(true);
+            this.getAllTickets();
+        break;
+        case 'opened':
+            this.getTicketSideMenu().down('#buttonOpened').toggle(true);
+            this.getTicketsOpened();
+        break;
+        case 'closed':
+            this.getTicketSideMenu().down('#buttonClosed').toggle(true);
+            this.getTicketsClosed();
+        break;
+        case 'my':
+            this.getTicketSideMenu().down('#buttonMyTickets').toggle(true);
+            this.getMyTickets();
+        break;
+        case 'noresp':
+            this.getTicketSideMenu().down('#buttonWithoutResponsible').toggle(true);
+            this.getTicketsWithoutResponsible();
+        break;
+      }  
+    },
     /**
      * Açoes realizadas por cada side button 
      * @param {type} btn
@@ -520,22 +509,28 @@ Ext.define('Helpdesk.controller.Ticket', {
     onTicketMenuClick: function (btn) {
         this.getSearchBox().reset();
         this.getTicketCardContainer().getLayout().setActiveItem(Helpdesk.Globals.ticket_datagrid);
-        this.getTicketEditContainer().getLayout().setActiveItem(Helpdesk.Globals.ticket_details_view);
-        if (typeof this.getTicketPanel() !== 'undefined') {
+        //this.getTicketEditContainer().getLayout().setActiveItem(Helpdesk.Globals.ticket_details_view);
+        
+        if (this.getTicketPanel() !== undefined) {
             if (btn.itemId === 'buttonAll') {
-                this.getAllTickets();
+                Ext.Router.redirect("ticket/all");
+                
             }
             else if (btn.itemId === 'buttonOpened') {
-                this.getTicketsOpened();
+                Ext.Router.redirect("ticket/opened");
+
             }
             else if (btn.itemId === 'buttonClosed') {
-                this.getTicketsClosed();
+                Ext.Router.redirect("ticket/closed");
+
             }
             else if (btn.itemId === 'buttonMyTickets') {
-                this.getMyTickets();
+                Ext.Router.redirect("ticket/my");
+
             }
             else if (btn.itemId === 'buttonWithoutResponsible') {
-                this.getTicketsWithoutResponsible();
+                Ext.Router.redirect("ticket/noresp");
+
             }
         }
     },
@@ -799,10 +794,23 @@ Ext.define('Helpdesk.controller.Ticket', {
      * @param {type} eOpts
      * @returns {undefined}
      */
+    edit: function(params){
+        var store = this.getTicketGrid().getStore();
+        var scope = this;
+        store.findById(params.id,function(result){
+            scope.getMainHeader().down("#ticket").toggle(true);
+            scope.getCardPanel().getLayout().setActiveItem(Helpdesk.Globals.ticketview);
+            scope.getTicketCardContainer().getLayout().setActiveItem(Helpdesk.Globals.ticket_details);
+            scope.setSideMenuButtonText();
+            //scope.getTicketView().down('form#ticketMainView').loadRecord(Ext.create('Helpdesk.model.Ticket'));
+            scope.setValuesFromView(scope.getTicketView(),result[0]);
+        });
+
+    },
     ticketClicked: function (grid, record, item, index, e, eOpts) {
-        var ticketView = this.getTicketCardContainer().getLayout().setActiveItem(Helpdesk.Globals.ticket_details);
-        ticketView.down('form#ticketMainView').loadRecord(Ext.create('Helpdesk.model.Ticket'));
-        this.setValuesFromView(ticketView, record);
+
+        var id = record.data.id;
+        Ext.Router.redirect("ticket/"+id+"/edit");
     },
     /**
      * @author Ricardo
@@ -1028,7 +1036,8 @@ Ext.define('Helpdesk.controller.Ticket', {
             var itemsLength = answers.length;
             if (itemsLength > 0) {
                 if (ticket.data.isOpen) {
-                    answers.items[itemsLength - 1].expand(true);
+                    var currentAnswer = answers.items[itemsLength - 1];
+                    currentAnswer.expand(true);
                 }
                 answers.items[itemsLength - 1].el.setStyle('margin', '0 0 10px 0');
             }
@@ -1498,10 +1507,10 @@ Ext.define('Helpdesk.controller.Ticket', {
         }
 
         htmlImage += '<img align="left" ';
-        if (imageUser !== null) {
+        if (imageUser !== null && imageUser !== '') {
             htmlImage += 'src = "' + imageUser + '" class = "image-profile-answer" ';
         } else {
-            htmlImage += 'class = "imagem-default-user"';
+            htmlImage += 'class = "image-default-user"';
         }
         htmlImage += '/>';
 
