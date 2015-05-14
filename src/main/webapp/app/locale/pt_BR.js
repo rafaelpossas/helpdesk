@@ -69,6 +69,7 @@ translations = {
     CHANGE_PASSWORD_COMPLETE_MESSAGE:'Uma nova senha foi gerada e enviada para o e-mail cadastrado.',
     CLEAR: 'Limpar',
     CANCELED_BY_USER: 'Cancelado pelo usuário',
+    CHECK_THE_ENTERED_VALUES: 'Cheque os valores inseridos',
     //############################################## [ D ] ##############################################//
 
     DELETE: 'Remover',
@@ -342,6 +343,7 @@ translations = {
     URGENT: 'Urgente',
     USER_TICKET:'user-ticket',
     USER_TICKET_OPEN:'user-ticket-open',
+    USER_NOT_CREATED: 'Usuário não criado',
     //############################################## [ V ] ##############################################//
 
 

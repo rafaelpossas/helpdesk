@@ -70,6 +70,7 @@ translations = {
     CHANGE_PASSWORD_COMPLETE_MESSAGE:'A new password was automatically generated and sent to your e-mail account',
     CLEAR: 'Clear',
     CANCELED_BY_USER: 'Canceled by user',
+    CHECK_THE_ENTERED_VALUES: 'Check the entered values',
     //############################################## [ D ] ##############################################//
 
     DELETE: 'Delete',
@@ -342,6 +343,7 @@ translations = {
     URGENT: 'Urgent',
     USER_TICKET:'user-ticket',
     USER_TICKET_OPEN:'user-ticket-open',
+    USER_NOT_CREATED: 'User not created',
     //############################################## [ V ] ##############################################//
 
 
