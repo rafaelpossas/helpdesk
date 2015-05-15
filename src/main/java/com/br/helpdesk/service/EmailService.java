@@ -149,7 +149,7 @@ public class EmailService {
 
             Transport.send(message);
         } catch (Exception e) {
-            e.printStackTrace();
+            throw e;
         }
     }
 
