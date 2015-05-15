@@ -37,7 +37,12 @@ public class UserService {
         model = repository.save(model);
         if (userTemp == null) {
             // usuario novo - Enviar email aos administradores e ao próprio usuário com os dados de cadastro.
-            emailService.sendEmailNewUserCreated(model);
+            try{
+                emailService.sendEmailNewUserCreated(model);
+            }catch(Exception e){
+                e.printStackTrace();
+            }
+            
         }
         model = (User) removePassword(null, model);
         return model;
