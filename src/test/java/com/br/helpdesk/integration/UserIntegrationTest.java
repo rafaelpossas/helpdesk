@@ -119,7 +119,7 @@ public class UserIntegrationTest {
         UserGroup userGroup = serviceUserGroup.findById(1L);
 
         User newUser = new User();
-        newUser.setEmail("email");
+        newUser.setEmail("andre.sulivam@cymo.com.br");
         newUser.setIsEnabled(true);
         newUser.setName("New User");
         newUser.setPassword("pass");

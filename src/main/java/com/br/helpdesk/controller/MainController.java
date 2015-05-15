@@ -39,8 +39,6 @@ public class MainController {
    // public static final String ACCOUNT_LOCKED = "accountlocked";
    // public static final String ACCOUNT_DISABLED = "accountdisabled";
     @Resource
-    private UserRepository userRepository;
-    @Resource
     private ClientRepository clientRepository;    
     @Resource
     private UserGroupRepository userGroupRepository;
@@ -50,17 +48,17 @@ public class MainController {
     private EmailService emailService;
     
     @RequestMapping(value="/credentials",method = RequestMethod.POST)
-    public void saveCredentials(HttpServletRequest request, HttpServletResponse response){
+    public void saveCredentials(HttpServletRequest request, HttpServletResponse response) throws Exception{
         String newPassword = request.getParameter("new_password");
         String userString = request.getParameter("user");
-        User user = userRepository.findByUserName(userString);
+        User user = userService.findByUserName(userString);
         user.setCredentialsNonExpired(Boolean.TRUE);
         user.setPassword(newPassword);
-        userRepository.save(user);
+        userService.save(user);
     }
     @RequestMapping(value="/login",method = RequestMethod.POST)
     @ResponseBody
-    public User createFromLogin(@RequestBody String user) {
+    public User createFromLogin(@RequestBody String user) throws Exception {
         JSONObject jsObject = new JSONObject(user);
         User newUsuario = new User();
         List<Client> clients = clientRepository.findByNameContaining((String)jsObject.get("client"));
@@ -86,8 +84,8 @@ public class MainController {
         newUsuario.setUserName((String)jsObject.get(Consts.USERNAME));
         newUsuario.setClient(client);
         newUsuario.setUserGroup(ug);
-        
-        newUsuario = userRepository.save(newUsuario);
+        newUsuario.setCredentialsNonExpired(true);
+        newUsuario = userService.save(newUsuario);
         //return user;
         return newUsuario;
     }
@@ -95,7 +93,7 @@ public class MainController {
     @RequestMapping(value = "/login/validuser", method = RequestMethod.POST, params={"username"})
     public @ResponseBody
     Boolean userValidation(@RequestParam(value = "username") String username) {
-        User user = userRepository.findByUserName(username);
+        User user = userService.findByUserName(username);
         if(user != null)
             return false;
         return true;
@@ -105,7 +103,7 @@ public class MainController {
     public ModelAndView getHome() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         ModelAndView modelAndView = new ModelAndView(Consts.HOME);
-        User user = userRepository.findByUserName(auth.getName());
+        User user = userService.findByUserName(auth.getName());
         JSONObject jsObject = new JSONObject(user);
         jsObject.remove("password");
         
@@ -120,7 +118,7 @@ public class MainController {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         ModelAndView modelAndView = new ModelAndView(Consts.LOGIN);
         if (!auth.getName().equals(Consts.ANONYMOUS_USER)) {
-            User user = userRepository.findByUserName(auth.getName());
+            User user = userService.findByUserName(auth.getName());
             modelAndView.addObject(Consts.USER, auth.getName());
             modelAndView.addObject(Consts.LOGGED, true);
             modelAndView.addObject(Consts.CLIENT, user.getClient().getId());

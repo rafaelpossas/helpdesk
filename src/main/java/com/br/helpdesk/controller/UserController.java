@@ -59,7 +59,7 @@ public class UserController {
 
     @RequestMapping(value = {"", "/{id}"}, method = {RequestMethod.PUT, RequestMethod.POST})
     @ResponseBody
-    public User save(@RequestBody User user) {
+    public User save(@RequestBody User user) throws Exception {
         return userService.save(user);
     }
 
@@ -115,7 +115,7 @@ public class UserController {
             @RequestParam(value = "name") String name,
             @RequestParam(value = "email") String email,
             @RequestParam(value = "picture") String picture,
-            @RequestParam(value = "password") String password) {
+            @RequestParam(value = "password") String password) throws Exception {
         User user = this.userService.findByUserName(username);
         user.setName(name);
         user.setEmail(email);

@@ -2,8 +2,8 @@
 <dataset>
     
     <Email_Config id="1" smtp_host="smtp.gmail.com" socket_factory_port="465" auth="true" 
-                      smtp_port="465" user_email="procymo@cymo.com.br" password="123mudar" imap="imap.gmail.com"
-                      marketing_smtp_host="smtp.sendgrid.net" marketing_user_email="procymo" marketing_password="cymotecnologia2011"/>
+                      smtp_port="465" user_email="procymo@cymo.com.br" password="123mudar1" imap="imap.gmail.com"
+                      marketing_smtp_host="smtp.sendgrid.net" marketing_user_email="procymo" marketing_password="cymotecnologia20111"/>
     
         
     <Client id="1" name="Cymo Tecnologia em Gestão"/>
@@ -18,9 +18,9 @@
     <User_Group id="4" name="Cliente 3"/>
     <User_Group id="5" name="EXISTE_ENTIDADE_COM_ESSE_NOME"/>
     
-    <User id="1" picture_byte="" email="rafaelpossas@gmail" name="Rafael Carvalhaes" username="rafaelpossas" password="1234" client_id="1" isEnabled="true" user_group_id="1"/>
-    <User id="2" picture_byte="" email="nacacio@gmail" name="André Nacácio" username="andrenacacio" password="1234" client_id="1" isEnabled="true" user_group_id="1"/>
-    <User id="3" picture_byte="" email="asulivam@gmail" name="André Sulivam" username="andresulivam" password="1234" client_id="1" isEnabled="true" user_group_id="1"/>
+    <User id="1" picture_byte="" email="sulivam2005@hotmail.com" name="Rafael Carvalhaes" username="rafaelpossas" password="1234" client_id="1" isEnabled="true" user_group_id="1"/>
+    <User id="2" picture_byte="" email="rafael.possas@cymo.com.br" name="André Nacácio" username="andrenacacio" password="1234" client_id="1" isEnabled="true" user_group_id="1"/>
+    <User id="3" picture_byte="" email="asulivam@gmail.com" name="André Sulivam" username="andresulivam" password="1234" client_id="1" isEnabled="true" user_group_id="1"/>
     <User id="4" picture_byte="" email="nacacio@gmail" name="Ricardo Damasceno" username="ricardodamasceno" password="1234" client_id="1" isEnabled="true" user_group_id="1"/>
     <User id="5" picture_byte="" email='email@gmail' name="EXISTE_ENTIDADE_COM_ESSE_NOME" username="user" password="1234" client_id="1" isEnabled="true" user_group_id="2"/>
     

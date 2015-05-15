@@ -2,10 +2,10 @@ package com.br.helpdesk.service;
 
 import com.br.helpdesk.model.User;
 import com.br.helpdesk.repository.UserRepository;
-import java.util.ArrayList;
 import java.util.List;
 import javax.annotation.Resource;
 import org.apache.commons.collections.IteratorUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -18,15 +18,27 @@ public class UserService {
         this.repository = repository;
     }
 
-    public User save(User model) {
+    @Autowired
+    private EmailService emailService;
+
+    public void setEmailService(EmailService service) {
+        this.emailService = service;
+    }
+
+    public User save(User model) throws Exception {
+        User userTemp = null;
         // caso usuário já exista no banco e tenha sido alterado em campos que não sejam o password
         if ((model.getId() != null && model.getId() > 0)
                 && (model.getPassword() == null || model.getPassword().equals(""))) {
             // pesquisa o usuário salvo no banco para setar a senha antiga ao usuário que está sendo salvo.
-            User userTemp = repository.findOne(model.getId());
+            userTemp = repository.findOne(model.getId());
             model.setPassword(userTemp.getPassword());
         }
         model = repository.save(model);
+        if (userTemp == null) {
+            // usuario novo - Enviar email aos administradores e ao próprio usuário com os dados de cadastro.
+            emailService.sendEmailNewUserCreated(model);
+        }
         model = (User) removePassword(null, model);
         return model;
     }

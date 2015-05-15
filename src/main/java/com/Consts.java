@@ -57,6 +57,7 @@ public class Consts {
     public static String ANONYMOUS_USER = "anonymousUser";
 
     public static String NONE = "none";
+    public static String NOVO_CADASTRO_USUARIO = "Novo Cadastro de Usuário - Helpdesk";
 
     public static String NO_CATEGORY = "Sem categoria";
     public static String NO_CATEGORY_EN = "NO_CATEGORY";
