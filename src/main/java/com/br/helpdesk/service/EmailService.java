@@ -565,6 +565,57 @@ public class EmailService {
     public void sendEmailByScreenConfiguration(String subject, String text, List<String> listEmails) throws Exception {
         sendEmail(listEmails, subject, text, Consts.MARKETING);
     }
+    
+    /**
+     * Método para enviar email quando se criar um novo usuário.
+     * 
+     * @author André Sulivam
+     * @param user
+     * @throws Exception 
+     */
+    public void sendEmailNewUserCreated(User user) throws Exception{
+        List<String> adminsEmail = getAdminEmails();
+        
+        String emailUser = user.getEmail();        
+        List<String> email = new ArrayList<String>();
+        email.add(emailUser);
+        
+        String htmlAdmin = contentNewUserToAdmins(user);
+        String htmlUser = contentNewUserToUser(user);
+        
+        sendEmail(adminsEmail, Consts.NOVO_CADASTRO_USUARIO, htmlAdmin, Consts.MARKETING);
+        sendEmail(email, Consts.NOVO_CADASTRO_USUARIO, htmlUser, Consts.DEFAULT);        
+    }
+    
+    public String contentNewUserToUser(User user) {
+        String fullEmail = contentDefaultEmailTop()
+                + "Seu usuário foi criado com sucesso no Helpdesk - PROCYMO!"
+                + "<br>"
+                + "Nome: "+user.getName()
+                + "<br>"
+                + "Email: "+user.getEmail()
+                + "<br>"
+                + "Usuario: "+user.getUserName()
+                + "<br>"
+                + "Senha: "+user.getPassword()
+                + "<br>"
+                + contentDefaultEmailBot();
+        return fullEmail;
+    }
+    
+    public String contentNewUserToAdmins(User user) {
+        String fullEmail = contentDefaultEmailTop()
+                + "Novo usuário criado no Helpdesk - PROCYMO!"
+                + "<br>"
+                + "Nome: "+user.getName()
+                + "<br>"
+                + "Email: "+user.getEmail()
+                + "<br>"
+                + "Cliente: "+user.getClient().getName()
+                + "<br>"
+                + contentDefaultEmailBot();
+        return fullEmail;
+    }
 
     /**
      * Content com a parte default superior do email.

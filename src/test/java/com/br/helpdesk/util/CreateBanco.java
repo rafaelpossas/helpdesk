@@ -93,7 +93,7 @@ public class CreateBanco {
     }
 
     // @Test
-    public void createBanco() {
+    public void createBanco() throws Exception {
 
         Long i;
         Category category;
