@@ -1,7 +1,14 @@
 package com.br.helpdesk.model;
 
+import org.hibernate.annotations.*;
+import org.hibernate.annotations.CascadeType;
+
 import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.Table;
 import java.util.Date;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Created with IntelliJ IDEA. User: rafaelpossas Date: 13/10/13 Time: 09:04 To
@@ -20,7 +27,7 @@ public class Ticket {
     @Column(name = "ISOPEN", nullable = false)
     private Boolean isOpen;
 
-    @ManyToOne
+    @OneToOne
     @JoinColumn(name = "USER_ID", nullable = true)
     private User user;
 
@@ -46,19 +53,19 @@ public class Ticket {
     @Column(name = "STEPS_TICKET")
     private String stepsTicket;
 
-    @ManyToOne
+    @OneToOne
     @JoinColumn(name = "RESPONSIBLE_ID", nullable = true)
     private User responsible;
 
-    @ManyToOne
+    @OneToOne
     @JoinColumn(name = "CATEGORY_ID", nullable = false)
     private Category category;
 
-    @ManyToOne
+    @OneToOne
     @JoinColumn(name = "CLIENT_ID", nullable = false)
     private Client client;
 
-    @ManyToOne
+    @OneToOne
     @JoinColumn(name = "PRIORITY_ID", nullable = true)
     private Priority priority;
 
@@ -72,9 +79,17 @@ public class Ticket {
     @Temporal(TemporalType.TIMESTAMP)
     private Date lastInteration;
     
-    @ManyToOne
+    @OneToOne
     @JoinColumn(name = "USER_LAST_INTERATION_ID", nullable = true)
     private User userLastInteration;
+
+    @OneToMany(fetch = FetchType.LAZY,mappedBy = "ticket")
+    @Cascade(value = CascadeType.REMOVE)
+    private Set<ChangesTicket> changes;
+
+    @OneToMany(fetch = FetchType.LAZY,mappedBy = "ticket")
+    @Cascade(value = CascadeType.REMOVE)
+    private Set<TicketAnswer> answers;
 
     @Transient
     private String userName;
@@ -256,4 +271,5 @@ public class Ticket {
     public void setUserLastInteration(User userLastInteration) {
         this.userLastInteration = userLastInteration;
     }
+
 }

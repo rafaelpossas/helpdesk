@@ -6,17 +6,7 @@
 package com.br.helpdesk.model;
 
 import java.util.Date;
-import javax.persistence.Basic;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
+import javax.persistence.*;
 
 /**
  *
@@ -35,7 +25,7 @@ public class ChangesTicket {
     @Column(name = "ID")
     private Long id;
 
-    @ManyToOne
+    @OneToOne
     @JoinColumn(name = "USER_ID", nullable = true)
     private User user;
 
@@ -48,27 +38,27 @@ public class ChangesTicket {
     @JoinColumn(name = "TICKET_ID", nullable = true)
     private Ticket ticket;
 
-    @ManyToOne
+    @OneToOne
     @JoinColumn(name = "OLDER_RESPONSIBLE", nullable = true)
     private User olderResponsible;
 
-    @ManyToOne
+    @OneToOne
     @JoinColumn(name = "NEW_RESPONSIBLE", nullable = true)
     private User newResponsible;
 
-    @ManyToOne
+    @OneToOne
     @JoinColumn(name = "OLDER_CATEGORY", nullable = true)
     private Category olderCategory;
 
-    @ManyToOne
+    @OneToOne
     @JoinColumn(name = "NEW_CATEGORY", nullable = true)
     private Category newCategory;
 
-    @ManyToOne
+    @OneToOne
     @JoinColumn(name = "OLDER_PRIORITY", nullable = true)
     private Priority olderPriority;
 
-    @ManyToOne
+    @OneToOne
     @JoinColumn(name = "NEW_PRIORITY", nullable = true)
     private Priority newPriority;
 

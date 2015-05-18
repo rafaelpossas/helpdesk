@@ -24,11 +24,11 @@ public class Attachments{
     @Column(name= "ARQ_NOME")
     private String name;
         
-    @ManyToOne
+    @OneToOne
     @JoinColumn(name="TICKET_ID")
     private Ticket ticket;
     
-    @ManyToOne
+    @OneToOne
     @JoinColumn(name="TICKET_ANSWER_ID")
     private TicketAnswer ticketAnswer;
     
