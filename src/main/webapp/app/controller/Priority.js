@@ -26,12 +26,28 @@ Ext.define('Helpdesk.controller.Priority', {
             selector: 'priority > prioritygrid'
         }
     ],
+    /**
+     * Adiciona uma nova Prioridade ao grid
+     * 
+     * @param {type} button
+     * @param {type} e
+     * @param {type} options
+     * @returns {undefined}
+     */
     onButtonClickAdd: function(button, e, options){
         var rec = new Helpdesk.model.Priority();
         var grid = this.getPriorityGrid();
         grid.getStore().insert(0, rec);
         grid.editingPlugin.startEdit(rec,1);
     },
+    /**
+     * Remove Prioridade selecionada, verificando se algum registro foi alterado.
+     * 
+     * @param {type} button
+     * @param {type} e
+     * @param {type} options
+     * @returns {undefined}
+     */
     onButtonClickDelete: function(button, e, options) {
         var grid = this.getPriorityGrid();
         var record = grid.getSelectionModel().getSelection();
@@ -60,6 +76,14 @@ Ext.define('Helpdesk.controller.Priority', {
             });
         }
     },
+    /**
+     * Salva as informações modificadas na Store
+     * 
+     * @param {type} button
+     * @param {type} e
+     * @param {type} options
+     * @returns {undefined}
+     */
     onButtonClickSave: function(button, e, options){
         this.getPriorityGrid().getStore().sync({
             callback:function(){

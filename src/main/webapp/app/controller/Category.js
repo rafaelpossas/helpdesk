@@ -29,6 +29,11 @@ Ext.define('Helpdesk.controller.Category', {
     ],
     /**
      * Adiciona uma nova Category ao grid
+     * 
+     * @param {type} button
+     * @param {type} e
+     * @param {type} options
+     * @returns {undefined}
      */
     onButtonClickAdd: function(button, e, options){
         var rec = new Helpdesk.model.Category();
@@ -39,6 +44,11 @@ Ext.define('Helpdesk.controller.Category', {
     
     /**
      * Remove Category selecionada, verificando se algum registro foi alterado.
+     * 
+     * @param {type} button
+     * @param {type} e
+     * @param {type} options
+     * @returns {undefined}
      */
     onButtonClickDelete: function(button, e, options) {
         var grid = this.getCategoryGrid();
@@ -72,6 +82,11 @@ Ext.define('Helpdesk.controller.Category', {
     
     /**
      * Salva as informações modificadas na Store
+     * 
+     * @param {type} button
+     * @param {type} e
+     * @param {type} options
+     * @returns {undefined}
      */
     onButtonClickSave: function(button, e, options){
         this.getCategoryGrid().getStore().sync({

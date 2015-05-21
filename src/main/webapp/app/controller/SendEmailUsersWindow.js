@@ -88,7 +88,6 @@ Ext.define('Helpdesk.controller.SendEmailUsersWindow', {
 
             // requisição para envio do email, enviando como parâmetro os atributos callback, subject, message, emailUser, idUser
             store.sendEmailSingle(function (result) {
-                console.log(result);
                 var jsonObj = $.parseJSON('[' + result + ']');
                 var idUser = jsonObj[0].id;
 

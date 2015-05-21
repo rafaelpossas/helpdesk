@@ -275,6 +275,7 @@ translations = {
     SEE_TICKETS_WITHOUT_CATEGORY: 'See tickets without category',
     SEE_FULL_REPORT: '(See full report)',
     SEARCH: 'Search',
+    SEARCHING: 'Searching',
     SERVICE: 'Service',
     SEND: 'Send',
     SEND_EMAIL: 'Send Email',

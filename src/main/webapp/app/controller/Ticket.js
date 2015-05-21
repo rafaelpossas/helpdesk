@@ -26,7 +26,8 @@ Ext.define('Helpdesk.controller.Ticket', {
         'Clients',
         'UsersAdmin',
         'Reports',
-        'ChangesTicket'],
+        'ChangesTicket',
+        'Attachments'],
     requires: ['Helpdesk.model.Ticket',
         'Helpdesk.store.Tickets',
         'Helpdesk.store.TicketAnswers',
@@ -138,28 +139,24 @@ Ext.define('Helpdesk.controller.Ticket', {
             var mainView = this.getTicketView();
             var record = button.up('form#ticketMainView').getRecord();
 
-            record.dirty = true;
             var store = this.getTicketsStore();
             if (button.id === 'btnCloseTkt') {
                 mainView.setLoading(translations.CLOSING_TICKET);
-                store.proxy.url = 'ticket/close-ticket';
+                //store.proxy.url = 'ticket/close-ticket';
+                store.closeTicket(record, function (result) {
+                    mainView.setLoading(false);
+                    scope.setSideMenuButtonText();
+                    scope.formatTicketDetailsByStatusTicket(false, button.up('form#ticketMainView'), record);
+                });
             } else if (button.id === 'btnOpenTkt') {
                 mainView.setLoading(translations.REOPENING_TICKET);
-                store.proxy.url = 'ticket/open-ticket';
-            }
-            store.add(record);
-            store.sync({
-                callback: function () {
+                //store.proxy.url = 'ticket/open-ticket';
+                store.openTicket(record, function (result) {
                     mainView.setLoading(false);
-                    store.proxy.url = 'ticket';
                     scope.setSideMenuButtonText();
-
-                    // verificando se o ticket foi reaberto ou fechado.
-                    var ticketOpen = (button.id === 'btnOpenTkt');
-
-                    scope.formatTicketDetailsByStatusTicket(ticketOpen, button.up('form#ticketMainView'), record);
-                }
-            });
+                    scope.formatTicketDetailsByStatusTicket(true, button.up('form#ticketMainView'), record);
+                });
+            }
         }
     },
     /**
@@ -279,39 +276,45 @@ Ext.define('Helpdesk.controller.Ticket', {
      * @returns {undefined}
      */
     changeGridPage: function (toolbar, page) {
-        var myscope = this;
         var limit = (page) * Helpdesk.Globals.pageSizeGrid;
         var start = limit - Helpdesk.Globals.pageSizeGrid;
-
-        myscope.getTicketPanel().getStore().proxy.url = this.getProxy() + '-paging';
-        myscope.getTicketPanel().getStore().load({
-            params: {
-                user: Helpdesk.Globals.userLogged.userName,
-                start: start,
-                limit: limit
-            },
-            callback: function () {
-                myscope.backToDefaultStore(myscope);
-                myscope.setSideMenuButtonText();
-            }
-        });
+        var username = Helpdesk.Globals.userLogged.userName;
+        this.getProxy(true, username, start, limit, this.callbackChangeGridPage);
     },
-    getProxy: function () {
-
+    callbackChangeGridPage: function () {
+        this.setSideMenuButtonText();
+    },
+    getProxy: function (paging, username, start, limit, callbackfunction) {
+        var store = this.getTicketPanel().getStore();
         var form = this.getTicketSideMenu();
-
-        if (form.down('button#buttonAll').pressed === true) {
-            return 'ticket/all';
-        } else if (form.down('button#buttonMyTickets').pressed === true) {
-            return 'ticket/mytickets';
-        } else if (form.down('button#buttonWithoutResponsible').pressed === true) {
-            return 'ticket/withoutresponsible';
-        } else if (form.down('button#buttonOpened').pressed === true) {
-            return 'ticket/opened';
-        } else if (form.down('button#buttonClosed').pressed === true) {
-            return 'ticket/closed';
+        if (paging) {
+            if (form.down('button#buttonAll').pressed === true) {
+                store.findAllTicketsPaging(username, start, limit, callbackfunction);
+            } else if (form.down('button#buttonMyTickets').pressed === true) {
+                store.findMyTicketsPaging(username, start, limit, callbackfunction);
+            } else if (form.down('button#buttonWithoutResponsible').pressed === true) {
+                store.findWithoutResponsibleTicketsPaging(username, start, limit, callbackfunction);
+            } else if (form.down('button#buttonOpened').pressed === true) {
+                store.findOpenedTicketsPaging(username, start, limit, callbackfunction);
+            } else if (form.down('button#buttonClosed').pressed === true) {
+                store.findClosedTicketsPaging(username, start, limit, callbackfunction);                
+            } else {
+                store.findAllTicketsPaging(username, start, limit, callbackfunction);
+            }
         } else {
-            return 'ticket/all';
+            if (form.down('button#buttonAll').pressed === true) {
+                return 'ticket/all';
+            } else if (form.down('button#buttonMyTickets').pressed === true) {
+                return 'ticket/mytickets';
+            } else if (form.down('button#buttonWithoutResponsible').pressed === true) {
+                return 'ticket/withoutresponsible';
+            } else if (form.down('button#buttonOpened').pressed === true) {
+                return 'ticket/opened';
+            } else if (form.down('button#buttonClosed').pressed === true) {
+                return 'ticket/closed';
+            } else {
+                return 'ticket/all';
+            }
         }
     },
     searchFunction: function (field, newValue, oldValue, eOpts) {
@@ -319,96 +322,28 @@ Ext.define('Helpdesk.controller.Ticket', {
         var store = scope.getTicketPanel().getStore();
         var grid = scope.getTicketPanel();
         var searchTerm = newValue.trim();
-        var typeSearch = this.getProxy().split('/')[1].trim();
-
+        var typeSearch = this.getProxy(false, '', '', '', '').split('/')[1].trim();
+        var limit = Helpdesk.Globals.pageSizeGrid;
+        var username = Helpdesk.Globals.userLogged.userName;
+        grid.setLoading(translations.SEARCHING);
         if (searchTerm != "") {
-            store.proxy.url = 'ticket/search';
-            store.load({
-                params: {
-                    searchterm: searchTerm,
-                    typesearch: typeSearch,
-                    start: 0,
-                    limit: Helpdesk.Globals.pageSizeGrid
-                },
-                callback: function (response) {
-                    var ticketsModel = Helpdesk.model.Ticket.getProxy().getReader().readRecords(response[0].raw.content);
-                    store.loadData(ticketsModel.records);
-                    var toolbar = grid.dockedItems.items[1];
-                    var totalRecords = response[0].raw.totalElements;
-                    toolbar.totalRecords = totalRecords;
-                    toolbar.refreshPagingToolBar(1, toolbar.totalRecords);
-                    scope.onTextFieldChange(newValue, store, grid);
-                }
+            store.search(searchTerm, typeSearch, 0, limit, function (response) {
+                grid.setLoading(false);
+                var ticketsModel = Helpdesk.model.Ticket.getProxy().getReader().readRecords(response[0].raw.content);
+                store.loadData(ticketsModel.records);
+                var toolbar = grid.dockedItems.items[1];
+                var totalRecords = response[0].raw.totalElements;
+                toolbar.totalRecords = totalRecords;
+                toolbar.refreshPagingToolBar(1, toolbar.totalRecords);
+                scope.onTextFieldChange(newValue, store, grid);
             });
         } else {
-            store.proxy.url = this.getProxy() + '-paging';
-            store.load({
-                params: {
-                    start: 0,
-                    limit: Helpdesk.Globals.pageSizeGrid
-                },
-                callback: function () {
-                    var toolbar = grid.dockedItems.items[1];
-                    var totalRecords = scope.getNumberOfTicketsFromMenuClicked();
-                    toolbar.totalRecords = totalRecords;
-                    toolbar.refreshPagingToolBar(1, toolbar.totalRecords);
-                }
-            });
-        }
-
-    },
-    changeCmbSearch: function (field, newValue, oldValue, eOpts) {
-        //The method will be executed only if the new value have at least 3 characters
-        var scope = this;
-        var store = field.up('container#maincontainer').down('#ticketgrid').getStore();
-        var grid = field.up('container#maincontainer').down('#ticketgrid');
-        var form = this.getTicketSideMenu();
-        if (newValue !== null) {
-            field.up('container#maincontainer').down('#ticketgrid').setLoading(translations.LOADING);
-            store.removeAll();
-            var storeTemp = new Helpdesk.store.Tickets();
-            storeTemp.proxy.url = this.getProxy();
-            storeTemp.load({
-                callback: function () {
-                    field.up('container#maincontainer').down('#ticketgrid').setLoading(false);
-                    for (var i = 0; i < storeTemp.getCount(); i++) {
-                        if (storeTemp.data.items[i].data.client.name.toLowerCase().indexOf(newValue.toLowerCase()) > -1) {
-                            store.add(storeTemp.data.items[i].data);
-                        } else if (storeTemp.data.items[i].data.title.toLowerCase().indexOf(newValue.toLowerCase()) > -1) {
-                            store.add(storeTemp.data.items[i].data);
-                        } else if (storeTemp.data.items[i].data.category.name.toLowerCase().indexOf(newValue.toLowerCase()) > -1) {
-                            store.add(storeTemp.data.items[i].data);
-                        } else if (storeTemp.data.items[i].data.user.name.toLowerCase().indexOf(newValue.toLowerCase()) > -1) {
-                            store.add(storeTemp.data.items[i].data);
-                        } else if (storeTemp.data.items[i].data.isOpen === true) {
-                            if (translations.OPENED.toLowerCase().indexOf(newValue.toLowerCase()) > -1) {
-                                store.add(storeTemp.data.items[i].data);
-                            }
-                        } else if (storeTemp.data.items[i].data.isOpen === false) {
-                            if (translations.CLOSED.toLowerCase().indexOf(newValue.toLowerCase()) > -1) {
-                                store.add(storeTemp.data.items[i].data);
-                            }
-                        }
-                    }
-                    if (store.getCount() === 0 && newValue === '') {
-                        for (var i = 0; i < storeTemp.getCount(); i++) {
-                            store.add(storeTemp.data.items[i].data);
-                        }
-                    }
-                    //Selects the matching values on the grid
-                    scope.onTextFieldChange(newValue, store, grid);
-                }
-            });
-        } else {
-            store.proxy.url = this.getProxy();
-            store.load({
-                params: {
-                    start: 0,
-                    limit: Helpdesk.Globals.pageSizeGrid
-                },
-                callback: function () {
-                    store.proxy.url = 'ticket';
-                }
+            this.getProxy(true, username, 0, limit, function () {
+                grid.setLoading(false);
+                var toolbar = grid.dockedItems.items[1];
+                var totalRecords = scope.getNumberOfTicketsFromMenuClicked();
+                toolbar.totalRecords = totalRecords;
+                toolbar.refreshPagingToolBar(1, toolbar.totalRecords);
             });
         }
     },
@@ -453,53 +388,37 @@ Ext.define('Helpdesk.controller.Ticket', {
             }
         });
     },
-    //Atualiza o grid após ação de crud
-    atualizaGrid: function () {
-        var button;
-        var sideMenu = this.getTicketSideMenu();
+    index: function (params) {
+        this.getCardPanel().getLayout().setActiveItem(Helpdesk.Globals.ticketview);
+        this.getTicketCardContainer().getLayout().setActiveItem(Helpdesk.Globals.ticket_datagrid);
+        this.getMainHeader().down("#ticket").toggle(true);
 
-        if (sideMenu.down('button#buttonAll').pressed === true) {
-            button = sideMenu.down('button#buttonAll');
-        } else if (sideMenu.down('button#buttonOpened').pressed === true) {
-            button = sideMenu.down('button#buttonOpened');
-        } else if (sideMenu.down('button#buttonClosed').pressed === true) {
-            button = sideMenu.down('button#buttonClosed');
-        } else if (sideMenu.down('button#buttonMyTickets').pressed === true) {
-            button = sideMenu.down('button#buttonMyTickets');
-        } else if (sideMenu.down('button#buttonWithoutResponsible').pressed === true) {
-            button = sideMenu.down('button#buttonWithoutResponsible');
-        }
-        if (button !== null) {
-            this.onTicketMenuClick(button);
-        }
+        var user = Helpdesk.Globals.userLogged.userName;
+        var start = 0;
+        var limit = Helpdesk.Globals.pageSizeGrid;
 
-    },
-    sidemenu: function(params){
-      this.getCardPanel().getLayout().setActiveItem(Helpdesk.Globals.ticketview);
-      this.getTicketCardContainer().getLayout().setActiveItem(Helpdesk.Globals.ticket_datagrid);  
-      this.getMainHeader().down("#ticket").toggle(true);
-      switch(params.type){
-        case 'all':
-            this.getTicketSideMenu().down('#buttonAll').toggle(true);
-            this.getAllTickets();
-        break;
-        case 'opened':
-            this.getTicketSideMenu().down('#buttonOpened').toggle(true);
-            this.getTicketsOpened();
-        break;
-        case 'closed':
-            this.getTicketSideMenu().down('#buttonClosed').toggle(true);
-            this.getTicketsClosed();
-        break;
-        case 'my':
-            this.getTicketSideMenu().down('#buttonMyTickets').toggle(true);
-            this.getMyTickets();
-        break;
-        case 'noresp':
-            this.getTicketSideMenu().down('#buttonWithoutResponsible').toggle(true);
-            this.getTicketsWithoutResponsible();
-        break;
-      }  
+        switch (params.type) {
+            case 'all':
+                this.getTicketSideMenu().down('#buttonAll').toggle(true);
+                this.getAllTickets(user, start, limit);
+                break;
+            case 'opened':
+                this.getTicketSideMenu().down('#buttonOpened').toggle(true);
+                this.getTicketsOpened(user, start, limit);
+                break;
+            case 'closed':
+                this.getTicketSideMenu().down('#buttonClosed').toggle(true);
+                this.getTicketsClosed(user, start, limit);
+                break;
+            case 'my':
+                this.getTicketSideMenu().down('#buttonMyTickets').toggle(true);
+                this.getMyTickets(user, start, limit);
+                break;
+            case 'noresp':
+                this.getTicketSideMenu().down('#buttonWithoutResponsible').toggle(true);
+                this.getTicketsWithoutResponsible(user, start, limit);
+                break;
+        }
     },
     /**
      * Açoes realizadas por cada side button 
@@ -509,28 +428,21 @@ Ext.define('Helpdesk.controller.Ticket', {
     onTicketMenuClick: function (btn) {
         this.getSearchBox().reset();
         this.getTicketCardContainer().getLayout().setActiveItem(Helpdesk.Globals.ticket_datagrid);
-        //this.getTicketEditContainer().getLayout().setActiveItem(Helpdesk.Globals.ticket_details_view);
-        
         if (this.getTicketPanel() !== undefined) {
             if (btn.itemId === 'buttonAll') {
                 Ext.Router.redirect("ticket/all");
-                
             }
             else if (btn.itemId === 'buttonOpened') {
                 Ext.Router.redirect("ticket/opened");
-
             }
             else if (btn.itemId === 'buttonClosed') {
                 Ext.Router.redirect("ticket/closed");
-
             }
             else if (btn.itemId === 'buttonMyTickets') {
                 Ext.Router.redirect("ticket/my");
-
             }
             else if (btn.itemId === 'buttonWithoutResponsible') {
                 Ext.Router.redirect("ticket/noresp");
-
             }
         }
     },
@@ -545,32 +457,62 @@ Ext.define('Helpdesk.controller.Ticket', {
     /**
      * Busca todos os Tickets
      */
-    getAllTickets: function () {
-        this.loadStoreBasic('all');
+    getAllTickets: function (user, start, limit) {
+        var myscope = this;
+        var store = myscope.getTicketPanel().getStore();
+        store.findAllTicketsPaging(user, start, limit, myscope.callbackLoadStore(myscope));
     },
     /**
      * Busca todos os tickets ABERTOS
      */
-    getTicketsOpened: function () {
-        this.loadStoreBasic('opened');
+    getTicketsOpened: function (user, start, limit) {
+        var myscope = this;
+        var store = myscope.getTicketPanel().getStore();
+        store.findOpenedTicketsPaging(user, start, limit, myscope.callbackLoadStore(myscope));
     },
     /**
      * Busca todos os tickets FECHADOS
      */
-    getTicketsClosed: function () {
-        this.loadStoreBasic('closed');
+    getTicketsClosed: function (user, start, limit) {
+        var myscope = this;
+        var store = myscope.getTicketPanel().getStore();
+        store.findClosedTicketsPaging(user, start, limit, myscope.callbackLoadStore(myscope));
     },
     /**
      * Busca todos os tickets em que o usuario logado é o responsavel
      */
-    getMyTickets: function () {
-        this.loadStoreBasic('mytickets');
+    getMyTickets: function (user, start, limit) {
+        var myscope = this;
+        var store = myscope.getTicketPanel().getStore();
+        store.findMyTicketsPaging(user, start, limit, myscope.callbackLoadStore(myscope));
     },
     /**
      * Busca todos os tickets em que não tenha responsavel 
      */
-    getTicketsWithoutResponsible: function () {
-        this.loadStoreBasic('withoutresponsible');
+    getTicketsWithoutResponsible: function (user, start, limit) {
+        var myscope = this;
+        var store = myscope.getTicketPanel().getStore();
+        store.findWithoutResponsibleTicketsPaging(user, start, limit, myscope.callbackLoadStore(myscope));
+    },
+    callbackLoadStore: function (scope) {
+        return function () {
+            scope.setSideMenuButtonText();
+            var totalRecords = scope.getNumberOfTicketsFromMenuClicked();
+            var toolbar = scope.getTicketPanel().getDockedItems()[1];
+            toolbar.totalRecords = totalRecords;
+            toolbar.refreshPagingToolBar(1, toolbar.totalRecords);
+            var btnFirst = toolbar.down('#btnFirst');
+            var btnPrev = toolbar.down('#btnPrev');
+            var btnNext = toolbar.down('#btnNext');
+            var btnLast = toolbar.down('#btnLast');
+            var pageItem = toolbar.down('#pageItem');
+
+            btnFirst.addListener('click', scope.onBtnFirstClick);
+            btnPrev.addListener('click', scope.onBtnPrevClick);
+            btnNext.addListener('click', scope.onBtnNextClick);
+            btnLast.addListener('click', scope.onBtnLastClick);
+            pageItem.addListener('change', scope.onPageItemChange, scope, {buffer: 400});
+        };
     },
     /**
      * Busca e preenche as informações do sidemenu (Quantidade de tickets em cada categoria),
@@ -578,41 +520,34 @@ Ext.define('Helpdesk.controller.Ticket', {
      */
     setSideMenuButtonText: function () {
         var myscope = this;
-        Ext.Ajax.request({
-            url: 'ticket/textmenu',
-            method: 'GET',
-            async: false,
-            params: {
-                user: Helpdesk.Globals.userLogged.userName
-            },
-            success: function (o) {
-                var decodedString = Ext.decode(o.responseText);
-
-                var sm = myscope.getTicketSideMenu();
-                var buttonAll = sm.down('#buttonAll');
-                var buttonOpened = sm.down('#buttonOpened');
-                var buttonClosed = sm.down('#buttonClosed');
-                var buttonMyTickets = sm.down('#buttonMyTickets');
-                var buttonWithoutResponsible = sm.down('#buttonWithoutResponsible');
-                buttonAll.setText(translations.ALL + ((decodedString.todos === '0') ? (" ") : (" (" + decodedString.todos + ")")));
-                buttonOpened.setText(translations.IN_PROGRESS + ((decodedString.abertos === '0') ? (" ") : (" (" + decodedString.abertos + ")")));
-                buttonClosed.setText(translations.CLOSED + ((decodedString.fechados === '0') ? (" ") : (" (" + decodedString.fechados + ")")));
-                buttonMyTickets.setText(translations.MY_TICKETS + ((decodedString.mytickets === '0') ? (" ") : (" (" + decodedString.mytickets + ")")));
-                buttonWithoutResponsible.setText(translations.WITHOUT_RESPONSIBLE + ((decodedString.withoutresponsible === '0') ? (" ") : (" (" + decodedString.withoutresponsible + ")")));
-                if (Helpdesk.Globals.userLogged.userGroup.id == Helpdesk.Globals.idAdminGroup) {//superusuario
-                    buttonAll.setVisible(true);
-                    buttonOpened.setVisible(true);
-                    buttonClosed.setVisible(true);
-                    buttonMyTickets.setVisible(true);
-                    buttonWithoutResponsible.setVisible(true);
-                }
-                else {//outros
-                    buttonAll.setVisible(true);
-                    buttonOpened.setVisible(true);
-                    buttonClosed.setVisible(true);
-                    buttonMyTickets.setVisible(false);
-                    buttonWithoutResponsible.setVisible(false);
-                }
+        var store = this.getTicketsStore();
+        var username = Helpdesk.Globals.userLogged.userName;
+        store.setSideMenuButtonText(username, function (o) {
+            var decodedString = Ext.decode(o.responseText);
+            var sm = myscope.getTicketSideMenu();
+            var buttonAll = sm.down('#buttonAll');
+            var buttonOpened = sm.down('#buttonOpened');
+            var buttonClosed = sm.down('#buttonClosed');
+            var buttonMyTickets = sm.down('#buttonMyTickets');
+            var buttonWithoutResponsible = sm.down('#buttonWithoutResponsible');
+            buttonAll.setText(translations.ALL + ((decodedString.todos === '0') ? (" ") : (" (" + decodedString.todos + ")")));
+            buttonOpened.setText(translations.IN_PROGRESS + ((decodedString.abertos === '0') ? (" ") : (" (" + decodedString.abertos + ")")));
+            buttonClosed.setText(translations.CLOSED + ((decodedString.fechados === '0') ? (" ") : (" (" + decodedString.fechados + ")")));
+            buttonMyTickets.setText(translations.MY_TICKETS + ((decodedString.mytickets === '0') ? (" ") : (" (" + decodedString.mytickets + ")")));
+            buttonWithoutResponsible.setText(translations.WITHOUT_RESPONSIBLE + ((decodedString.withoutresponsible === '0') ? (" ") : (" (" + decodedString.withoutresponsible + ")")));
+            if (Helpdesk.Globals.userLogged.userGroup.id == Helpdesk.Globals.idAdminGroup) {//superusuario
+                buttonAll.setVisible(true);
+                buttonOpened.setVisible(true);
+                buttonClosed.setVisible(true);
+                buttonMyTickets.setVisible(true);
+                buttonWithoutResponsible.setVisible(true);
+            }
+            else {//outros
+                buttonAll.setVisible(true);
+                buttonOpened.setVisible(true);
+                buttonClosed.setVisible(true);
+                buttonMyTickets.setVisible(false);
+                buttonWithoutResponsible.setVisible(false);
             }
         });
     },
@@ -786,31 +721,23 @@ Ext.define('Helpdesk.controller.Ticket', {
      * @author Ricardo
      * 
      * Altera para a view de resposta de ticket
-     * @param {type} grid
-     * @param {type} record
-     * @param {type} item
-     * @param {type} index
-     * @param {type} e
-     * @param {type} eOpts
+     * @param {type} params
      * @returns {undefined}
      */
-    edit: function(params){
+    edit: function (params) {
         var store = this.getTicketGrid().getStore();
         var scope = this;
-        store.findById(params.id,function(result){
+        store.findById(params.id, function (result) {
             scope.getMainHeader().down("#ticket").toggle(true);
             scope.getCardPanel().getLayout().setActiveItem(Helpdesk.Globals.ticketview);
             scope.getTicketCardContainer().getLayout().setActiveItem(Helpdesk.Globals.ticket_details);
             scope.setSideMenuButtonText();
-            //scope.getTicketView().down('form#ticketMainView').loadRecord(Ext.create('Helpdesk.model.Ticket'));
-            scope.setValuesFromView(scope.getTicketView(),result[0]);
+            scope.setValuesFromView(scope.getTicketView(), result[0]);
         });
-
     },
     ticketClicked: function (grid, record, item, index, e, eOpts) {
-
-        var id = record.data.id;
-        Ext.Router.redirect("ticket/"+id+"/edit");
+        var ticketId = record.data.id;
+        Ext.Router.redirect("ticket/" + ticketId + "/edit");
     },
     /**
      * @author Ricardo
@@ -977,7 +904,6 @@ Ext.define('Helpdesk.controller.Ticket', {
         //set steps textarea
         var stepsText = ticketView.down('#tktSteps').text;
         ticketView.down('#stepsTicket').setValue(stepsText);
-
     },
     cancelEditTicket: function (button, e, options) {
         this.getTicketEditContainer().getLayout().setActiveItem(Helpdesk.Globals.ticket_details_view);
@@ -1051,63 +977,60 @@ Ext.define('Helpdesk.controller.Ticket', {
      * 
      * @param {type} ticket
      * @param {type} answersList
+     * @param {type} ticketView
      * @returns answersList
      */
     getFilesFromTicket: function (ticket, answersList, ticketView) {
         var scope = this;
         var ticketId = ticket.data.id;
-
-        Ext.Ajax.request({
-            url: 'attachments/' + ticketId + '/attachments',
-            method: 'GET',
-            success: function (response, opts) {
-                if (response.responseText !== '') {
-                    var responseJSON = Ext.decode(response.responseText);
-                    for (var i = 0; i < answersList.length; i++) {
-                        var answer = answersList[i];
-                        var idAnswer = answer.down('hiddenfield#idAnswer').text;
-                        var idTicket = answer.down('hiddenfield#id').text;
-                        var fileContainer = answer.down('container#anexo');
-                        for (var j = 0; j < responseJSON.length; j++) {
-                            var file = responseJSON[j];
-                            var fileIdTicket = file.fileTicketId;
-                            var fileIdAnswer = file.fileTicketAnswerId;
-                            var fileName = file.fileName;
-                            var fileId = file.fileId;
-                            var insertAnexo = false;
-                            if (idAnswer === 0) {
-                                if (fileIdAnswer === '' && parseInt(fileIdTicket) === parseInt(idTicket)) {
-                                    insertAnexo = true;
-                                }
+        var attachmentsStore = this.getAttachmentsStore();
+        attachmentsStore.getFilesFromTicket(ticketId, function (response, opts) {
+            if (response.responseText !== '') {
+                var responseJSON = Ext.decode(response.responseText);
+                for (var i = 0; i < answersList.length; i++) {
+                    var answer = answersList[i];
+                    var idAnswer = answer.down('hiddenfield#idAnswer').text;
+                    var idTicket = answer.down('hiddenfield#id').text;
+                    var fileContainer = answer.down('container#anexo');
+                    for (var j = 0; j < responseJSON.length; j++) {
+                        var file = responseJSON[j];
+                        var fileIdTicket = file.fileTicketId;
+                        var fileIdAnswer = file.fileTicketAnswerId;
+                        var fileName = file.fileName;
+                        var fileId = file.fileId;
+                        var insertAnexo = false;
+                        if (idAnswer === 0) {
+                            if (fileIdAnswer === '' && parseInt(fileIdTicket) === parseInt(idTicket)) {
+                                insertAnexo = true;
                             }
-                            else {
-                                if (parseInt(fileIdAnswer) === parseInt(idAnswer)) {
-                                    insertAnexo = true;
-                                }
+                        }
+                        else {
+                            if (parseInt(fileIdAnswer) === parseInt(idAnswer)) {
+                                insertAnexo = true;
                             }
-                            if (insertAnexo) {
-                                var containerAnexos = answer.down('container#containerAttachments');
-                                containerAnexos.setVisible(true);
-                                var linkButton = {
-                                    xtype: 'button',
-                                    text: fileName,
-                                    fileId: fileId,
-                                    cls: 'btn-linkbutton-custom',
-                                    iconCls: 'clip',
-                                    listeners: {
-                                        click: function (button, e, eOpts) {
-                                            scope.downloadFile(button.fileId);
-                                        }
+                        }
+                        if (insertAnexo) {
+                            var containerAnexos = answer.down('container#containerAttachments');
+                            containerAnexos.setVisible(true);
+                            var linkButton = {
+                                xtype: 'button',
+                                text: fileName,
+                                fileId: fileId,
+                                cls: 'btn-linkbutton-custom',
+                                iconCls: 'clip',
+                                listeners: {
+                                    click: function (button, e, eOpts) {
+                                        scope.downloadFile(button.fileId);
                                     }
-                                };
-                                fileContainer.insert(linkButton);
-                            }
+                                }
+                            };
+                            fileContainer.insert(linkButton);
                         }
                     }
                 }
-                // inserindo mudanças de ticket no panel de resposta.
-                scope.getChangesFromTicket(ticket, answersList, ticketView);
             }
+            // inserindo mudanças de ticket no panel de resposta.
+            scope.getChangesFromTicket(ticket, answersList, ticketView);
         });
         return answersList;
     },
@@ -1266,12 +1189,9 @@ Ext.define('Helpdesk.controller.Ticket', {
                 text += ". ";
             }
         }
-
         text += "<br />";
         text += "<pre>" + textResponsible + "<b>" + responsible + "</b>" + changeDate + "</pre>";
-
         return text;
-
     },
     getButtonMenuClicked: function () {
         var form = this.getTicketSideMenu();
@@ -1299,53 +1219,13 @@ Ext.define('Helpdesk.controller.Ticket', {
             return 0;
         }
     },
-    loadStoreBasic: function (urlSimples) {
-        //loadStore to GRID
-        var myscope = this;
-        myscope.getTicketPanel().getStore().proxy.url = 'ticket/' + urlSimples + '-paging';
-        myscope.getTicketPanel().getStore().load({
-            params: {
-                user: Helpdesk.Globals.userLogged.userName,
-                start: 0,
-                limit: Helpdesk.Globals.pageSizeGrid
-            },
-            callback: function (result) {
-                myscope.backToDefaultStore(myscope);
-                myscope.setSideMenuButtonText();
-
-                var totalRecords = myscope.getNumberOfTicketsFromMenuClicked();
-
-                var toolbar = myscope.getTicketPanel().getDockedItems()[1];
-                toolbar.totalRecords = totalRecords;
-                toolbar.refreshPagingToolBar(1, toolbar.totalRecords);
-                var btnFirst = toolbar.down('#btnFirst');
-                var btnPrev = toolbar.down('#btnPrev');
-                var btnNext = toolbar.down('#btnNext');
-                var btnLast = toolbar.down('#btnLast');
-                var pageItem = toolbar.down('#pageItem');
-
-                btnFirst.addListener('click', myscope.onBtnFirstClick);
-                btnPrev.addListener('click', myscope.onBtnPrevClick);
-                btnNext.addListener('click', myscope.onBtnNextClick);
-                btnLast.addListener('click', myscope.onBtnLastClick);
-                pageItem.addListener('change', myscope.onPageItemChange, myscope, {buffer: 400});
-            }
-        });
-
-    },
     changePage: function (page) {
         var myscope = this;
-        myscope.getTicketPanel().getStore().proxy.url = this.getProxy() + '-paging';
-        myscope.getTicketPanel().getStore().load({
-            params: {
-                user: Helpdesk.Globals.userLogged.userName,
-                start: ((page - 1) * Helpdesk.Globals.pageSizeGrid) + 1,
-                limit: ((page) * Helpdesk.Globals.pageSizeGrid)
-            },
-            callback: function () {
-                myscope.backToDefaultStore(myscope);
-                myscope.setSideMenuButtonText();
-            }
+        var user = Helpdesk.Globals.userLogged.userName;
+        var start = ((page - 1) * Helpdesk.Globals.pageSizeGrid) + 1;
+        var limit = ((page) * Helpdesk.Globals.pageSizeGrid);
+        this.getProxy(true, user, start, limit, function(){
+            myscope.setSideMenuButtonText();
         });
     },
     onPageItemChange: function (item, newValue, oldValue, eOpts) {

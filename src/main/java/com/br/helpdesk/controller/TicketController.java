@@ -245,10 +245,10 @@ public class TicketController {
         return "{\"todos\":'" + todos + "', \"abertos\": '" + abertos + "', \"fechados\": '" + fechados + "', \"mytickets\": '" + mytickets + "', \"withoutresponsible\": '" + withoutresponsible + "'}";
     }
 
-    @RequestMapping(value = {"close-ticket/{id}"}, method = {RequestMethod.PUT})
+    @RequestMapping(value = {"close-ticket"}, method = {RequestMethod.POST}, params = {"ticket"})
     @ResponseBody
-    public Ticket closeTicket(@RequestBody Ticket ticket, @RequestParam(value = "user") String username) throws Exception {
-        User user = userService.findByUserName(username);
+    public Ticket closeTicket(@RequestBody Ticket ticket) throws Exception {
+        User user = userService.findByUserName("sulivam");
         Ticket olderTicket = ticketService.findById(ticket.getId());
         ticket.setIsOpen(false);
         ticket.setEndDate(Calendar.getInstance().getTime());
@@ -267,9 +267,9 @@ public class TicketController {
         return ticket;
     }
 
-    @RequestMapping(value = {"open-ticket/{id}"}, method = {RequestMethod.PUT})
+    @RequestMapping(value = {"open-ticket"}, method = {RequestMethod.POST}, params = {"user", "ticket"})
     @ResponseBody
-    public Ticket reOpenTicket(@RequestBody Ticket ticket, @RequestParam(value = "user") String username) throws Exception {
+    public Ticket reOpenTicket(@RequestParam(value = "user") String username, @RequestParam(value = "ticket") Ticket ticket) throws Exception {
         User user = userService.findByUserName(username);
 
         Ticket olderTicket = ticketService.findById(ticket.getId());

@@ -1,4 +1,4 @@
- /* 
+/* 
  * @Author rafaelpossas
  * 
  * Controller responsible for taking care of the main header. Listeners are attached
@@ -12,17 +12,16 @@
 Ext.define('Helpdesk.controller.Home', {
     extend: 'Ext.app.Controller',
     views: ['home.Home'],
-    stores:[
+    stores: [
         'Users'
     ],
-    controllers: ['Dashboard'],        
-    init: function() {
+    controllers: ['Dashboard'],
+    init: function () {
         this.control({
-            
-            'mainheader':{
-                afterrender:this.setButtonsAndView
+            'mainheader': {
+                afterrender: this.setButtonsAndView
             },
-            'mainheader button': {                                                
+            'mainheader button': {
                 click: this.onMainNavClick
             }
         });
@@ -55,12 +54,17 @@ Ext.define('Helpdesk.controller.Home', {
             selector: '#settings'
         },
         {
-            ref:'homeView',
-            selector:'home'
+            ref: 'homeView',
+            selector: 'home'
         }
     ],
-    
-    setButtonsAndView: function(form) {
+    /**
+     * Método que formata a tela inicial baseado no usuário ser um administrador ou não.
+     * 
+     * @param {type} form
+     * @returns {undefined}
+     */
+    setButtonsAndView: function (form) {
         var mainHeader = this.getMainHeader();
         var btnHome = mainHeader.down("#home");
         var btnTicket = mainHeader.down("#ticket");
@@ -70,7 +74,6 @@ Ext.define('Helpdesk.controller.Home', {
             btnTicket.setVisible(true);
             btnReports.setVisible(false);
             this.getMainHeaderSettings().setVisible(false);
-            Ext.Router.redirect('ticket/opened');
         } else {
             btnTicket.setVisible(true);
             btnHome.setVisible(true);
@@ -78,16 +81,29 @@ Ext.define('Helpdesk.controller.Home', {
             this.getMainHeaderSettings().setVisible(true);
         }
     },
-    onError: function(error) {
+    onError: function (error) {
         this.getServerError().update(error);
         this.getCardPanel().getLayout().setActiveItem(Helpdesk.Globals.errorview);
     },
-    index: function() {
-        this.getCardPanel().getLayout().setActiveItem(Helpdesk.Globals.homeview);
-        var mainHeader = this.getMainHeader();
-        var btnHome = mainHeader.down("#home");
-        btnHome.toggle(true);
-        this.getDashboardController().setChartsAndView();
+    /**
+     * Método chamado quando a url é direcionada pra /#home.
+     * 
+     * @returns {undefined}
+     */
+    index: function () {
+        if (Helpdesk.Globals.userLogged.userGroup.id != Helpdesk.Globals.idAdminGroup) {
+            this.getCardPanel().getLayout().setActiveItem(Helpdesk.Globals.ticketview);
+            var mainHeader = this.getMainHeader();
+            var btnTicket = mainHeader.down("#ticket");
+            btnTicket.toggle(true);
+            Ext.Router.redirect("ticket/opened");
+        } else {
+            this.getCardPanel().getLayout().setActiveItem(Helpdesk.Globals.homeview);
+            var mainHeader = this.getMainHeader();
+            var btnHome = mainHeader.down("#home");
+            btnHome.toggle(true);
+            this.getDashboardController().setChartsAndView();
+        }
     },
     /*
      * This function controls the history router declared in app.js.
@@ -95,22 +111,25 @@ Ext.define('Helpdesk.controller.Home', {
      * and then redirect to the page according to the button id. The mappings
      * can be found in app.js.
      */
-    onMainNavClick: function(btn) {
+    onMainNavClick: function (btn) {
         if (btn.itemId === 'logout') {
             Ext.Ajax.request({
                 url: 'logout',
-                success: function(response) {
+                success: function (response) {
                     window.location.href = "../" + homeURL;
                 }
             });
         }
         else {
-            if(btn.itemId !== 'ticket'){
+            if (btn.itemId !== 'ticket') {
                 Ext.Router.redirect(btn.itemId);
-            }else{
-                Ext.Router.redirect("ticket/my");
+            } else {
+                if (Helpdesk.Globals.userLogged.userGroup.id != Helpdesk.Globals.idAdminGroup) {
+                    Ext.Router.redirect("ticket/opened");
+                } else {
+                    Ext.Router.redirect("ticket/my");
+                }
             }
-            
         }
     }
 });
