@@ -8,7 +8,7 @@ Ext.define('Helpdesk.Globals',{
     singleton: true,
     
     idAdminGroup: 1,
-    userLogged: Ext.decode(document.getElementById("userLogged").value),
+    userLogged: (document.getElementById("userLogged")!==null?Ext.decode(document.getElementById("userLogged").value):''),
     
     //Views
     errorview:0,
@@ -40,5 +40,19 @@ Ext.define('Helpdesk.Globals',{
     reports_client_view: 2,
     reports_export_view: 3,
     
-    pageSizeGrid: 30
+    pageSizeGrid: 30,
+    
+    // java text returns
+    change_password_complete: 'change-password-complete',
+    email_not_sent: 'email-not-sent',
+    invalid_username: 'invalid-username',
+    
+    // configure dashboard charts
+    category_ticket: 'categoria-ticket',
+    user_ticket: 'user-ticket',
+    status_ticket: 'status-ticket',
+    agent_ticket: 'agent-ticket',
+    user_ticket_open: 'user-ticket-open',
+    no_responsible_open: 'no-responsible-open',
+    open_ticket: 'open-ticket'
 });

@@ -32,6 +32,10 @@ Ext.define('Helpdesk.controller.Login', {
         {
             ref: 'loginView',
             selector: 'loginview'
+        },
+        {
+           ref: 'translation',
+           selector: 'translation'
         }
     ],
     init: function () {
@@ -107,9 +111,8 @@ Ext.define('Helpdesk.controller.Login', {
         if (e.getKey() === e.ENTER) {
             var submitBtn = field.up('form').down('button#submit');// Pega o elemento pai para depois buscar a referência ao botão
             var submitCredencials = Ext.ComponentQuery.query('credentialsexpiredwindow button#submit_credentials')[0];
-            if (submitBtn !== null)
+            if (submitBtn !== null && submitBtn !== undefined)
                 submitBtn.fireEvent('click', submitBtn, e, options);
-
             if (submitCredencials !== null)
                 submitCredencials.fireEvent('click', submitCredencials, e, options);
         }
@@ -336,14 +339,16 @@ Ext.define('Helpdesk.controller.Login', {
         var usersStore = this.getUsersStore();
         if (form.down('textfield#userNameRetrieveValue').getValue() !== '') {
             form.setLoading(translations.PLEASE_WAIT);
-            usersStore.resetPasswordUser(userName, localStorage.getItem('user-lang'), function (o) {
+            usersStore.resetPasswordUser(userName, function (o) {
                 var decodedString = Ext.decode(o.responseText);
                 form.setLoading(false, false);
-                if (decodedString.status === translations.CHANGE_PASSWORD_COMPLETE) {
+                if (decodedString.status === Helpdesk.Globals.change_password_complete) {
                     Ext.Msg.alert(translations.INFORMATION, translations.CHANGE_PASSWORD_COMPLETE_MESSAGE);
                     form.up().close();
-                } else if (decodedString.status === translations.INVALID_USERNAME) {
+                } else if (decodedString.status === Helpdesk.Globals.invalid_username) {
                     Ext.Msg.alert(translations.INFORMATION, translations.INVALID_USERNAME_MESSAGE);
+                } else if (decodedString.status === Helpdesk.Globals.email_not_sent) {
+                    Ext.Msg.alert(translations.INFORMATION, translations.PLEASE_CONTACT_US_BY_PHONE);
                 }
             });
         } else {

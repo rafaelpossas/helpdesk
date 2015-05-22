@@ -27,12 +27,13 @@ public class UserService {
 
     public User save(User model) throws Exception {
         User userTemp = null;
-        // caso usuário já exista no banco e tenha sido alterado em campos que não sejam o password
-        if ((model.getId() != null && model.getId() > 0)
-                && (model.getPassword() == null || model.getPassword().equals(""))) {
+        // caso usuário já exista no banco
+        if ((model.getId() != null && model.getId() > 0)) {
             // pesquisa o usuário salvo no banco para setar a senha antiga ao usuário que está sendo salvo.
             userTemp = repository.findOne(model.getId());
-            model.setPassword(userTemp.getPassword());
+            if(model.getPassword() == null || model.getPassword().equals("")){
+                model.setPassword(userTemp.getPassword());
+            }
         }
         model = repository.save(model);
         if (userTemp == null) {
@@ -41,8 +42,7 @@ public class UserService {
                 emailService.sendEmailNewUserCreated(model);
             }catch(Exception e){
                 e.printStackTrace();
-            }
-            
+            }            
         }
         model = (User) removePassword(null, model);
         return model;

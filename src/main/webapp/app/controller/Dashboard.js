@@ -55,11 +55,11 @@ Ext.define('Helpdesk.controller.Dashboard', {
      * @param {type} button
      * @returns {undefined}
      */
-    changeView: function (button) {        
+    changeView: function (button) {
         if (button.itemId === 'btnDashboardNoResp') {
             Ext.Router.redirect('ticket/noresp');
         } else if (button.itemId === 'btnDashboardLate') {
-            Ext.Router.redirect('ticket/opened');      
+            Ext.Router.redirect('ticket/opened');
         }
     },
     /**
@@ -93,31 +93,31 @@ Ext.define('Helpdesk.controller.Dashboard', {
                 //Seta a store de Tickets x Category                
                 for (var i = 0; i < store.getCount(); i++) {
                     var data = store.data.items[i].data;
-                    if (data.type === translations.CATEGORY_TICKET) {
+                    if (data.type === Helpdesk.Globals.category_ticket) {
                         categoryStore.add(data);
                     }
                     //Seta a store de tickets x users                
-                    if (data.type === translations.USER_TICKET) {
+                    if (data.type === Helpdesk.Globals.user_ticket) {
                         userStore.add(data);
                     }
                     //Seta a store de status x tickets                    
-                    if (data.type === translations.STATUS_TICKET) {
+                    if (data.type === Helpdesk.Globals.status_ticket) {
                         statusTickets.add(data);
                     }
                     //Seta a store de Agent x tickets                    
-                    if (data.type === translations.AGENT_TICKET) {
+                    if (data.type === Helpdesk.Globals.agent_ticket) {
                         agentStore.add(data);
                     }
                     //Seta a store de User x tickets                    
-                    if (data.type === translations.USER_TICKET_OPEN) {
+                    if (data.type === Helpdesk.Globals.user_ticket_open) {
                         clientsStore.add(data);
-                    }                    
+                    }
                     //Seta a store de tickets sem responsável
-                    if (data.type === translations.NO_RESPONSIBLE_OPEN) {                          
-                        form.down('panel#noRespHtml').update(data.count);                       
+                    if (data.type === Helpdesk.Globals.no_responsible_open) {
+                        form.down('panel#noRespHtml').update(data.count);
                     }
                     //Seta a store de tickets em andamento
-                    if (store.data.items[i].data.type === translations.OPEN_TICKET_TITLE) {
+                    if (store.data.items[i].data.type === Helpdesk.Globals.open_ticket) {
                         form.down('panel#noRespLate').update(data.count);
                     }
                 }

@@ -512,43 +512,24 @@ public class EmailService {
      * @author Ricardo
      * @update André Sulivam
      * @param user
-     * @param language
      * @throws MessagingException
      */
-    public void sendEmailPasswordChanged(User user, String language) throws Exception {
+    public void sendEmailPasswordChanged(User user) throws Exception {
 
-        String html = "";
-        //Define o idioma do email
-        if (language.trim().equals("pt_BR")) {
-            html = contentDefaultEmailTop()
-                    + "<p> Prezado " + user.getName() + ",</p>"
-                    + "<br/>"
-                    + "<p> Uma nova senha foi gerada para seu acesso ao sistema.</p>"
-                    + "<p> Aconselhamos que altere a mesma para uma de sua preferência pois trata-se de uma senha temporária.</p>"
-                    + "<p> Sua nova senha é: <b>" + user.getPassword() + "</b></p>"
-                    + "<p> Link para acesso: <a href='http://cymosupport.tecnologia.ws/Helpdesk'> http://cymosupport.tecnologia.ws/Helpdesk </a> </p>"
-                    + "<p>Atenciosamente,</p>"
-                    + contentDefaultEmailBot();
-        } else if (language.trim().equals("en")) {
-            html = contentDefaultEmailTop()
-                    + "<p> Dear " + user.getName() + ",</p>"
-                    + "<br/>"
-                    + "<p> A new password was generated for you access in the system.</p>"
-                    + "<p> We strongly recommend you to change the password to one of your preference.</p>"
-                    + "<p> Your new password is: <b>" + user.getPassword() + "</b></p>"
-                    + "<p> Link for the access: <a href='http://cymosupport.tecnologia.ws/Helpdesk'> http://cymosupport.tecnologia.ws/Helpdesk </a> </p>"
-                    + "<p>Att,</p>"
-                    + contentDefaultEmailBot();
-        }
+        String subject = "Alerta de alteração de senha";
+        String html = contentDefaultEmailTop()
+                + "<p> Prezado " + user.getName() + ",</p>"
+                + "<br/>"
+                + "<p> Uma nova senha foi gerada para seu acesso ao sistema.</p>"
+                + "<p> Aconselhamos que altere a mesma para uma de sua preferência pois trata-se de uma senha temporária.</p>"
+                + "<p> Sua nova senha é: <b>" + user.getPassword() + "</b></p>"
+                + "<p> Link para acesso: <a href='http://cymosupport.tecnologia.ws/Helpdesk'> http://cymosupport.tecnologia.ws/Helpdesk </a> </p>"
+                + "<p>Atenciosamente,</p>"
+                + contentDefaultEmailBot(); 
 
         List<String> emails = new ArrayList<String>();
         emails.add(user.getEmail());
-        String subject = "";
-        if (language.trim().equals("pt_BR")) {
-            subject = "Alerta de alteração de senha";
-        } else if (language.trim().equals("en")) {
-            subject = "Password recovery";
-        }
+
         sendEmail(emails, subject, html, Consts.DEFAULT);
     }
 
@@ -565,53 +546,53 @@ public class EmailService {
     public void sendEmailByScreenConfiguration(String subject, String text, List<String> listEmails) throws Exception {
         sendEmail(listEmails, subject, text, Consts.MARKETING);
     }
-    
+
     /**
      * Método para enviar email quando se criar um novo usuário.
-     * 
+     *
      * @author André Sulivam
      * @param user
-     * @throws Exception 
+     * @throws Exception
      */
-    public void sendEmailNewUserCreated(User user) throws Exception{
+    public void sendEmailNewUserCreated(User user) throws Exception {
         List<String> adminsEmail = getAdminEmails();
-        
-        String emailUser = user.getEmail();        
+
+        String emailUser = user.getEmail();
         List<String> email = new ArrayList<String>();
         email.add(emailUser);
-        
+
         String htmlAdmin = contentNewUserToAdmins(user);
         String htmlUser = contentNewUserToUser(user);
-        
+
         sendEmail(adminsEmail, Consts.NOVO_CADASTRO_USUARIO, htmlAdmin, Consts.MARKETING);
-        sendEmail(email, Consts.NOVO_CADASTRO_USUARIO, htmlUser, Consts.DEFAULT);        
+        sendEmail(email, Consts.NOVO_CADASTRO_USUARIO, htmlUser, Consts.DEFAULT);
     }
-    
+
     public String contentNewUserToUser(User user) {
         String fullEmail = contentDefaultEmailTop()
                 + "Seu usuário foi criado com sucesso no Helpdesk - PROCYMO!"
                 + "<br>"
-                + "Nome: "+user.getName()
+                + "Nome: " + user.getName()
                 + "<br>"
-                + "Email: "+user.getEmail()
+                + "Email: " + user.getEmail()
                 + "<br>"
-                + "Usuario: "+user.getUserName()
+                + "Usuario: " + user.getUserName()
                 + "<br>"
-                + "Senha: "+user.getPassword()
+                + "Senha: " + user.getPassword()
                 + "<br>"
                 + contentDefaultEmailBot();
         return fullEmail;
     }
-    
+
     public String contentNewUserToAdmins(User user) {
         String fullEmail = contentDefaultEmailTop()
                 + "Novo usuário criado no Helpdesk - PROCYMO!"
                 + "<br>"
-                + "Nome: "+user.getName()
+                + "Nome: " + user.getName()
                 + "<br>"
-                + "Email: "+user.getEmail()
+                + "Email: " + user.getEmail()
                 + "<br>"
-                + "Cliente: "+user.getClient().getName()
+                + "Cliente: " + user.getClient().getName()
                 + "<br>"
                 + contentDefaultEmailBot();
         return fullEmail;
