@@ -64,13 +64,12 @@ Ext.define('Helpdesk.store.Users', {
             success: success
         });
     },
-    resetPasswordUser: function (userName, language, success) {
+    resetPasswordUser: function (userName, success) {
         Ext.Ajax.request({
             url: 'login/reset-password',
             method: 'GET',
             params: {
-                username: userName,
-                language: language
+                username: userName
             },
             success: success
         });

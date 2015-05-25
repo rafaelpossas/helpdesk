@@ -6,7 +6,7 @@
 <input type="hidden" name="userLogged" id="userLogged" value="<%=request.getAttribute("userLogged")%>">
 <html>
     <head>
-        <title>Help-Desk - Procymo</title>
+        <title>Helpdesk - Procymo</title>
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
         
         <script type="text/javascript">

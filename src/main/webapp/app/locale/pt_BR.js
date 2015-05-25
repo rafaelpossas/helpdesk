@@ -21,7 +21,6 @@ translations = {
     AGENT: 'Agente',
     ACTIVE: 'Ativo',
     ANSWERED: 'Respondido',
-    AGENT_TICKET:'agent-ticket',
     //############################################## [ B ] ##############################################//
 
     BACK: 'Voltar',
@@ -29,8 +28,8 @@ translations = {
     BY: 'Por',
     BUG: 'Bug',
     BROWSE: 'Procurar..',
-    BLANK_VARIABLE:'blank-variable',
-    BLANK_VARIABLE_MESSAGE:'Digite um nome de usuário',
+    BLANK_VARIABLE: 'blank-variable',
+    BLANK_VARIABLE_MESSAGE: 'Digite um nome de usuário',
     //############################################## [ C ] ##############################################//
 
     CANCEL: 'Cancelar',
@@ -63,10 +62,9 @@ translations = {
     COMMENT_INTERNAL_BY: 'Comentário interno por',
     CLOSING_TICKET: 'Encerrando Ticket...',
     CHECK_ADDED_INFORMATIONS: 'Verifique as informações adicionadas!',
-    CATEGORY_TICKET:'categoria-ticket',
     CHANGED_WITH_SUCCESS: 'Alterado com sucesso',
     CHANGE_PASSWORD_COMPLETE: 'change-password-complete',
-    CHANGE_PASSWORD_COMPLETE_MESSAGE:'Uma nova senha foi gerada e enviada para o e-mail cadastrado.',
+    CHANGE_PASSWORD_COMPLETE_MESSAGE: 'Uma nova senha foi gerada e enviada para o e-mail cadastrado.',
     CLEAR: 'Limpar',
     CANCELED_BY_USER: 'Cancelado pelo usuário',
     CHECK_THE_ENTERED_VALUES: 'Cheque os valores inseridos',
@@ -110,11 +108,11 @@ translations = {
     FIRST_TIME_REQUESTING_SERVICE: 'Solicitando Atendimento pela primeira vez?',
     FROM: 'de',
     FORMAT_DATE: 'pt-BR',
-    FORMAT_DATE_TIME: 'd/m/Y H:i',    
+    FORMAT_DATE_TIME: 'd/m/Y H:i',
     FORMAT_JUST_DATE: 'd/m/Y',
-    FORMAT_EN: 'Y/m/d',  
+    FORMAT_EN: 'Y/m/d',
     FOR: 'para',
-    FORGOT_PASSWORD:'Esqueceu sua senha?',
+    FORGOT_PASSWORD: 'Esqueceu sua senha?',
     //############################################## [ G ] ##############################################//
 
     GROUP: 'Grupo',
@@ -136,8 +134,7 @@ translations = {
     IF_CLIENT_NOT_REGISTERED: 'Se o cliente ainda não for cadastrado',
     INFORMATIONS: 'Informações',
     INOVATION: 'Inovação',
-    INVALID_USERNAME:'invalid-username',
-    INVALID_USERNAME_MESSAGE:'Nome de usuário inválido ou inexistente',
+    INVALID_USERNAME_MESSAGE: 'Nome de usuário inválido ou inexistente',
     IMAP: 'IMAP',
     INSERT_IMAGE: 'Inserir Imagem',
     INSERT_IMAGE_ON_BODY_EMAIL: 'Inserir imagem no corpo do email.',
@@ -188,7 +185,6 @@ translations = {
     NAME_CLIENT: 'Nome do Cliente',
     NO: 'Não',
     NO_RESPONSIBLE: 'Sem responsável',
-    NO_RESPONSIBLE_OPEN:'no-responsible-open',
     NEWS: 'Novidades',
     NO_CATEGORY: 'Sem categoria',
     NO_PRIORITY: 'Sem Prioridade',
@@ -205,16 +201,15 @@ translations = {
     OPEN: 'Em aberto',
     OPEN_FROM: 'Em aberto',
     OPEN_TO: 'Em aberto',
-    OPEN_TICKET: 'Abrir ticket', 
+    OPEN_TICKET: 'Abrir ticket',
     ONLY_UPLOAD_IMAGES: 'Você só pode fazer upload de imagens',
-    OPEN_TICKET_TITLE:'open-ticket',
     OF: 'de',
     //############################################## [ P ] ##############################################//
 
     PASSWORD: 'Senha',
     PASSWORD_CHECK: 'Confirmar',
     PASSWORD_NOT_MATCH: 'Senhas não conferem',
-    PASSWORD_CHANGED_WITH_SUCCESS:  'Senha alterada com sucesso',
+    PASSWORD_CHANGED_WITH_SUCCESS: 'Senha alterada com sucesso',
     PICTURE: 'Imagem',
     PORTUGUESE: 'Português',
     PROCYMO_LOGO: '/resources/img/logoProcymo.png',
@@ -222,7 +217,8 @@ translations = {
     PARTIAL: '(Parcial)',
     PRIORITY_CHANGED_FROM: 'Prioridade alterada de ',
     PAGE: 'Página',
-    PLEASE_WAIT:'Por favor aguarde',
+    PLEASE_WAIT: 'Por favor aguarde',
+    PLEASE_CONTACT_US_BY_PHONE: 'Por favor, contate-nos por telefone.',
     //############################################## [ Q ] ##############################################//
 
     QUANTITY_OF_CREATED_TICKETS: 'Quantidade de Tickets Criados',
@@ -239,7 +235,7 @@ translations = {
     REPORTS_BY_ENTERPRISE: 'Relatórios de tickets por empresa',
     REPORTS_EXPORT_DATA: 'Exportar dados de tickets para Excel (xls)',
     REGISTERED_CLIENTS: 'clientes registrados',
-    REQUIRED_ITENS_TICKETS: 'Todos os campos obrigatórios devem ser preenchidos',    
+    REQUIRED_ITENS_TICKETS: 'Todos os campos obrigatórios devem ser preenchidos',
     REQUIRED_CLIENT: 'Selecione um cliente válido!',
     REQUIRED_CATEGORY: 'Selecione uma categora válida!',
     REQUIRED_STEPS: 'Descreva os passos para reproduzir o erro!',
@@ -248,9 +244,8 @@ translations = {
     RESPONSIBLE_CHANGED_FROM: 'Responsável alterado de ',
     REOPENING_TICKET: 'Reabrindo Ticket ...',
     RECORDS: 'registro(s)',
-    RETRIEVE_PASSWORD:'Recuperar senha',
-    RETRIEVE:'Recuperar',
-    
+    RETRIEVE_PASSWORD: 'Recuperar senha',
+    RETRIEVE: 'Recuperar',
     //############################################## [ S ] ##############################################//
 
     SAVE: 'Salvar',
@@ -269,7 +264,7 @@ translations = {
     SUBJECT: 'Assunto',
     SELECT_FILE: 'Selecione um arquivo...',
     SEE_TICKETS_WITHOUT_RESPONSIBLE: 'Ver tickets sem responsável',
-    SEE_TICKETS_ON_GOING:'Ver tickets em andamento',
+    SEE_TICKETS_ON_GOING: 'Ver tickets em andamento',
     SEE_TICKETS_LATE: 'Ver tickets atrasados',
     SEE_TICKETS_WITHOUT_CATEGORY: 'Ver tickets sem categoria',
     SEE_FULL_REPORT: '(Ver relatório completo)',
@@ -285,7 +280,6 @@ translations = {
     SELECT_A_PROFILE_PICTURE: 'Selecione uma foto de perfil',
     SHOW_ALL: '(Mostrar todas)',
     SITUATION: 'Situação',
-    STATUS_TICKET:'status-ticket',
     SMTP: 'SMTP',
     SELECTED: 'Selecionados',
     SENT: 'Enviado',
@@ -342,8 +336,6 @@ translations = {
     UPLOADING_FILES: 'Enviando arquivos..',
     UNIT: 'unidade',
     URGENT: 'Urgente',
-    USER_TICKET:'user-ticket',
-    USER_TICKET_OPEN:'user-ticket-open',
     USER_NOT_CREATED: 'Usuário não criado',
     //############################################## [ V ] ##############################################//
 
