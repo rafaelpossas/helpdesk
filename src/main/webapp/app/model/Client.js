@@ -7,7 +7,8 @@ Ext.define('Helpdesk.model.Client',{
    extend: 'Ext.data.Model',
    idProperty: 'id',
    fields: [
-       {name: 'name'}
+       {name: 'name'},
+       {name: 'isEnabled'}
    ]
 });
 

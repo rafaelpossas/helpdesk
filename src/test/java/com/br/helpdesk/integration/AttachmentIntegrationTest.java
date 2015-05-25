@@ -1,11 +1,9 @@
 package com.br.helpdesk.integration;
 
 import com.br.helpdesk.model.Attachments;
-import com.br.helpdesk.model.Ticket;
 import com.br.helpdesk.service.AttachmentsService;
 import com.github.springtestdbunit.DbUnitTestExecutionListener;
 import com.github.springtestdbunit.annotation.DatabaseSetup;
-import org.apache.cxf.message.Attachment;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,11 +24,12 @@ import java.util.List;
 @RunWith(SpringJUnit4ClassRunner.class)
 @WebAppConfiguration
 @ContextConfiguration(locations = {"file:src/main/webapp/WEB-INF/configuration/application.xml",
-        "file:src/main/webapp/WEB-INF/configuration/database_local.xml", "file:src/main/webapp/WEB-INF/configuration/security.xml"})
+    "file:src/main/webapp/WEB-INF/configuration/database_test.xml", "file:src/main/webapp/WEB-INF/configuration/security.xml"})
 @TestExecutionListeners({DependencyInjectionTestExecutionListener.class,
-        DirtiesContextTestExecutionListener.class,
-        TransactionalTestExecutionListener.class,
-        DbUnitTestExecutionListener.class})
+    DirtiesContextTestExecutionListener.class,
+    TransactionalTestExecutionListener.class,
+    DbUnitTestExecutionListener.class})
+@DatabaseSetup(value = "CompleteData.xml")
 public class AttachmentIntegrationTest {
 
     @Autowired
@@ -39,7 +38,7 @@ public class AttachmentIntegrationTest {
     @Test
     public void TestFindByTicket() throws Exception{
         List<Attachments> result = attachmentsService.findByAnswerWithoutFile(75L);
-        assertThat(result.size(),greaterThan(0));
+        assertThat(result.size(),is(0));
 
     }
 }

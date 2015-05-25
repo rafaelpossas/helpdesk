@@ -47,8 +47,21 @@ public class SendEmailService {
     public String getJsonEmails(String groupClient) {
         String resultado = "";
         List<Long> idClients = convertStringIdClientsToListLong(groupClient);
-        List<User> users = userService.findByGroupClient(idClients);
+        List<User> users = new ArrayList<User>();
+        if (idClients != null && idClients.size() > 0) {
+            List<User> usersTemp = new ArrayList<User>();
+            for (Long idClient : idClients) {
+                if (!idClient.equals(0L)) {
+                    usersTemp = userService.findByClientAndIsEnabled(idClient, Boolean.TRUE);
+                    users.addAll(usersTemp);
+                } else if (idClient.equals(0L)) {
+                    usersTemp = userService.findByUserGroupAndIsEnabled(1L, Boolean.TRUE);
+                    users.addAll(usersTemp);
+                }
+            }
+        }
         if (users.size() > 0) {
+            users = removeDuplicateUsers(users);
             for (int i = 0; i < users.size(); i++) {
                 if (users.get(i).getEmail() != null && !(users.get(i).getEmail().equals(""))) {
                     if (i != 0 && resultado.length() > 0) {
@@ -62,14 +75,39 @@ public class SendEmailService {
                 }
             }
         }
+
         return resultado;
+    }
+
+    /**
+     * Remove usuários duplicados na lista.
+     *
+     * @author André Sulivam
+     * @param list
+     * @return
+     */
+    public List<User> removeDuplicateUsers(List<User> list) {
+        boolean userFound = false;
+        List<User> listWithoutDuplicate = new ArrayList<User>();
+        for (User user : list) {
+            for (User userTemp : listWithoutDuplicate) {
+                if (user.getId().equals(userTemp.getId())) {
+                    userFound = true;
+                }
+            }
+            if (!userFound) {
+                listWithoutDuplicate.add(user);
+            }
+            userFound = false;
+        }
+        return listWithoutDuplicate;
     }
 
     /**
      * Método para criar uma lista com os ids dos clientes. <br>
      * A alteração ocorre da seguinte forma: <br>
-     * Recebe-se um json com o seguinte formato: [{"id":"1"},{"id":"2"},{"id":"3"}] e retorna uma
-     * list de Long com os ids.
+     * Recebe-se um json com o seguinte formato:
+     * [{"id":"1"},{"id":"2"},{"id":"3"}] e retorna uma list de Long com os ids.
      *
      * @param groupClient
      * @return
@@ -97,7 +135,7 @@ public class SendEmailService {
      * @param emailUser
      * @param id
      * @return
-     * @throws Exception 
+     * @throws Exception
      */
     public String sendEmailSingle(String subject, String message, String emailUser, Long id) throws Exception {
         String resultado = "{\"id\":\"" + id
@@ -106,7 +144,7 @@ public class SendEmailService {
             List<String> listEmails = new ArrayList<String>();
             listEmails.add(emailUser);
             emailService.sendEmailByScreenConfiguration(subject, message, listEmails);
-            resultado += "\",\"status\":\"SENT"  
+            resultado += "\",\"status\":\"SENT"
                     + "\",\"message\":\"\"}";
         } catch (MessagingException e) {
             String error = e.getMessage();

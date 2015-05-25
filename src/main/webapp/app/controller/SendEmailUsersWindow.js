@@ -25,7 +25,7 @@ Ext.define('Helpdesk.controller.SendEmailUsersWindow', {
             }
         });
     },
-    requires: ['Helpdesk.store.SendEmails', 
+    requires: ['Helpdesk.store.SendEmails',
         'Helpdesk.view.sendemail.SendEmailInfo'],
     stores: ['SendEmails'],
     refs: [
@@ -121,18 +121,20 @@ Ext.define('Helpdesk.controller.SendEmailUsersWindow', {
      * @returns {undefined}
      */
     updateStatusSentEmail: function (idUser, status, message) {
-        var storepanel = this.getUsersWindow().down('#usersPanel').getStore();
-        var items = storepanel.data.items;
-        var idTemp = 0;
-        for (var i = 0; i < items.length; i++) {
-            idTemp = new Number(items[i].data.id);
-            if (idTemp.toString() === idUser.toString()) {
-                items[i].data.status = status;
-                items[i].data.message = message;
+        if (this.getUsersWindow() !== null && this.getUsersWindow() !== undefined) {
+            var storepanel = this.getUsersWindow().down('#usersPanel').getStore();
+            var items = storepanel.data.items;
+            var idTemp = 0;
+            for (var i = 0; i < items.length; i++) {
+                idTemp = new Number(items[i].data.id);
+                if (idTemp.toString() === idUser.toString()) {
+                    items[i].data.status = status;
+                    items[i].data.message = message;
+                }
             }
+            // força atualização da store no grid.
+            this.getUsersWindow().down('#usersPanel').getView().refresh();
         }
-        // força atualização da store no grid.
-        this.getUsersWindow().down('#usersPanel').getView().refresh();
     },
     /**
      * Método quando o usuário clicar no botão cancelar antes do envio do email para todos os usuários. <br>
@@ -200,7 +202,7 @@ Ext.define('Helpdesk.controller.SendEmailUsersWindow', {
     onClickButtonInfo: function () {
         var window = Ext.create('Helpdesk.view.sendemail.SendEmailInfo');
         var fieldset = window.down('#fieldset');
-        
+
         var name = fieldset.items.items[0];
         var email = fieldset.items.items[1];
         var status = fieldset.items.items[2];
@@ -210,9 +212,9 @@ Ext.define('Helpdesk.controller.SendEmailUsersWindow', {
         email.setValue(this.userSelected.email);
         status.setValue(translations[this.userSelected.status]);
         message.setValue(this.userSelected.message);
-        
+
         fieldset.doLayout();
-        window.show();        
+        window.show();
     }
 });
 

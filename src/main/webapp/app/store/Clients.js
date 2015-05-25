@@ -9,7 +9,7 @@ Ext.define('Helpdesk.store.Clients', {
     model: 'Helpdesk.model.Client',
     storeId: 'clients',
     autoLoad: false,
-    constructor: function(config) {
+    constructor: function (config) {
         // applyIf means only copy if it doesn't exist
         Ext.applyIf(config, {
             proxy: Ext.create('Helpdesk.proxy.Base', {
@@ -17,6 +17,14 @@ Ext.define('Helpdesk.store.Clients', {
             })
         });
         this.callParent([config]);
+    },
+    findByIsEnabled: function (isEnabled, callbackfunction) {
+        this.load({
+            params: {
+                isEnabled: isEnabled
+            },
+            callback: callbackfunction
+        });
     }
 
 });

@@ -1,6 +1,5 @@
 package com.br.helpdesk.model;
 
-import java.util.List;
 import javax.persistence.*;
 
 /**
@@ -22,6 +21,10 @@ public class Client {
     @Basic
     @Column(name = "NAME")
     private String name;
+    
+    @Basic
+    @Column(name="ISENABLED", columnDefinition="boolean default true")
+    private Boolean isEnabled;
 
     public String getName() {
         return name;
@@ -37,4 +40,12 @@ public class Client {
     public void setId(Long id) {
         this.id = id;
     }
+
+    public Boolean getIsEnabled() {
+        return isEnabled;
+    }
+
+    public void setIsEnabled(Boolean isEnabled) {
+        this.isEnabled = isEnabled;
+    }    
 }

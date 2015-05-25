@@ -54,5 +54,7 @@ Ext.define('Helpdesk.Globals',{
     agent_ticket: 'agent-ticket',
     user_ticket_open: 'user-ticket-open',
     no_responsible_open: 'no-responsible-open',
-    open_ticket: 'open-ticket'
+    open_ticket: 'open-ticket',
+    
+    admin: 'ADMIN'
 });

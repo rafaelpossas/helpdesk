@@ -496,9 +496,9 @@ public class EmailService {
      */
     public List<String> getAdminEmails() {
         List<String> listEmails = new ArrayList<String>();
-        List<User> listAdmin = userService.findByUserAdmin();
+        List<User> listAdmin = userService.findByUserGroupAndIsEnabled(1L, true);
         for (User admin : listAdmin) {
-            if (admin.getIsEnabled() && admin.getEmail() != null && !(admin.getEmail().equals(""))) {
+            if (admin.getEmail() != null && !(admin.getEmail().equals(""))) {
                 listEmails.add(admin.getEmail());
             }
         }

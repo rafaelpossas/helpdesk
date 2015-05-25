@@ -57,7 +57,7 @@ Ext.define('Helpdesk.controller.SendEmail', {
         store.getJsonEmailUsers(this.onBackGetJsonEmailUsers, groupClient, this);
     },
     /**
-     * Método que converte os clientes selecionados no grid para o formato de JSON.
+     * Método que cria um array com os objetos selecionados no grid de clientes.
      * 
      * @author André Sulivam
      * @returns {String}
@@ -66,7 +66,7 @@ Ext.define('Helpdesk.controller.SendEmail', {
         var form = this.getEmailForm();
         var clientsSelected = form.down('clientgridcheckbox').getSelectionModel().getSelection();
         var arrayCliente = [];
-        for (var i = 0; i < clientsSelected.length; i++) {
+        for (var i = 0; i < clientsSelected.length; i++) {            
             var cliente = {
                 id: clientsSelected[i].data.id,
                 name: clientsSelected[i].data.name
@@ -166,7 +166,6 @@ Ext.define('Helpdesk.controller.SendEmail', {
         })(fileSelected);
         // start upload
         reader.readAsBinaryString(fileSelected);
-        console.log(reader);
     },
     /**
      * Verifica a cada alteração no formulário se todos os campos obrigatórios foram preenchidos e
@@ -182,8 +181,12 @@ Ext.define('Helpdesk.controller.SendEmail', {
         var message = form.down('#htmleditormessage').value;
         var clientsSelected = form.down('clientgridcheckbox').getSelectionModel().getSelection();
 
-        var disableButton = (subject === "" || message === "" || clientsSelected.length === 0);
-        this.disableButtonSave(disableButton);
+        var disableButton = (
+                (subject === "" || subject === undefined) || 
+                (message === "" || message === undefined) || 
+                (clientsSelected.length === 0)
+                );
+        this.disableButtonSend(disableButton);
     },
     /**
      * Método para habilitar ou desabilitar o botão de Enviar o email baseado no parâmetro enviado.
@@ -191,7 +194,7 @@ Ext.define('Helpdesk.controller.SendEmail', {
      * @param {type} disableButton
      * @returns {undefined}
      */
-    disableButtonSave: function (disableButton) {
+    disableButtonSend: function (disableButton) {
         var sendEmail = this.getSendEmail();
         var button = sendEmail.down('button#sendEmails');
         button.setDisabled(disableButton);
