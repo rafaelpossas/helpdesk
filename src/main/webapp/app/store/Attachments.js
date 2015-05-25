@@ -20,8 +20,11 @@ Ext.define('Helpdesk.store.Attachments', {
     },
     getFilesFromTicket: function (ticketId, callbackfunction) {
         Ext.Ajax.request({
-            url: 'attachments/' + ticketId + '/attachments',
             method: 'GET',
+            url: '/attachments',
+            params: {
+                ticket: ticketId
+            },
             success: callbackfunction
         });
     }

@@ -128,7 +128,7 @@ public class UserIntegrationTest {
         newUser.setUserGroup(userGroup);
         newUser.setPicture("");
 
-        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.put("/user")
+        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.post("/user")
                 .content(TestUtil.convertObjectToJsonBytes(newUser))
                 .contentType(TestUtil.APPLICATION_JSON_UTF8))
                 .andExpect(MockMvcResultMatchers.status().isOk())//verifica se esta chamando corretamente a url

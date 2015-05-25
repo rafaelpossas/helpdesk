@@ -7,7 +7,6 @@
 		http://www.springframework.org/schema/security
 		http://www.springframework.org/schema/security/spring-security.xsd">
 
-
     <security:http use-expressions="true">
         <security:intercept-url pattern="/login/**"
                                 access="permitAll" />
@@ -29,11 +28,12 @@
         <security:logout invalidate-session="true"
                          logout-url="/logout" />
         <security:remember-me key="defaultKey" token-validity-seconds="2419200"/>
+        <!--<security:csrf disabled="true"/>-->
     </security:http>
 
     <security:global-method-security pre-post-annotations="enabled"/>
 
-   
+
     <security:authentication-manager>
         <security:authentication-provider
                 user-service-ref="customUserDetailsService" />
@@ -53,7 +53,5 @@
             </props>
         </property>
     </bean>
-
-
 
 </beans>

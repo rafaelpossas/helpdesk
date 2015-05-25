@@ -14,9 +14,9 @@
 
     <bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource">
         <property name="driverClassName" value="com.mysql.jdbc.Driver" />
-        <property name="url" value="jdbc:mysql://$database_address$" />
-        <property name="username" value="$database_username$" />
-        <property name="password" value="$database_password$" />
+        <property name="url" value="jdbc:mysql://localhost:3306/helpdesk" />
+        <property name="username" value="root" />
+        <property name="password" value="cymotecnologia" />
         <property name="initialSize" value="5" />
         <property name="maxActive" value="10" />
     </bean>

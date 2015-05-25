@@ -18,14 +18,14 @@ import java.util.List;
 import javax.persistence.EntityNotFoundException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import com.br.helpdesk.util.MimeTypeConstants;
+import org.apache.commons.io.FilenameUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.FileCopyUtils;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
@@ -61,7 +61,7 @@ public class AttachmentsController {
     /**
      * upload
      */
-    @RequestMapping(value = "/attachments", method = RequestMethod.POST)
+    @RequestMapping(method = RequestMethod.POST)
     @ResponseBody
     public String uploadFile(HttpServletRequest request, HttpServletResponse response) throws Exception {
         String username = request.getParameter("username");
@@ -81,29 +81,30 @@ public class AttachmentsController {
     /**
      * download
      */
-    @RequestMapping(value = "/attachments/{attachmentId}", method = RequestMethod.GET)
+    @RequestMapping(value = "/{attachmentId}", method = RequestMethod.GET)
     @ResponseBody
     public void downloadFile(HttpServletRequest request, HttpServletResponse response, @PathVariable(value = "attachmentId") Long attachmentId) throws Exception {
         Attachments attachment = attachmentsService.findById(attachmentId);
 
-        response.setContentType(attachment.getContentType());
+        String contentType = MimeTypeConstants.getMimeType(FilenameUtils.getExtension(attachment.getName()));
+        response.setContentType(contentType);
         response.setContentLength(attachment.getByteArquivo().length);
         response.setHeader("Content-Disposition", "attachment; filename=\"" + attachment.getName() + "\"");
 
         FileCopyUtils.copy(attachment.getByteArquivo(), response.getOutputStream());
     }
 
-    @RequestMapping(value = "/{ticketId}/attachments", method = RequestMethod.GET)
+    @RequestMapping(method = RequestMethod.GET, params = {"ticket"})
     @ResponseBody
-    public String getFilesListFromTicket(HttpServletRequest request, HttpServletResponse response, @PathVariable(value = "ticketId") Long ticketId) throws Exception {
+    public String getFilesListFromTicket(@RequestParam(value = "ticket") Long ticketId) throws Exception {
         Ticket ticket = ticketService.findById(ticketId);
         List<Attachments> listAllFiles = new ArrayList<Attachments>();
-        List<Attachments> listFilesTicket = attachmentsService.findByTicket(ticketId);
+        List<Attachments> listFilesTicket = attachmentsService.findByTicketWithoutFile(ticketId);
         listAllFiles.addAll(listFilesTicket);
         List<Attachments> listFilesAnswers = new ArrayList<Attachments>();
         List<TicketAnswer> listAnswer = ticketAnswerService.findAnswersByTicket(ticket);
         for (TicketAnswer answer : listAnswer) {
-            listFilesAnswers.addAll(attachmentsService.findByAnswer(answer.getId()));
+            listFilesAnswers.addAll(attachmentsService.findByAnswerWithoutFile(answer.getId()));
         }
         listAllFiles.addAll(listFilesAnswers);
         String returnJson = attachmentsService.getListFilesJSON(listAllFiles);

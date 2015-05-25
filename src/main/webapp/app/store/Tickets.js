@@ -14,10 +14,7 @@ Ext.define('Helpdesk.store.Tickets', {
         // applyIf means only copy if it doesn't exist
         Ext.applyIf(config, {
             proxy: Ext.create('Helpdesk.proxy.Base', {
-                url: 'ticket',
-                extraParams: {
-                    user: Helpdesk.Globals.userLogged.userName
-                }
+                url: 'ticket'
             })
         });
         this.callParent([config]);
@@ -45,30 +42,42 @@ Ext.define('Helpdesk.store.Tickets', {
         }
     },
     closeTicket: function (ticket, callbackfunction) {
-        console.log(ticket);
-        $.ajax({
-            type: 'POST',
-            data: {
-                ticket: ticket.data
-            },
-            url: 'ticket/close-ticket',
-            success: Ext.bind(callbackfunction)
+        Ext.Ajax.request({
+            method: 'PUT',
+            jsonData: Helpdesk.Globals.userLogged,
+            url: 'ticket/'+ticket.id+'/close',
+            success: callbackfunction,
+            failure: function(response){
+                var bodyHtml = /<body.*?>([\s\S]*)<\/body>/.exec(response.responseText)[1];
+                Helpdesk.Current.fireEvent('servererror', bodyHtml);
+            }
+
         });
     },
     openTicket: function (ticket, username, callbackfunction) {
-        $.ajax({
-            type: 'POST',
-            data: {
-                ticket: ticket,
-                user: username
-            },
-            url: 'ticket/open-ticket',
-            success: Ext.bind(callbackfunction)
+        Ext.Ajax.request({
+            method: 'PUT',
+            jsonData: Helpdesk.Globals.userLogged,
+            url: 'ticket/'+ticket.id+'/open',
+            success: callbackfunction,
+            failure: function(response){
+                var bodyHtml = /<body.*?>([\s\S]*)<\/body>/.exec(response.responseText)[1];
+                Helpdesk.Current.fireEvent('servererror', bodyHtml);
+            }
         });
     },
-    findAllTicketsPaging: function (user, start, limit, callbackfunction) {
+    findAll: function (user, start, limit, callbackfunction) {
         this.load({
-            url: 'ticket/all-paging',
+            url: 'ticket',
+            params: {
+                start: start,
+                limit: limit
+            },
+            callback: callbackfunction
+        });
+    },
+    findByResponsible: function(user,start,limit,callbackfunction){
+        this.load({
             params: {
                 user: user,
                 start: start,
@@ -77,53 +86,18 @@ Ext.define('Helpdesk.store.Tickets', {
             callback: callbackfunction
         });
     },
-    findMyTicketsPaging: function (user, start, limit, callbackfunction) {
+    findByStatus: function (start, limit,status,callbackfunction) {
         this.load({
-            url: 'ticket/mytickets-paging',
             params: {
-                user: user,
                 start: start,
-                limit: limit
-            },
-            callback: callbackfunction
-        });
-    },
-    findWithoutResponsibleTicketsPaging: function (user, start, limit, callbackfunction) {
-        this.load({
-            url: 'ticket/withoutresponsible-paging',
-            params: {
-                user: user,
-                start: start,
-                limit: limit
-            },
-            callback: callbackfunction
-        });
-    },
-    findOpenedTicketsPaging: function (user, start, limit, callbackfunction) {
-        this.load({
-            url: 'ticket/opened-paging',
-            params: {
-                user: user,
-                start: start,
-                limit: limit
-            },
-            callback: callbackfunction
-        });
-    },
-    findClosedTicketsPaging: function (user, start, limit, callbackfunction) {
-        this.load({
-            url: 'ticket/closed-paging',
-            params: {
-                user: user,
-                start: start,
-                limit: limit
+                limit: limit,
+                status: status
             },
             callback: callbackfunction
         });
     },
     search: function (searchterm, typesearch, start, limit, callbackfunction) {
         this.load({
-            url: 'ticket/search',
             params: {
                 searchterm: searchterm,
                 typesearch: typesearch,
@@ -133,14 +107,11 @@ Ext.define('Helpdesk.store.Tickets', {
             callback: callbackfunction
         });
     },
-    setSideMenuButtonText: function (user, callbackfunction) {
+    getTicketCount: function (callbackfunction) {
         Ext.Ajax.request({
-            url: 'ticket/textmenu',
+            url: 'ticket/count',
             method: 'GET',
             async: false,
-            params: {
-                user: user
-            },
             success: callbackfunction
         });
     }

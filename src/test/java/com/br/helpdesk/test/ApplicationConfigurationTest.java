@@ -20,16 +20,6 @@ import org.springframework.test.context.web.WebAppConfiguration;
  *
  * @author Andre
  */
-@RunWith(SpringJUnit4ClassRunner.class)
-@WebAppConfiguration
-@ContextConfiguration(locations = {"file:src/main/webapp/WEB-INF/configuration/application.xml",
-    "file:src/main/webapp/WEB-INF/configuration/database.xml", "file:src/main/webapp/WEB-INF/configuration/security.xml"})
-@TestExecutionListeners({DependencyInjectionTestExecutionListener.class,
-    DirtiesContextTestExecutionListener.class,
-    TransactionalTestExecutionListener.class})
 public class ApplicationConfigurationTest {    
-    @Test
-    public void configurationDataBase(){
-        System.out.println("OK");
-    }
+
 }

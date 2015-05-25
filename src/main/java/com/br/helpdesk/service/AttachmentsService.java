@@ -1,6 +1,8 @@
 package com.br.helpdesk.service;
 
 import com.br.helpdesk.model.Attachments;
+import com.br.helpdesk.model.Ticket;
+import com.br.helpdesk.model.TicketAnswer;
 import com.br.helpdesk.repository.AttachmentsRepository;
 import java.io.File;
 import java.io.FileInputStream;
@@ -49,12 +51,21 @@ public class AttachmentsService {
         return repository.findOne(codigo);
     }
 
-    public List<Attachments> findByTicket(Long idTicket) {
-        return repository.findByTicket(idTicket);
+    public List<Attachments> findByTicketWithoutFile(Long idTicket) throws Exception{
+        return repository.findByTicketWithoutFile(idTicket);
     }
 
-    public List<Attachments> findByAnswer(Long idAnswer) {
-        return repository.findByAnswer(idAnswer);
+    public List<Attachments> findByAnswerWithoutFile(Long idAnswer) throws Exception{
+        return repository.findByAnswerWithoutFile(idAnswer);
+    }
+
+    public Attachments getAttachmentsWithoutByte(Object[] o) throws Exception{
+        Attachments attachment = new Attachments();
+        attachment.setId((Long) o[0]);
+        attachment.setName((String) o[1]);
+        attachment.setTicket((Ticket) o[2]);
+        attachment.setTicketAnswer((TicketAnswer) o[3]);
+        return attachment;
     }
 
     public File createTempDirectory() throws IOException {

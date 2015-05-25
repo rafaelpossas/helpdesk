@@ -9,7 +9,6 @@ package com.br.helpdesk.model;
 import java.io.Serializable;
 import javax.persistence.*;
 
-import org.codehaus.jackson.annotate.JsonAutoDetect;
 
 /**
  *
@@ -17,7 +16,6 @@ import org.codehaus.jackson.annotate.JsonAutoDetect;
  */
 @Entity
 @Table(name = "USER")
-@JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.ANY, fieldVisibility = JsonAutoDetect.Visibility.NONE, setterVisibility = JsonAutoDetect.Visibility.ANY)
 public class User implements Serializable{
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)

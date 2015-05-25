@@ -16,10 +16,19 @@ import com.br.helpdesk.service.UserService;
 import com.br.helpdesk.util.TestUtil;
 import com.github.springtestdbunit.DbUnitTestExecutionListener;
 import com.github.springtestdbunit.annotation.DatabaseSetup;
+
 import java.util.Date;
+import java.util.List;
+
+import org.junit.After;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.AuthorityUtils;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestExecutionListeners;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -40,6 +49,8 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+
+import javax.servlet.http.HttpSession;
 
 /**
  * Created with IntelliJ IDEA.
@@ -96,8 +107,19 @@ public class TicketIntegrationTest {
     
     @Autowired
     private EmailService emailService;
+
+    private Authentication authentication;
     
-    
+    private void setAdminUser(){
+        List<GrantedAuthority> authorities = AuthorityUtils.createAuthorityList("USER");
+        authentication = new UsernamePasswordAuthenticationToken("andrenacacio","1234", authorities);
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+    }
+    private void setUser(){
+        List<GrantedAuthority> authorities = AuthorityUtils.createAuthorityList("USER");
+        authentication = new UsernamePasswordAuthenticationToken("user","1234", authorities);
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+    }
     /**
      * @author Andre
      * - Cria o servico e o repositorio reais,
@@ -117,6 +139,11 @@ public class TicketIntegrationTest {
         controller.setCategoryService(serviceCategory);
         controller.setEmailService(emailService);
         mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
+
+    }
+    @After
+    public void teardown() {
+        SecurityContextHolder.clearContext();
     }
     
     /**
@@ -142,7 +169,8 @@ public class TicketIntegrationTest {
      */
     @Test
     public void testGetTicketsOpenedByUserWithSuperuser() throws Exception {
-        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get("/ticket/opened").param("user", "andrenacacio"))
+        setAdminUser();
+        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get("/ticket").param("start", "0").param("limit","30").param("status","opened").principal(authentication))
                 .andExpect(MockMvcResultMatchers.status().isOk())//verifica se esta chamando corretamente a url
                 .andExpect(MockMvcResultMatchers.content().contentType(TestUtil.APPLICATION_JSON_UTF8))//verifica se esta retornando um JSON na codifica��o UTF8
                 .andReturn();// retorna um objeto de tipo MvcResult 
@@ -159,7 +187,8 @@ public class TicketIntegrationTest {
      */
     @Test
     public void testGetTicketsOpenedByUser() throws Exception {
-        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get("/ticket/opened").param("user", "user"))
+        setUser();
+        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get("/ticket").param("start", "0").param("limit","30").param("status","opened").principal(authentication))
                 .andExpect(MockMvcResultMatchers.status().isOk())//verifica se esta chamando corretamente a url
                 .andExpect(MockMvcResultMatchers.content().contentType(TestUtil.APPLICATION_JSON_UTF8))//verifica se esta retornando um JSON na codifica��o UTF8
                 .andReturn();// retorna um objeto de tipo MvcResult 
@@ -176,7 +205,8 @@ public class TicketIntegrationTest {
      */
     @Test
     public void testGetTicketsClosedByUser() throws Exception {
-        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get("/ticket/closed").param("user", "user"))
+        setUser();
+        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get("/ticket").param("start", "0").param("limit","30").param("status","closed").principal(authentication))
                 .andExpect(MockMvcResultMatchers.status().isOk())//verifica se esta chamando corretamente a url
                 .andExpect(MockMvcResultMatchers.content().contentType(TestUtil.APPLICATION_JSON_UTF8))//verifica se esta retornando um JSON na codifica��o UTF8
                 .andReturn();// retorna um objeto de tipo MvcResult 
@@ -192,7 +222,8 @@ public class TicketIntegrationTest {
      */
     @Test
     public void testGetTicketsClosedByUserWithSuperuser() throws Exception {
-        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get("/ticket/closed").param("user", "andrenacacio"))
+        setAdminUser();
+        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get("/ticket").param("start", "0").param("limit","30").param("status","closed").principal(authentication))
                 .andExpect(MockMvcResultMatchers.status().isOk())//verifica se esta chamando corretamente a url
                 .andExpect(MockMvcResultMatchers.content().contentType(TestUtil.APPLICATION_JSON_UTF8))//verifica se esta retornando um JSON na codifica��o UTF8
                 .andReturn();// retorna um objeto de tipo MvcResult 
@@ -209,7 +240,8 @@ public class TicketIntegrationTest {
      */
     @Test
     public void testGetAllTicketsByUser() throws Exception {
-        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get("/ticket/all").param("user", "user"))
+        setUser();
+        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get("/ticket").param("start","0").param("limit","30").principal(authentication))
                 .andExpect(MockMvcResultMatchers.status().isOk())//verifica se esta chamando corretamente a url
                 .andExpect(MockMvcResultMatchers.content().contentType(TestUtil.APPLICATION_JSON_UTF8))//verifica se esta retornando um JSON na codifica��o UTF8
                 .andReturn();// retorna um objeto de tipo MvcResult 
@@ -226,7 +258,8 @@ public class TicketIntegrationTest {
      */
     @Test
     public void testGetAllTicketsByUserWithSuperuser() throws Exception {
-        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get("/ticket/all").param("user", "andrenacacio"))
+        setAdminUser();
+        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get("/ticket").param("start","0").param("limit","30").principal(authentication))
                 .andExpect(MockMvcResultMatchers.status().isOk())//verifica se esta chamando corretamente a url
                 .andExpect(MockMvcResultMatchers.content().contentType(TestUtil.APPLICATION_JSON_UTF8))//verifica se esta retornando um JSON na
                 .andReturn();// retorna um objeto de tipo MvcResult 
@@ -244,7 +277,8 @@ public class TicketIntegrationTest {
      */
     @Test
     public void testGetTextMenuWithSuperuser() throws Exception {
-        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get("/ticket/textmenu").param("user", "andrenacacio"))
+        setAdminUser();
+        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get("/ticket/count").principal(authentication))
                 .andExpect(MockMvcResultMatchers.status().isOk())//verifica se esta chamando corretamente a url
                 .andExpect(MockMvcResultMatchers.content().contentType(TestUtil.APPLICATION_JSON_UTF8))//verifica se esta retornando um JSON na codifica��o UTF8
                 .andReturn();// retorna um objeto de tipo MvcResult 
@@ -265,7 +299,8 @@ public class TicketIntegrationTest {
      */
     @Test
     public void testGetTextMenu() throws Exception {
-        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get("/ticket/textmenu").param("user", "user"))
+        setUser();
+        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get("/ticket/count").principal(authentication))
                 .andExpect(MockMvcResultMatchers.status().isOk())//verifica se esta chamando corretamente a url
                 .andExpect(MockMvcResultMatchers.content().contentType(TestUtil.APPLICATION_JSON_UTF8))//verifica se esta retornando um JSON na codifica��o UTF8
                 .andReturn();// retorna um objeto de tipo MvcResult 

@@ -1,7 +1,8 @@
 package com.br.helpdesk.model;
 
+import com.br.helpdesk.util.MimeTypeConstants;
+
 import javax.persistence.*;
-import org.codehaus.jackson.annotate.JsonAutoDetect;
 
 /**
  * Created with IntelliJ IDEA.
@@ -12,9 +13,24 @@ import org.codehaus.jackson.annotate.JsonAutoDetect;
  */
 @Entity
 @Table(name = "ATTACHMENTS")
-@JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.ANY, fieldVisibility = JsonAutoDetect.Visibility.NONE, setterVisibility = JsonAutoDetect.Visibility.ANY)
 public class Attachments{
+    public Attachments(){
 
+    }
+    public Attachments(Long id,String name,Ticket ticket){
+        this.id = id;
+        this.name = name;
+        this.ticket = ticket;
+        this.ticketAnswer = null;
+        this.byteArquivo = null;
+    }
+    public Attachments(Long id,String name,TicketAnswer ticketAnswer){
+        this.id = id;
+        this.name = name;
+        this.ticket = null;
+        this.ticketAnswer = ticketAnswer;
+        this.byteArquivo = null;
+    }
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name="ID")
@@ -35,11 +51,7 @@ public class Attachments{
     @Lob
     @Column(name="ARQ_BYTE",nullable=false)
     private byte[] byteArquivo;
-    
-    @Basic
-    @Column(name= "CONTENT_TYPE")
-    private String contentType;
-    
+
 
 
     public Long getId() {
@@ -81,13 +93,6 @@ public class Attachments{
         this.ticketAnswer = ticketAnswer;
     }
 
-    public String getContentType() {
-        return contentType;
-    }
-
-    public void setContentType(String contentType) {
-        this.contentType = contentType;
-    }
     
     
 }
