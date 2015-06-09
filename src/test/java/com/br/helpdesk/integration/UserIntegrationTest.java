@@ -13,6 +13,8 @@ import com.br.helpdesk.service.UserService;
 import com.br.helpdesk.util.TestUtil;
 import com.github.springtestdbunit.DbUnitTestExecutionListener;
 import com.github.springtestdbunit.annotation.DatabaseSetup;
+import com.sun.javafx.scene.control.skin.VirtualFlow;
+import java.util.List;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -105,7 +107,7 @@ public class UserIntegrationTest {
         String contentString = mvcResult.getResponse().getContentAsString();//recebe o retorno da fun��o
         JSONArray jsonArray = new JSONArray(contentString);//transforma o JSON String para JsonArray
 
-        assertThat(jsonArray.length(), is(5));
+        assertThat(jsonArray.length(), is(6));
     }
 
     /**
@@ -128,7 +130,7 @@ public class UserIntegrationTest {
         newUser.setUserGroup(userGroup);
         newUser.setPicture("");
 
-        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.put("/user")
+        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.post("/user")
                 .content(TestUtil.convertObjectToJsonBytes(newUser))
                 .contentType(TestUtil.APPLICATION_JSON_UTF8))
                 .andExpect(MockMvcResultMatchers.status().isOk())//verifica se esta chamando corretamente a url
@@ -138,7 +140,7 @@ public class UserIntegrationTest {
         String contentString = mvcResult.getResponse().getContentAsString();//recebe o retorno da fun��o
         JSONObject jsonObject = new JSONObject(contentString);//transforma o JSON String para JsonArray
 
-        assertThat(jsonObject.getInt("id"), is(6));
+        assertThat(jsonObject.getInt("id"), is(7));
     }
 
     @Test
@@ -204,5 +206,30 @@ public class UserIntegrationTest {
         assertThat(json, is(not(IsNull.nullValue())));
         assertThat(json.getInt("id"), is(5));
     }
+    
+    @Test
+    public void testFindByUserGroupAndIsEnabled() throws Exception {
+        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get("/user").param("idUserGroup", "1").param("isEnabled","true"))
+                .andExpect(MockMvcResultMatchers.status().isOk())//verifica se esta chamando corretamente a url
+                .andExpect(MockMvcResultMatchers.content().contentType(TestUtil.APPLICATION_JSON_UTF8))//verifica se esta retornando um JSON na codifica��o UTF8
+                .andReturn();// retorna um objeto de tipo MvcResult 
 
+        String contentString = mvcResult.getResponse().getContentAsString();//recebe o retorno da fun��o
+        JSONArray jsonArray = new JSONArray(contentString);//transforma o JSON String para JsonArray
+
+        assertThat(jsonArray.length(), is(3));
+    }
+    
+    @Test
+    public void testFindByClientAndIsEnabled() throws Exception {
+        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get("/user").param("idClient", "2").param("isEnabled","true"))
+                .andExpect(MockMvcResultMatchers.status().isOk())//verifica se esta chamando corretamente a url
+                .andExpect(MockMvcResultMatchers.content().contentType(TestUtil.APPLICATION_JSON_UTF8))//verifica se esta retornando um JSON na codifica��o UTF8
+                .andReturn();// retorna um objeto de tipo MvcResult 
+
+        String contentString = mvcResult.getResponse().getContentAsString();//recebe o retorno da fun��o
+        JSONArray jsonArray = new JSONArray(contentString);//transforma o JSON String para JsonArray
+
+        assertThat(jsonArray.length(), is(1));
+    }
 }

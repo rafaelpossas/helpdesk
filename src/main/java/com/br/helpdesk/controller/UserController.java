@@ -7,8 +7,11 @@ package com.br.helpdesk.controller;
 
 import com.Consts;
 import com.br.helpdesk.model.User;
+import com.br.helpdesk.model.UserGroup;
+import com.br.helpdesk.service.UserGroupService;
 import com.br.helpdesk.service.UserService;
 import java.io.IOException;
+import java.security.Principal;
 import java.util.List;
 import javax.persistence.EntityNotFoundException;
 import javax.servlet.http.HttpServletResponse;
@@ -127,6 +130,22 @@ public class UserController {
         user = userService.save(user);
         user = (User) userService.removePassword(null, user);
         return user;
+    }
+
+    @RequestMapping(method = RequestMethod.GET, params = {"idUserGroup", "isEnabled"})
+    public @ResponseBody
+    List<User> findByUserGroupAndIsEnabled(@RequestParam(value = "idUserGroup") Long idUserGroup,
+            @RequestParam(value = "isEnabled") Boolean isEnabled) throws Exception {
+        List<User> list = userService.findByUserGroupAndIsEnabled(idUserGroup, isEnabled);
+        return list;
+    }
+
+    @RequestMapping(method = RequestMethod.GET, params = {"idClient", "isEnabled"})
+    public @ResponseBody
+    List<User> findByClientAndIsEnabled(@RequestParam(value = "idClient") Long idClient,
+            @RequestParam(value = "isEnabled") Boolean isEnabled) throws Exception {
+        List<User> list = userService.findByClientAndIsEnabled(idClient, isEnabled);
+        return list;
     }
 
     /**

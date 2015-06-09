@@ -10,8 +10,7 @@ Ext.define('Helpdesk.store.Users', {
     requires: [
         'Helpdesk.model.User'
     ],
-    
-    constructor: function(config) {
+    constructor: function (config) {
         // applyIf means only copy if it doesn't exist
         Ext.applyIf(config, {
             proxy: Ext.create('Helpdesk.proxy.Base', {
@@ -20,30 +19,60 @@ Ext.define('Helpdesk.store.Users', {
         });
         this.callParent([config]);
     },
-    onCreateRecords: function(records, operation, success) {
-        if (success) {           
-            Ext.Msg.alert(translations.INFORMATION, translations.USER+' '+translations.SAVED_WITH_SUCCESS);
-        }
-    },
-    onUpdateRecords: function(records, operation, success) {
+    onCreateRecords: function (records, operation, success) {
         if (success) {
-            Ext.Msg.alert(translations.INFORMATION, translations.USER+' '+translations.UPDATED_WITH_SUCCESS);
+            Ext.Msg.alert(translations.INFORMATION, translations.USER + ' ' + translations.SAVED_WITH_SUCCESS);
         }
     },
-    onDestroyRecords: function(records, operation, success){
-        if(success){
-            Ext.Msg.alert(translations.INFORMATION, translations.USER+' '+translations.DELETED_WITH_SUCCESS);
+    onUpdateRecords: function (records, operation, success) {
+        if (success) {
+            Ext.Msg.alert(translations.INFORMATION, translations.USER + ' ' + translations.UPDATED_WITH_SUCCESS);
+        }
+    },
+    onDestroyRecords: function (records, operation, success) {
+        if (success) {
+            Ext.Msg.alert(translations.INFORMATION, translations.USER + ' ' + translations.DELETED_WITH_SUCCESS);
             this.callParent(arguments);
         }
     },
-    findByUserName: function(callbackFunction, username) {
+    findByUserName: function (callbackFunction, username) {
         this.load({
             url: 'user/' + username,
             callback: callbackFunction
         });
     },
-    findAll: function(callbackFunction) {
+    findAll: function (callbackFunction) {
         this.load(callbackFunction);
+    },
+    saveNewUserByLoginScreen: function (record, callbackfunction) {
+        this.proxy.url = "login";
+        this.add(record);
+        this.sync({
+            callback: callbackfunction
+        });
+    },
+    saveChangesUser: function (username, name, email, picture, password, success) {
+        Ext.Ajax.request({
+            url: 'user/update-profile/' + username,
+            method: 'POST',
+            params: {
+                name: name,
+                email: email,
+                picture: picture,
+                password: password
+            },
+            success: success
+        });
+    },
+    resetPasswordUser: function (userName, success) {
+        Ext.Ajax.request({
+            url: 'login/reset-password',
+            method: 'GET',
+            params: {
+                username: userName
+            },
+            success: success
+        });
     }
 });
 

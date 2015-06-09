@@ -42,7 +42,7 @@ Ext.define('Helpdesk.controller.TicketAnswer', {
             var userLogadoText = Ext.DomHelper.append(Ext.getBody(), '<input type="text" name="username" value="' + Helpdesk.Globals.userLogged.userName + '">');
             //Criação do form para upload de arquivos
             var formId = 'fileupload-form-' + time;
-            var formEl = Ext.DomHelper.append(Ext.getBody(), '<form id="' + formId + '" method="POST" action="attachments/attachments" enctype="multipart/form-data" class="x-hide-display"></form>');
+            var formEl = Ext.DomHelper.append(Ext.getBody(), '<form id="' + formId + '" method="POST" action="attachments" enctype="multipart/form-data" class="x-hide-display"></form>');
             formEl.appendChild(userLogadoText);
             Ext.each(multiupload.filesListArchive, function(fileField) {
                 formEl.appendChild(fileField);

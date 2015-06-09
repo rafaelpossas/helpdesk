@@ -8,8 +8,9 @@ package com.br.helpdesk.util;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
-import org.codehaus.jackson.map.ObjectMapper;
-import org.codehaus.jackson.map.annotate.JsonSerialize;
+
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.http.MediaType;
 
 /**
@@ -24,7 +25,7 @@ public class TestUtil {
     
      public static byte[] convertObjectToJsonBytes(Object object) throws IOException {
         ObjectMapper mapper = new ObjectMapper();
-        mapper.setSerializationInclusion(JsonSerialize.Inclusion.NON_NULL);
+        mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
         return mapper.writeValueAsBytes(object);
     }
 }

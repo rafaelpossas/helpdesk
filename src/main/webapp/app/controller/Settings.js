@@ -104,8 +104,16 @@ Ext.define('Helpdesk.controller.Settings', {
     getEmailConfig: function () {  
         this.setPressedButton('emailconfig');        
     },
-    getSendEmail: function () {     
-        this.getClientGridPanelEmail().getStore().load();
+    getSendEmail: function () { 
+        var store = this.getClientGridPanelEmail().getStore();
+        store.findByIsEnabled(true, function(){
+            var admins = {
+                id: 0,
+                isEnabled: true,
+                name: Helpdesk.Globals.admin
+            };
+            store.insert(0,admins);                
+        });
         this.setPressedButton('sendemail');        
     },
     setPressedButton: function (buttonID) {

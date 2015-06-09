@@ -1,8 +1,6 @@
 package com.br.helpdesk.model;
 
-import java.util.List;
 import javax.persistence.*;
-import org.codehaus.jackson.annotate.JsonAutoDetect;
 
 /**
  * Created with IntelliJ IDEA.
@@ -13,7 +11,6 @@ import org.codehaus.jackson.annotate.JsonAutoDetect;
  */
 @Entity
 @Table(name = "CLIENT")
-@JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.ANY, fieldVisibility = JsonAutoDetect.Visibility.NONE, setterVisibility = JsonAutoDetect.Visibility.ANY)
 public class Client {
 
     @Id
@@ -24,6 +21,10 @@ public class Client {
     @Basic
     @Column(name = "NAME")
     private String name;
+    
+    @Basic
+    @Column(name="ISENABLED", columnDefinition="boolean default true")
+    private Boolean isEnabled;
 
     public String getName() {
         return name;
@@ -39,4 +40,12 @@ public class Client {
     public void setId(Long id) {
         this.id = id;
     }
+
+    public Boolean getIsEnabled() {
+        return isEnabled;
+    }
+
+    public void setIsEnabled(Boolean isEnabled) {
+        this.isEnabled = isEnabled;
+    }    
 }

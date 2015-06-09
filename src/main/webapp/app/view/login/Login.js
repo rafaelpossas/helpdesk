@@ -5,7 +5,7 @@
  */
 Ext.define('Helpdesk.view.login.Login', {
     extend: 'Ext.container.Container',
-    requires: ['Helpdesk.view.Translation','Helpdesk.view.login.LoginForm','Helpdesk.view.login.CapsLockTooltip','Helpdesk.view.login.SignInForm','Helpdesk.proxy.Base'],
+    requires: ['Helpdesk.view.Translation','Helpdesk.view.login.LoginForm','Helpdesk.view.login.CapsLockTooltip','Helpdesk.view.login.SignInForm','Helpdesk.proxy.Base','Helpdesk.Globals'],
     alias: 'widget.loginview',
     layout: 'border',
     items: [

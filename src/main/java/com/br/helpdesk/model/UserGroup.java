@@ -14,7 +14,6 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
-import org.codehaus.jackson.annotate.JsonAutoDetect;
 
 /**
  *
@@ -22,7 +21,6 @@ import org.codehaus.jackson.annotate.JsonAutoDetect;
  */
 @Entity
 @Table(name = "USER_GROUP")
-@JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.ANY, fieldVisibility = JsonAutoDetect.Visibility.NONE, setterVisibility = JsonAutoDetect.Visibility.ANY)
 public class UserGroup implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)

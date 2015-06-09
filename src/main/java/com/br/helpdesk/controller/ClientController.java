@@ -53,6 +53,12 @@ public class ClientController {
         return clientes;
     }
     
+    @RequestMapping(method = RequestMethod.GET, params={"isEnabled"})
+    public @ResponseBody List<Client> findByIsEnabled (@RequestParam(value = "isEnabled") Boolean isEnabled){
+        List<Client> clientes = clientService.findByIsEnabled(isEnabled);
+        return clientes;
+    }
+    
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
     public @ResponseBody Client findById(@PathVariable long id) throws EntityNotFoundException{
         Client client = clientService.findById(id);

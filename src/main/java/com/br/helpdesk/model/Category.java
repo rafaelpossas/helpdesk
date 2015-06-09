@@ -1,8 +1,6 @@
 package com.br.helpdesk.model;
 
-import java.util.List;
 import javax.persistence.*;
-import org.codehaus.jackson.annotate.JsonAutoDetect;
 
 /**
  * Created with IntelliJ IDEA.
@@ -13,7 +11,6 @@ import org.codehaus.jackson.annotate.JsonAutoDetect;
  */
 @Entity
 @Table(name = "CATEGORY")
-@JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.ANY, fieldVisibility = JsonAutoDetect.Visibility.NONE, setterVisibility = JsonAutoDetect.Visibility.ANY)
 public class Category {
 
     @Id

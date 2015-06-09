@@ -15,15 +15,15 @@ import org.springframework.data.repository.query.Param;
  */
 public interface AttachmentsRepository extends CrudRepository<Attachments,Long> {
     List<Attachments> findByNameContaining(String name);
-       
+
     @Query(
-            "Select t FROM Attachments t WHERE t.ticket.id= :ticketId"
+            "Select new Attachments(t.id,t.name,t.ticket) FROM Attachments t WHERE (t.ticket is not null and t.ticket.id= :ticketId)"
     )            
-    List<Attachments> findByTicket(@Param("ticketId") Long ticketId);
+    List<Attachments> findByTicketWithoutFile(@Param("ticketId") Long ticketId);
     
     @Query(
-            "Select t FROM Attachments t WHERE t.ticketAnswer.id= :answerId"
+            "Select new Attachments(t.id,t.name,t.ticketAnswer) FROM Attachments t WHERE (t.ticketAnswer is not null and t.ticketAnswer.id= :answerId)"
     )            
-    List<Attachments> findByAnswer(@Param("answerId") Long answerId);
+    List<Attachments> findByAnswerWithoutFile(@Param("answerId") Long answerId);
     
 }

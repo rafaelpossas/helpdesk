@@ -26,8 +26,7 @@ Ext.define('Helpdesk.model.Ticket',{
         {name: 'userGroupName', mapping: 'user.userGroup.name',persist: false},        
         {name: 'responsibleName', mapping: 'responsible.name',persist: false},
         {name: 'categoryName', mapping: 'category.name',persist: false},
-        {name: 'priorityName', mapping: 'priority.name',persist: false}        
-        
+        {name: 'priorityName', mapping: 'priority.name',persist: false}          
    ]
 });
 

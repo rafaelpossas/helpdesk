@@ -3,29 +3,30 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-Ext.define('Helpdesk.store.Clients', {
+Ext.define('Helpdesk.store.Attachments', {
     extend: 'Helpdesk.store.BasicStore',
-    requires: ['Helpdesk.model.Client'],
-    model: 'Helpdesk.model.Client',
-    storeId: 'clients',
+    requires: ['Helpdesk.model.Attachments'],
+    model: 'Helpdesk.model.Attachments',
+    storeId: 'attachments',
     autoLoad: false,
     constructor: function (config) {
         // applyIf means only copy if it doesn't exist
         Ext.applyIf(config, {
             proxy: Ext.create('Helpdesk.proxy.Base', {
-                url: 'client'
+                url: 'attachments'
             })
         });
         this.callParent([config]);
     },
-    findByIsEnabled: function (isEnabled, callbackfunction) {
-        this.load({
+    getFilesFromTicket: function (ticketId, callbackfunction) {
+        Ext.Ajax.request({
+            method: 'GET',
+            url: '/attachments',
             params: {
-                isEnabled: isEnabled
+                ticket: ticketId
             },
-            callback: callbackfunction
+            success: callbackfunction
         });
     }
-
 });
 

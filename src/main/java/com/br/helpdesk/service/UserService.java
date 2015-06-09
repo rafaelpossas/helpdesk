@@ -1,6 +1,8 @@
 package com.br.helpdesk.service;
 
+import com.br.helpdesk.model.Client;
 import com.br.helpdesk.model.User;
+import com.br.helpdesk.model.UserGroup;
 import com.br.helpdesk.repository.UserRepository;
 import java.util.List;
 import javax.annotation.Resource;
@@ -25,30 +27,52 @@ public class UserService {
         this.emailService = service;
     }
 
+    @Autowired
+    private UserGroupService userGroupService;
+
+    public void setUserGroupService(UserGroupService service) {
+        this.userGroupService = service;
+    }
+
+    @Autowired
+    private ClientService clientService;
+
+    public void setClientService(ClientService service) {
+        this.clientService = service;
+    }
+
     public User save(User model) throws Exception {
         User userTemp = null;
-        // caso usuário já exista no banco e tenha sido alterado em campos que não sejam o password
-        if ((model.getId() != null && model.getId() > 0)
-                && (model.getPassword() == null || model.getPassword().equals(""))) {
+        // caso usuário já exista no banco
+        if ((model.getId() != null && model.getId() > 0)) {
             // pesquisa o usuário salvo no banco para setar a senha antiga ao usuário que está sendo salvo.
             userTemp = repository.findOne(model.getId());
-            model.setPassword(userTemp.getPassword());
+            if (model.getPassword() == null || model.getPassword().equals("")) {
+                model.setPassword(userTemp.getPassword());
+            }
         }
         model = repository.save(model);
         if (userTemp == null) {
             // usuario novo - Enviar email aos administradores e ao próprio usuário com os dados de cadastro.
-            try{
+            try {
                 emailService.sendEmailNewUserCreated(model);
-            }catch(Exception e){
+            } catch (Exception e) {
                 e.printStackTrace();
             }
-            
         }
         model = (User) removePassword(null, model);
         return model;
     }
 
     public List<User> findAll() {
+        List<User> list = IteratorUtils.toList(repository.findAll().iterator());
+        if (list != null && list.size() > 0) {
+            list = (List) removePassword(list, null);
+        }
+        return list;
+    }
+
+    public List<User> findAllAndIsEnable(boolean isEnable) {
         List<User> list = IteratorUtils.toList(repository.findAll().iterator());
         if (list != null && list.size() > 0) {
             list = (List) removePassword(list, null);
@@ -121,6 +145,20 @@ public class UserService {
 
     public List<User> findByGroupClient(List<Long> idClients) {
         List<User> list = repository.findByGroupClient(idClients);
+        return list;
+    }
+
+    public List<User> findByUserGroupAndIsEnabled(Long idUserGroup, Boolean isEnabled) {
+        UserGroup userGroup = userGroupService.findById(idUserGroup);
+        List<User> list = repository.findByUserGroupAndIsEnabled(userGroup, isEnabled);
+        list = (List) removePassword(list, null);
+        return list;
+    }
+
+    public List<User> findByClientAndIsEnabled(Long idClient, Boolean isEnabled) {
+        Client client = clientService.findById(idClient);
+        List<User> list = repository.findByClientAndIsEnabled(client, isEnabled);
+        list = (List) removePassword(list, null);
         return list;
     }
 }

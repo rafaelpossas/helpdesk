@@ -139,7 +139,7 @@ public class ChangesTicketService {
     /**
      * @author andresulivam
      *
-     * Método que verifica se a categoria foi alterada no ticket.<br>
+     * Método que verifica se a prioridade foi alterada no ticket.<br>
      * Se foi alterada, ele insere em changesTickets o valor antigo e o novo.
      *
      * @param changesTicket
@@ -168,7 +168,7 @@ public class ChangesTicketService {
     /**
      * @author andresulivam
      *
-     * Método que verifica se a categoria foi alterada no ticket.<br>
+     * Método que verifica se a data estimada foi alterada no ticket.<br>
      * Se foi alterada, ele insere em changesTickets o valor antigo e o novo.
      *
      * @param changesTicket
@@ -202,7 +202,7 @@ public class ChangesTicketService {
     /**
      * @author andresulivam
      *
-     * Método que verifica se a categoria foi alterada no ticket.<br>
+     * Método que verifica se o status (aberto, fechado) foi alterado no ticket.<br>
      * Se foi alterada, ele insere em changesTickets o valor antigo e o novo.
      *
      * @param changesTicket

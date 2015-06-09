@@ -37,7 +37,7 @@ Ext.application({
     enableRouter: true,
     routes: {
         '/': 'home#index',
-        'ticket/:type': 'ticket#sidemenu',
+        'ticket/:type': 'ticket#index',
         'ticket/:id/edit' : 'ticket#edit',
         'settings':'settings#index',
         'user': 'user#list',

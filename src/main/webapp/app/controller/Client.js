@@ -29,6 +29,11 @@ Ext.define('Helpdesk.controller.Client', {
     
     /**
      * Adiciona um novo Client ao grid
+     * 
+     * @param {type} button
+     * @param {type} e
+     * @param {type} options
+     * @returns {undefined}
      */
     onButtonClickAdd: function(button, e, options){
         var rec = new Helpdesk.model.Client();
@@ -39,6 +44,11 @@ Ext.define('Helpdesk.controller.Client', {
     
     /**
      * Remove Client selecionada, verificando se algum registro foi alterado.
+     * 
+     * @param {type} button
+     * @param {type} e
+     * @param {type} options
+     * @returns {undefined}
      */
     onButtonClickDelete: function(button, e, options) {
         var grid = this.getClientGrid();
@@ -71,6 +81,11 @@ Ext.define('Helpdesk.controller.Client', {
     
     /**
      * Salva as informações modificadas na Store
+     * 
+     * @param {type} button
+     * @param {type} e
+     * @param {type} options
+     * @returns {undefined}
      */
     onButtonClickSave: function(button, e, options){
         this.getClientGrid().getStore().sync({

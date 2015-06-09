@@ -28,6 +28,14 @@ Ext.define('Helpdesk.controller.Login', {
         {
             ref: 'capslockTooltip',
             selector: 'capslocktooltip'
+        },
+        {
+            ref: 'loginView',
+            selector: 'loginview'
+        },
+        {
+           ref: 'translation',
+           selector: 'translation'
         }
     ],
     init: function () {
@@ -62,40 +70,61 @@ Ext.define('Helpdesk.controller.Login', {
             '#btnRetrieve': {
                 click: this.generateNewPassword
             }
-
         });
-
     },
+    /**
+     * Variável usada para contabilizar os usuários que estão sendo criados pela tela de login. 
+     * @author André Sulivam
+     */
     numberUsersCreated: 0,
+    /**
+     * Validando texto de password no campo de login.
+     * 
+     * @param {type} field
+     * @param {type} e
+     * @param {type} options
+     * @returns {undefined}
+     */
     onTextfieldKeyPress: function (field, e, options) {
         var charCode = e.getCharCode();
         if ((e.shiftKey && charCode >= 97 && charCode <= 122) ||
                 (!e.shiftKey && charCode >= 65 && charCode <= 90)) {
-
             if (this.getCapslockTooltip() === undefined) {
                 Ext.widget('capslocktooltip');
             }
             this.getCapslockTooltip().show();
-
         } else {
-
             if (this.getCapslockTooltip() !== undefined) {
                 this.getCapslockTooltip().hide();
             }
         }
-
     },
+    /**
+     * Validando os textos inseridos nos textfields de login.
+     * 
+     * @param {type} field
+     * @param {type} e
+     * @param {type} options
+     * @returns {undefined}
+     */
     onTextfieldSpecialKey: function (field, e, options) {
         if (e.getKey() === e.ENTER) {
             var submitBtn = field.up('form').down('button#submit');// Pega o elemento pai para depois buscar a referência ao botão
             var submitCredencials = Ext.ComponentQuery.query('credentialsexpiredwindow button#submit_credentials')[0];
-            if (submitBtn !== null)
+            if (submitBtn !== null && submitBtn !== undefined)
                 submitBtn.fireEvent('click', submitBtn, e, options);
-
             if (submitCredencials !== null)
                 submitCredencials.fireEvent('click', submitCredencials, e, options);
         }
     },
+    /**
+     * Validar e enviar os valores para credencial expirada.
+     * 
+     * @param {type} button
+     * @param {type} e
+     * @param {type} options
+     * @returns {undefined}
+     */
     onSubmitCredentials: function (button, e, options) {
         var formCredentials = button.up('form');
         var formLogin = Ext.ComponentQuery.query('#mainform')[0];
@@ -112,17 +141,20 @@ Ext.define('Helpdesk.controller.Login', {
                     formLogin.getForm().findField('password').setValue(newPassword);
                     var submitButton = Ext.ComponentQuery.query('loginform button#submit')[0];
                     submitButton.fireEvent('click', submitButton);
-
                 },
                 failure: function (form, action) {
                     console.log("User Changed Failed");
                 }
             });
         }
-
     },
+    /**
+     * Fazendo login.
+     * 
+     * @param {type} form
+     * @returns {undefined}
+     */
     loginSubmit: function (form) {
-        console.log("loginSubmit");
         var formTopElement = Ext.get(form.getEl()); // Busca pelo elemento superior que representa o componente (Neste caso o PANEL)
         formTopElement.mask(translations.AUTHENTICATING, 'loading'); // Adiciona a máscara de carregamento 
         form.submit({
@@ -134,7 +166,6 @@ Ext.define('Helpdesk.controller.Login', {
             failure: function (form, action) {
                 formTopElement.unmask(); // Remove máscara de carregamento  
                 var obj = Ext.JSON.decode(action.response.responseText);
-                console.log(action);
                 if (action.failureType === 'server') {
                     var translatedError = "";
                     if (obj.error === 'credentialsexpired' || obj.error === 'accountlocked') {
@@ -151,16 +182,30 @@ Ext.define('Helpdesk.controller.Login', {
                     }
                 } else {
                     Ext.Msg.alert(translations.ERROR, translations.CONNECTING_ERROR);
-
                 }
             }
         });
     },
+    /**
+     * Quando se clicar no botão de fazer login.
+     * 
+     * @param {type} button
+     * @param {type} e
+     * @param {type} options
+     * @returns {undefined}
+     */
     onSubmit: function (button, e, options) {
         var form = button.up('form');
         this.loginSubmit(form);
-
     },
+    /**
+     * Criando tela para criação de novo usuário no sistema através da tela de login.
+     * 
+     * @param {type} button
+     * @param {type} e
+     * @param {type} options
+     * @returns {undefined}
+     */
     onButtonClickSignIn: function (button, e, options) {
         var win = Ext.create('Ext.window.Window', {
             title: translations.SIGN_IN,
@@ -178,6 +223,13 @@ Ext.define('Helpdesk.controller.Login', {
         win.down('form').loadRecord(Ext.create('Helpdesk.model.User'));
         win.show();
     },
+    /**
+     * 
+     * @param {type} button
+     * @param {type} e
+     * @param {type} options
+     * @returns {undefined}
+     */
     onSignInCriarConta: function (button, e, options) {
 
         var form = button.up('form');
@@ -187,72 +239,57 @@ Ext.define('Helpdesk.controller.Login', {
         values.userName = values.email;
         record.set(values);
 
-        this.changeUserStoreProperties(0);
         this.getUsersStore().add(record);
         var myscope = this;
-        this.getUsersStore().sync({
-            callback: function (result) {
-                // usuários criados pela tela de login
-                var users = result.events.operationcomplete.listeners[0].scope.data.items;
-                
-                // usuario da ultima tentativa
-                var currentUser = users[myscope.numberUsersCreated];
-                
-                if(currentUser.data.id !== null && currentUser.data.id !== ""){
-                    Ext.Msg.alert(translations.INFORMATION, translations.USER + ' ' + translations.CREATED_WITH_SUCCESS);
-                } else {
-                    Ext.Msg.alert(translations.INFORMATION, translations.USER_NOT_CREATED + '. '+ translations.CHECK_THE_ENTERED_VALUES + '.');
-                }
-                // incrementando o valor da variável de número de usuários criados para o próximo teste.
-                myscope.numberUsersCreated = myscope.numberUsersCreated+1;
-                
-//                myscope.changeUserStoreProperties(1);
-//
+        var loginView = this.getLoginView();
+        loginView.setLoading(translations.SAVING);
+        this.getUsersStore().saveNewUserByLoginScreen(record, function (result) {
+            loginView.setLoading(false);
+            // usuários criados pela tela de login
+            var users = result.events.operationcomplete.listeners[0].scope.data.items;
+
+            // usuario da ultima tentativa
+            var currentUser = users[myscope.numberUsersCreated];
+
+            if (currentUser.data.id !== null && currentUser.data.id !== "") {
+                Ext.Msg.alert(translations.INFORMATION, translations.USER + ' ' + translations.CREATED_WITH_SUCCESS);
 //                Ext.Ajax.request({
 //                    url: 'j_spring_security_check',
 //                    method: 'POST',
 //                    params: {
-//                        j_username: values.userName,
-//                        j_password: values.password
+//                        j_username: currentUser.data.userName,
+//                        j_password: currentUser.data.password
 //                    },
 //                    success: function (o) {
-//                        //window.location.href = "../" + homeURL;
+//                        window.location.href = "../" + homeURL;
 //                    }
 //                });
+            } else {
+                Ext.Msg.alert(translations.INFORMATION, translations.USER_NOT_CREATED + '. ' + translations.CHECK_THE_ENTERED_VALUES + '.');
             }
+            // incrementando o valor da variável de número de usuários criados para o próximo teste.
+            myscope.numberUsersCreated = myscope.numberUsersCreated + 1;
         });
-
         form.up('.window').close();
     },
+    /**
+     * Cancelando a criação de nova conta de usuário.
+     * 
+     * @param {type} button
+     * @param {type} e
+     * @param {type} options
+     * @returns {undefined}
+     */
     onSignInVoltar: function (button, e, options) {
         var form = button.up('form');
         form.up('.window').close();
     },
     /**
-     * 0 - Antes de utilizar a store dentro do login
-     * 1 - Depois de utilizar a store dentro do login
+     * Criando tela para geração de novo password ao usuário.
+     * 
+     * @returns {undefined}
      */
-    changeUserStoreProperties: function (tipo) {
-        if (tipo === 0) {
-            this.getUsersStore().proxy.url = "login";
-            Ext.override(this.getUsersStore(), {
-                onCreateRecords: function (success, rs, data) {
-                }
-            });
-        }
-        else if (tipo === 1) {
-            this.getUsersStore().proxy.url = "user";
-            Ext.override(this.getUsersStore(), {
-                onCreateRecords: function (success, rs, data) {
-                    if (success) {
-                        Ext.Msg.alert(translations.INFORMATION, translations.USER + ' ' + translations.SAVED_WITH_SUCCESS);
-                    }
-                }
-            });
-        }
-    },
     generateRetrievePasswordWindow: function () {
-
         var window = Ext.create('Ext.window.Window', {
             title: translations.RETRIEVE_PASSWORD,
             width: 500,
@@ -290,34 +327,32 @@ Ext.define('Helpdesk.controller.Login', {
         });
         window.show();
     },
+    /**
+     * Gerando novo password ao usuario
+     * 
+     * @param {type} btn
+     * @returns {undefined}
+     */
     generateNewPassword: function (btn) {
-
         var form = btn.up();
         var userName = form.down('textfield#userNameRetrieveValue').getValue();
-
+        var usersStore = this.getUsersStore();
         if (form.down('textfield#userNameRetrieveValue').getValue() !== '') {
             form.setLoading(translations.PLEASE_WAIT);
-            Ext.Ajax.request({
-                url: 'login/reset-password',
-                method: 'GET',
-                params: {
-                    username: userName,
-                    language: localStorage.getItem('user-lang')
-                },
-                success: function (o) {
-                    var decodedString = Ext.decode(o.responseText);
-                    form.setLoading(false, false);
-                    if (decodedString.status === translations.CHANGE_PASSWORD_COMPLETE) {
-                        Ext.Msg.alert(translations.INFORMATION, translations.CHANGE_PASSWORD_COMPLETE_MESSAGE);
-                        form.up().close();
-                    } else if (decodedString.status === translations.INVALID_USERNAME) {
-                        Ext.Msg.alert(translations.INFORMATION, translations.INVALID_USERNAME_MESSAGE);
-                    }
+            usersStore.resetPasswordUser(userName, function (o) {
+                var decodedString = Ext.decode(o.responseText);
+                form.setLoading(false, false);
+                if (decodedString.status === Helpdesk.Globals.change_password_complete) {
+                    Ext.Msg.alert(translations.INFORMATION, translations.CHANGE_PASSWORD_COMPLETE_MESSAGE);
+                    form.up().close();
+                } else if (decodedString.status === Helpdesk.Globals.invalid_username) {
+                    Ext.Msg.alert(translations.INFORMATION, translations.INVALID_USERNAME_MESSAGE);
+                } else if (decodedString.status === Helpdesk.Globals.email_not_sent) {
+                    Ext.Msg.alert(translations.INFORMATION, translations.PLEASE_CONTACT_US_BY_PHONE);
                 }
             });
         } else {
             Ext.Msg.alert(translations.INFORMATION, translations.BLANK_VARIABLE_MESSAGE);
         }
     }
-
 });

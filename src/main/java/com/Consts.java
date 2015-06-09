@@ -109,4 +109,7 @@ public class Consts {
     public static String DEFAULT = "default";
     
     public static String CYMO_GESTAO_PERFOMANCE = "CYMO - Gestão e Perfomance";
+    
+    public static String PORTUGUES = "Português";
+    public static String ENGLISH = "English";
 }

@@ -18,16 +18,23 @@ import java.io.File;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.security.Principal;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import javax.persistence.EntityNotFoundException;
+
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
@@ -117,27 +124,12 @@ public class TicketController {
         return ticketService.findAll();
     }
 
-    /**
-     * FindAll com registro do usuário que fez a requisição.
-     *
-     * @param username
-     * @return
-     */
-    @RequestMapping(value = "/all", method = RequestMethod.GET, params = {"user"})
-    public @ResponseBody
-    List<Ticket> getAllTicketsByUser(@RequestParam(value = "user") String username) {
-        User user = this.userService.findByUserName(username);
-        if (user.getUserGroup().getId() == Consts.ADMIN_GROUP_ID) {//SUPERUSER
-            return ticketService.findAll(user);
-        } else {
-            return ticketService.findByUser(user);
-        }
-    }
 
-    @RequestMapping(value = "/all-paging", method = RequestMethod.GET, params = {"user", "start", "limit"})
+    @RequestMapping(method = RequestMethod.GET, params = {"start", "limit"})
     public @ResponseBody
-    List<Ticket> getAllTicketsByUserPaging(@RequestParam(value = "user") String username, @RequestParam(value = "start") int start, @RequestParam(value = "limit") int limit) {
-        User user = this.userService.findByUserName(username);
+    List<Ticket> getAllTicketsByUserPaging(@RequestParam(value = "start") int start, @RequestParam(value = "limit") int limit,Principal principal) {
+        String name = principal.getName();
+        User user = this.userService.findByUserName(name);
         PageRequest pageRequest = getPageRequest(limit, start);
 
         if (user.getUserGroup().getId() == Consts.ADMIN_GROUP_ID) {//SUPERUSER
@@ -147,87 +139,44 @@ public class TicketController {
         }
     }
 
-    @RequestMapping(value = "/opened", method = RequestMethod.GET, params = {"user"})
-    public @ResponseBody
-    List<Ticket> getTicketsOpenedByUser(@RequestParam(value = "user") String username) {
-        User user = this.userService.findByUserName(username);
 
-        if (user.getUserGroup().getId() == Consts.ADMIN_GROUP_ID) {//SUPERUSER
-            return ticketService.findByIsOpenAndResponsibleNotNull(true);
-        } else {
-            return ticketService.findByIsOpenAndUser(true, user);
-        }
-    }
-
-    @RequestMapping(value = "/opened-paging", method = RequestMethod.GET, params = {"user", "start", "limit"})
+    @RequestMapping(method = RequestMethod.GET, params = {"start", "limit","status"})
     public @ResponseBody
-    List<Ticket> getTicketsOpenedByUserWithPaging(@RequestParam(value = "user") String username, @RequestParam(value = "start") int start, @RequestParam(value = "limit") int limit) {
-        User user = this.userService.findByUserName(username);
+    List<Ticket> getTicketByStatus(@RequestParam(value = "start") int start, @RequestParam(value = "limit") int limit,@RequestParam(value="status") String status,Principal principal) {
+        User user = this.userService.findByUserName(principal.getName());
         PageRequest pageRequest = getPageRequest(limit, start);
-
-        if (user.getUserGroup().getId() == Consts.ADMIN_GROUP_ID) {//SUPERUSER
-            return ticketService.findByIsOpenAndResponsibleNotNullWithPaging(true, pageRequest, user);
-        } else {
-            return ticketService.findByIsOpenAndUser(true, user);
+        if (status.equals("opened")) {
+            if (user.getUserGroup().getId() == Consts.ADMIN_GROUP_ID) {//SUPERUSER
+                return ticketService.findByIsOpenAndResponsibleNotNullWithPaging(true, pageRequest, user);
+            } else {
+                return ticketService.findByIsOpenAndUser(true, user);
+            }
+        } else if (status.equals("closed")) {
+            if (user.getUserGroup().getId() == Consts.ADMIN_GROUP_ID) {//SUPERUSER
+                return ticketService.findByIsOpenWithPaging(false, pageRequest, user);
+            } else {
+                return ticketService.findByIsOpenAndUserWithPaging(false, user, pageRequest);
+            }
         }
+        return null;
     }
 
-    @RequestMapping(value = "/closed", method = RequestMethod.GET, params = {"user"})
+
+    @RequestMapping(method = RequestMethod.GET, params = {"user", "start", "limit"})
     public @ResponseBody
-    List<Ticket> getTicketsClosedByUser(@RequestParam(value = "user") String username) {
-        User user = this.userService.findByUserName(username);
-        if (user.getUserGroup().getId() == Consts.ADMIN_GROUP_ID) {//SUPERUSER
-            return ticketService.findByIsOpen(false);
-        } else {
-            return ticketService.findByIsOpenAndUser(false, user);
+    List<Ticket> getByResponsible(@RequestParam(value = "user") String username, @RequestParam(value = "start") int start, @RequestParam(value = "limit") int limit) {
+        User user = null;
+        if(!username.equals("null")){
+            user = this.userService.findByUserName(username);
         }
-    }
-
-    @RequestMapping(value = "/closed-paging", method = RequestMethod.GET, params = {"user", "start", "limit"})
-    public @ResponseBody
-    List<Ticket> getTicketsClosedByUserWithPaging(@RequestParam(value = "user") String username, @RequestParam(value = "start") int start, @RequestParam(value = "limit") int limit) {
-        User user = this.userService.findByUserName(username);
-        PageRequest pageRequest = getPageRequest(limit, start);
-
-        if (user.getUserGroup().getId() == Consts.ADMIN_GROUP_ID) {//SUPERUSER
-            return ticketService.findByIsOpenWithPaging(false, pageRequest, user);
-        } else {
-            return ticketService.findByIsOpenAndUserWithPaging(false, user, pageRequest);
-        }
-    }
-
-    @RequestMapping(value = "/mytickets", method = RequestMethod.GET, params = {"user"})
-    public @ResponseBody
-    List<Ticket> getMyTickets(@RequestParam(value = "user") String username) {
-        User user = this.userService.findByUserName(username);
-        return ticketService.findByResponsible(user);
-    }
-
-    @RequestMapping(value = "/mytickets-paging", method = RequestMethod.GET, params = {"user", "start", "limit"})
-    public @ResponseBody
-    List<Ticket> getMyTicketsWithPaging(@RequestParam(value = "user") String username, @RequestParam(value = "start") int start, @RequestParam(value = "limit") int limit) {
-        User user = this.userService.findByUserName(username);
         PageRequest pageRequest = getPageRequest(limit, start);
         return ticketService.findByResponsibleWithPaging(user, pageRequest);
     }
 
-    @RequestMapping(value = "/withoutresponsible", method = RequestMethod.GET, params = {"user"})
+    @RequestMapping(value = "/count", method = RequestMethod.GET, produces = "application/json;charset=UTF-8")
     public @ResponseBody
-    List<Ticket> getTicketsWithoutResponsible(@RequestParam(value = "user") String username) {
-        return ticketService.findByResponsible(null);
-    }
-
-    @RequestMapping(value = "/withoutresponsible-paging", method = RequestMethod.GET, params = {"user", "start", "limit"})
-    public @ResponseBody
-    List<Ticket> getTicketsWithoutResponsibleWithPaging(@RequestParam(value = "user") String username, @RequestParam(value = "start") int start, @RequestParam(value = "limit") int limit) {
-        PageRequest pageRequest = getPageRequest(limit, start);
-        return ticketService.findByResponsibleWithPaging(null, pageRequest);
-    }
-
-    @RequestMapping(value = "/textmenu", method = RequestMethod.GET, params = {"user"}, produces = "application/json;charset=UTF-8")
-    public @ResponseBody
-    String getTextMenu(@RequestParam(value = "user") String username, HttpServletResponse response) throws UnsupportedEncodingException {
-        User user = this.userService.findByUserName(username);
+    String getTextMenu(Principal principal) throws UnsupportedEncodingException {
+        User user = this.userService.findByUserName(principal.getName());
         Long todos, abertos, fechados, withoutresponsible, mytickets;
         if (user.getUserGroup().getId() == Consts.ADMIN_GROUP_ID) {//SUPERUSER
             todos = ticketService.countFindAll();
@@ -245,10 +194,10 @@ public class TicketController {
         return "{\"todos\":'" + todos + "', \"abertos\": '" + abertos + "', \"fechados\": '" + fechados + "', \"mytickets\": '" + mytickets + "', \"withoutresponsible\": '" + withoutresponsible + "'}";
     }
 
-    @RequestMapping(value = {"close-ticket/{id}"}, method = {RequestMethod.PUT})
+    @RequestMapping(value = {"/{id}/close"}, method = {RequestMethod.PUT})
     @ResponseBody
-    public Ticket closeTicket(@RequestBody Ticket ticket, @RequestParam(value = "user") String username) throws Exception {
-        User user = userService.findByUserName(username);
+    public Ticket closeTicket(@RequestBody User user,@PathVariable Long id) throws Exception {
+        Ticket ticket = ticketService.findById(id);
         Ticket olderTicket = ticketService.findById(ticket.getId());
         ticket.setIsOpen(false);
         ticket.setEndDate(Calendar.getInstance().getTime());
@@ -262,16 +211,20 @@ public class TicketController {
         if (emails.size() > 0) {
             String subjectString = "Encerramento do Ticket #" + ticketId + "#: " + ticketTitle;
             String contentString = emailService.contentCloseTicket(ticket, user);
-            emailService.sendEmail(emails, subjectString, contentString, Consts.DEFAULT);
+            try{
+                emailService.sendEmail(emails, subjectString, contentString, Consts.DEFAULT);
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+
         }
         return ticket;
     }
 
-    @RequestMapping(value = {"open-ticket/{id}"}, method = {RequestMethod.PUT})
+    @RequestMapping(value = {"/{id}/open"}, method = {RequestMethod.PUT})
     @ResponseBody
-    public Ticket reOpenTicket(@RequestBody Ticket ticket, @RequestParam(value = "user") String username) throws Exception {
-        User user = userService.findByUserName(username);
-
+    public Ticket reOpenTicket(@RequestBody User user, @PathVariable Long id) throws Exception {
+        Ticket ticket = ticketService.findById(id);
         Ticket olderTicket = ticketService.findById(ticket.getId());
         ticket.setIsOpen(true);
         ticket.setEndDate(null);
@@ -286,7 +239,12 @@ public class TicketController {
         if (emails.size() > 0) {
             String subjectString = "Reabertura do Ticket #" + ticketId + "#: " + ticketTitle;
             String contentString = emailService.contentReOpenTicket(ticket, user);
-            emailService.sendEmail(emails, subjectString, contentString, Consts.DEFAULT);
+            try{
+                emailService.sendEmail(emails, subjectString, contentString, Consts.DEFAULT);
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+
         }
         return ticket;
     }
@@ -297,11 +255,11 @@ public class TicketController {
         return ticketService.findById(id);
     }
 
-    @RequestMapping(value = {"", "/{id}"}, method = {RequestMethod.POST, RequestMethod.PUT}, params = {"user"})
+    @RequestMapping(value = {"", "/{id}"}, method = {RequestMethod.POST, RequestMethod.PUT})
     @ResponseBody
-    public Ticket save(@RequestBody Ticket newTicket, @RequestParam(value = "user") String username) throws IOException, Exception {
-        User user = userService.findByUserName(username);
-        List<File> filesToSave = attachmentsService.getAttachmentsFromUser(username);
+    public Ticket save(@RequestBody Ticket newTicket, Principal principal) throws IOException, Exception {
+        User user = userService.findByUserName(principal.getName());
+        List<File> filesToSave = attachmentsService.getAttachmentsFromUser(principal.getName());
 
         List<String> emails = new ArrayList<String>();
         Ticket olderTicket = null;
@@ -361,11 +319,15 @@ public class TicketController {
                 subjectString = "Novo Ticket #" + newTicket.getId() + "#: " + newTicket.getTitle();
                 contentString = emailService.contentNewTicket(newTicket);
             }
-            emailService.sendEmail(emails, subjectString, contentString, Consts.DEFAULT); //NEW
+            try{
+                emailService.sendEmail(emails, subjectString, contentString, Consts.DEFAULT); //NEW
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+
         }
         return newTicket;
     }
-
     @RequestMapping(value = {"/save_without_email_routine", "/save_without_email_routine/{id}"}, method = {RequestMethod.POST, RequestMethod.PUT}, params = {"user"})
     @ResponseBody
     public Ticket saveWithoutEmailRoutine(@RequestBody Ticket ticket, @RequestParam(value = "user") String username) throws IOException {
@@ -422,7 +384,7 @@ public class TicketController {
         return new PageRequest(page, pageSize);
     }
 
-    @RequestMapping(value = "/search", method = RequestMethod.GET, params = {"user", "searchterm", "typesearch", "start", "limit"})
+    @RequestMapping(method = RequestMethod.GET, params = {"user", "searchterm", "typesearch", "start", "limit"})
     public @ResponseBody
     Page<Ticket> getTicketsBySearch(@RequestParam(value = "user") String username,
             @RequestParam(value = "searchterm") String searchTerm,

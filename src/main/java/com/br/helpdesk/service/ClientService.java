@@ -38,5 +38,9 @@ public class ClientService{
 
     public Client findById(Long codigo) {
         return repository.findOne(codigo);
-    }    
+    } 
+    
+    public List<Client> findByIsEnabled(Boolean isEnabled){        
+        return repository.findByIsEnabled(isEnabled);
+    }
 }
