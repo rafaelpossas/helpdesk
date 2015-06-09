@@ -396,15 +396,16 @@
                 <executions>
                     <execution>
                         <id>database-configuration</id>
-                        <phase>package</phase>
+                        <phase>compile</phase>
                         <goals>
                             <goal>run</goal>
                         </goals>
                         <configuration>
                             <target name="database-configuration">
-                                <replace file="${project.build.directory}/Helpdesk/WEB-INF/configuration/database.xml" token="$database_address$" value="${database_address}" />
-                                <replace file="${project.build.directory}/Helpdesk/WEB-INF/configuration/database.xml" token="$database_username$" value="${database_username}" />
-                                <replace file="${project.build.directory}/Helpdesk/WEB-INF/configuration/database.xml" token="$database_password$" value="${database_password}" />
+                                <copy file="${project.basedir}/src/main/webapp/WEB-INF/configuration/template/database.xml" todir="${project.basedir}/src/main/webapp/WEB-INF/configuration/"/>
+                                <replace file="${project.basedir}/src/main/webapp/WEB-INF/configuration/database.xml" token="$database_address$" value="${database_address}" />
+                                <replace file="${project.basedir}/src/main/webapp/WEB-INF/configuration/database.xml" token="$database_username$" value="${database_username}" />
+                                <replace file="${project.basedir}/src/main/webapp/WEB-INF/configuration/database.xml" token="$database_password$" value="${database_password}" />
                             </target>
                         </configuration>
                     </execution>
