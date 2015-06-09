@@ -111,10 +111,9 @@ public class UserController {
      * @param password
      * @return
      */
-    @RequestMapping(value = "/update-profile/{username}",
-            method = RequestMethod.POST, params = {"name", "email", "picture", "password"})
+    @RequestMapping(method = RequestMethod.POST, params = {"name", "email", "picture", "password"})
     public @ResponseBody
-    User saveUpdatesProfile(@PathVariable String username,
+    User saveUpdatesProfile(@RequestParam String username,
             @RequestParam(value = "name") String name,
             @RequestParam(value = "email") String email,
             @RequestParam(value = "picture") String picture,

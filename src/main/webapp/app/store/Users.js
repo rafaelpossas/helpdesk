@@ -53,9 +53,10 @@ Ext.define('Helpdesk.store.Users', {
     },
     saveChangesUser: function (username, name, email, picture, password, success) {
         Ext.Ajax.request({
-            url: 'user/update-profile/' + username,
+            url: 'user',
             method: 'POST',
             params: {
+                username: username,
                 name: name,
                 email: email,
                 picture: picture,
