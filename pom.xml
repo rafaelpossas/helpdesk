@@ -21,7 +21,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <database_address>helpdesk.procymo.com.br:3306/helpdesk</database_address>
         <database_username>user</database_username>
-        <database_password>cymodb2014</database_password>
+        <database_password>cymodb@2014</database_password>
     </properties>
 
 
