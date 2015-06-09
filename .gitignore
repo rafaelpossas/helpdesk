@@ -9,6 +9,9 @@ nb-configuration.xml
 #Java
 *.class
 
+#database
+src/main/webapp/WEB-INF/configuration/database.xml
+
 # Mobile Tools for Java (J2ME)
 .mtj.tmp/
 
