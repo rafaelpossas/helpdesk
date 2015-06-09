@@ -13,7 +13,6 @@ import com.br.helpdesk.service.UserService;
 import com.br.helpdesk.util.TestUtil;
 import com.github.springtestdbunit.DbUnitTestExecutionListener;
 import com.github.springtestdbunit.annotation.DatabaseSetup;
-import com.sun.javafx.scene.control.skin.VirtualFlow;
 import java.util.List;
 import org.junit.Test;
 import org.junit.runner.RunWith;
