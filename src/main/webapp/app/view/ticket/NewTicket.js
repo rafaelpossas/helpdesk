@@ -300,9 +300,9 @@ Ext.define('Helpdesk.view.ticket.NewTicket', {
             xtype: 'button',
             itemId: 'addTicket',
             text: translations.ADD,
-            maxWidth: 104,
+            maxWidth: 150,
             height: 37,
-            margin: '10 0 0 0',
+            margin: '10 0 0 0',            
             baseCls: 'new-ticket-save-button'
         }
     ],

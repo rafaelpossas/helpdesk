@@ -130,8 +130,9 @@ Ext.define('Helpdesk.controller.TicketAnswer', {
                 panel.removeAll();
                 var ticketView = panel.up().up();
                 var ticket = answer.data.ticket;
-                scope.getTicketController().formatAnswersPanel(ticketView, ticket, answerStore.data.items);                
-                scope.getTicketController().resetMultiupload(ticketView);
+                scope.getTicketController().formatAnswersPanel(ticketView, ticket, answerStore.data.items);
+                var panelanswer = ticketView.down('panel #panelElementsNewAnswer');
+                scope.getTicketController().resetMultiupload(null, panelanswer);
             }
         });
     }

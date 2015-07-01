@@ -334,31 +334,32 @@
 }
 
 .new-ticket-save-button{
-    background:-webkit-gradient( linear, left top, left bottom, color-stop(0.05, #00aaea), color-stop(1, #007cdb) );
-    background:-moz-linear-gradient( center top, #00aaea) 5%, #007cdb 100% ;
+/*    background:-webkit-gradient( linear, left top, left bottom, color-stop(0.05, #00aaea), color-stop(1, #007cdb) ) !important;
+    background:-moz-linear-gradient( center top, #00aaea) 5%, #007cdb 100%  !important;*/
 
-    border: 1px solid #007ed2;
+    background: linear-gradient(90deg, #0086c8, #0052a5);
+    border: 1px solid #007ed2 !important;
 
-    -webkit-border-top-left-radius:5px;
-    -moz-border-radius-topleft:5px;
-    border-top-left-radius:5px;
+    -webkit-border-top-left-radius:5px !important;
+    -moz-border-radius-topleft:5px !important;
+    border-top-left-radius:5px !important;
 
-    -webkit-border-top-right-radius:5px;
-    -moz-border-radius-topright:5px;
-    border-top-right-radius:5px;
+    -webkit-border-top-right-radius:5px !important;
+    -moz-border-radius-topright:5px !important;
+    border-top-right-radius:5px !important;
 
-    -webkit-border-bottom-right-radius:5px;
-    -moz-border-radius-bottomright:5px;
-    border-bottom-right-radius:5px;
+    -webkit-border-bottom-right-radius:5px !important;
+    -moz-border-radius-bottomright:5px !important;
+    border-bottom-right-radius:5px !important;
 
-    -webkit-border-bottom-left-radius:5px;
-    -moz-border-radius-bottomleft:5px;
-    border-bottom-left-radius:5px;
+    -webkit-border-bottom-left-radius:5px !important;
+    -moz-border-radius-bottomleft:5px !important;
+    border-bottom-left-radius:5px !important;
 
     text-align:center !important;
-    color:#FFF;
-    font-size:15px;    
-    font-family: lsans,"Lucida Sans","Lucida Grande",Lucida,"Lucida Sans Unicode",sans-serif;
+    color:#FFF !important;
+    font-size:17px !important;    
+    font-family: lsans,"Lucida Sans","Lucida Grande",Lucida,"Lucida Sans Unicode",sans-serif !important;
 }
 
 .new-ticket-save-button:hover{
