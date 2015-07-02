@@ -510,6 +510,8 @@ Ext.define('Helpdesk.controller.Ticket', {
      */
     onCriarTicket: function () {
         this.getTicketCardContainer().getLayout().setActiveItem(Helpdesk.Globals.ticket_new);
+        var panel = this.getTicketView().down('#panelnewticket');
+        this.resetMultiupload(panel, null);
     },
     saveNewTicket: function (button, e, options) {
         var ticketView = this.getTicketView();
@@ -679,7 +681,7 @@ Ext.define('Helpdesk.controller.Ticket', {
      */
     edit: function (params) {
         var store = this.getTicketGrid().getStore();
-        var scope = this;
+        var scope = this;        
         store.findById(params.id, function (result) {
             scope.getMainHeader().down("#ticket").toggle(true);
             scope.getCardPanel().getLayout().setActiveItem(Helpdesk.Globals.ticketview);
@@ -773,7 +775,8 @@ Ext.define('Helpdesk.controller.Ticket', {
             answerStore.load({
                 callback: function () {
                     scope.formatAnswersPanel(ticketView, ticket, answerStore.data.items);
-                    scope.resetMultiupload(ticketView);
+                    var panel = ticketView.down('panel #panelElementsNewAnswer');
+                    scope.resetMultiupload(null, panel);
                 }
             });
         }
@@ -868,12 +871,18 @@ Ext.define('Helpdesk.controller.Ticket', {
      * @param {type} ticketView
      * @returns {undefined}
      */
-    resetMultiupload: function (ticketView) {
+    resetMultiupload: function (panelTicketView, panelTicketAnswer) {
         // removendo e adicionando um novo item 'multiupload' para zerar os anexos inseridos anteriormente
         var multiUpload = Ext.create('Helpdesk.util.MultiUpload', {
             padding: '0 0 10 0'
         });
-        var panel = ticketView.down('panel #panelElementsNewAnswer');
+        var panel;
+        if(panelTicketView !== null){
+            panel = panelTicketView;
+        } else if(panelTicketAnswer !== null){
+            panel = panelTicketAnswer;
+        }
+//        var panel = ticketView.down('panel #panelElementsNewAnswer');
         var i = 0;
         var index;
         panel.items.each(function (item) {
@@ -884,8 +893,8 @@ Ext.define('Helpdesk.controller.Ticket', {
             }
             i++;
         });
-        ticketView.down('panel #panelElementsNewAnswer').insert(index, multiUpload);
-        ticketView.down('panel #panelElementsNewAnswer').doLayout();
+        panel.insert(index, multiUpload);
+        panel.doLayout();
     },
     /**
      * Método para inserir no painel de resposta os anexos e mudanças de tickets ocorridas. 

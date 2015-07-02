@@ -85,7 +85,8 @@ Ext.define('Helpdesk.view.ticket.Ticket', {
                    ]
                },
                {
-                   xtype: 'newticket'
+                   xtype: 'newticket',
+                   itemId: 'panelnewticket'
                },
                {
                    xtype:'ticketdetails'

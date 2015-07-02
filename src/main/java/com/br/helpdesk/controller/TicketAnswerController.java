@@ -138,7 +138,11 @@ public class TicketAnswerController {
         if (emails.size() > 0) {
             String subjectString = "Nova Resposta ao Ticket #" + answer.getTicket().getId() + "#: " + answer.getTicket().getTitle();
             String contentString = emailService.contentNewAnswer(answer, userAnswer.getName());
-            emailService.sendEmail(emails, subjectString, contentString, Consts.DEFAULT);
+            try{
+                emailService.sendEmail(emails, subjectString, contentString, Consts.DEFAULT);
+            }catch (Exception e){
+                e.printStackTrace();
+            }            
         }
 
         return answer;
