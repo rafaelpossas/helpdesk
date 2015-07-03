@@ -18,7 +18,8 @@
         <property name="username" value="root" />
         <property name="password" value="cymotecnologia" />
         <property name="initialSize" value="5" />
-        <property name="maxActive" value="10" />
+        <property name="maxActive" value="500" />
+        <property name="validationQuery" value="SELECT 1"/>
     </bean>
 
 
