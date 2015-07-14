@@ -120,6 +120,11 @@ public class TicketAnswerController {
 
         ticket.setLastInteration(answer.getDateCreation());
         ticket.setUserLastInteration(answer.getUser());
+        
+        //setting ticket responsible if ticket is without responsible
+        if(ticket.getResponsible() == null && userAnswer.getUserGroup().getId().equals(1L)){
+            ticket.setResponsible(userAnswer);
+        }
         ticketService.save(ticket);
 
         Attachments attachment = null;

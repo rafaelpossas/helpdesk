@@ -947,19 +947,18 @@ Ext.define('Helpdesk.controller.Ticket', {
         var ticketId = ticket.data.id;
         var attachmentsStore = this.getAttachmentsStore();
         attachmentsStore.getFilesFromTicket(ticketId, function (response, opts) {
-            if (response.responseText !== '') {
-                var responseJSON = Ext.decode(response.responseText);
+            if (response !== null && response.length > 0) {
                 for (var i = 0; i < answersList.length; i++) {
                     var answer = answersList[i];
                     var idAnswer = answer.down('hiddenfield#idAnswer').text;
                     var idTicket = answer.down('hiddenfield#id').text;
                     var fileContainer = answer.down('container#anexo');
-                    for (var j = 0; j < responseJSON.length; j++) {
-                        var file = responseJSON[j];
-                        var fileIdTicket = file.fileTicketId;
-                        var fileIdAnswer = file.fileTicketAnswerId;
-                        var fileName = file.fileName;
-                        var fileId = file.fileId;
+                    for (var j = 0; j < response.length; j++) {
+                        var file = response[j];
+                        var fileIdTicket = file.raw.fileTicketId;
+                        var fileIdAnswer = file.raw.fileTicketAnswerId;
+                        var fileName = file.raw.fileName;
+                        var fileId = file.raw.fileId;
                         var insertAnexo = false;
                         if (idAnswer === 0) {
                             if (fileIdAnswer === '' && parseInt(fileIdTicket) === parseInt(idTicket)) {
