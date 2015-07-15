@@ -101,7 +101,8 @@ public class EmailService {
 
     private Session getSession(String type) {
         setEmailProperties(type);
-        Session session = Session.getDefaultInstance(PROPERTIES, new javax.mail.Authenticator() {
+        Session session = null;
+        session = Session.getDefaultInstance(PROPERTIES, new javax.mail.Authenticator() {
             @Override
             protected PasswordAuthentication getPasswordAuthentication() {
                 String username = PROPERTIES.getProperty(Consts.USER_EMAIL);

@@ -780,6 +780,9 @@ Ext.define('Helpdesk.controller.Ticket', {
                 }
             });
         }
+        //limpa campo de texto de nova mensagem
+        ticketView.down('panel#panelElementsNewAnswer').down('textarea#tktNewAnswer').setValue('');
+        
         //Seta a visibilidade dos botões de fechar ou abrir tickets de acordo com o ticket corrente
         if (ticket.isOpen === true) {
             ticketView.down('label#lblTicketOpen').setVisible(true);
