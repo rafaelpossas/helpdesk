@@ -113,29 +113,20 @@ Ext.define('Helpdesk.controller.TicketAnswer', {
                 callback: function(result) {
                     store.proxy.url = 'ticket-answer';
                     tela.setLoading(false);
+                    
+                    // limpando valores preenchidos anteriormente
                     txtNewAnswer.setValue("");
-                    scope.addNewAnswerInPanel(answer, panelTktAnswers);
+                    var ticketView = panelTktAnswers.up().up();
+                    var panelanswer = ticketView.down('panel #panelElementsNewAnswer');
+                    scope.getTicketController().resetMultiupload(null, panelanswer);
+                    
+                    // atualizando a view com as informacoes mais recentes do ticket.
+                    Ext.Router.redirect("ticket/" + answer.data.ticketId + "/edit");
                 }
             });
         } else {
             Ext.Msg.alert(translations.INFORMATION, translations.TICKET_ANSWER_EMPTY_WARNING);
         }
-    },
-    addNewAnswerInPanel: function(answer, panel) {
-        var scope = this;
-        var answerStore = this.getTicketAnswersStore();
-        answerStore.proxy.url = 'ticket-answer/find-by-ticket/' + answer.data.ticketId;
-        answerStore.load({
-            callback: function() {
-                panel.removeAll();
-                var ticketView = panel.up().up();
-                var ticket = answer.data.ticket;
-                scope.getTicketController().formatAnswersPanel(ticketView, ticket, answerStore.data.items);
-                var panelanswer = ticketView.down('panel #panelElementsNewAnswer');
-                scope.getTicketController().resetMultiupload(null, panelanswer);
-            }
-        });
     }
-
 });
 
