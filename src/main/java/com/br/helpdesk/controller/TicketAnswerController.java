@@ -11,6 +11,7 @@ import com.br.helpdesk.model.Ticket;
 import com.br.helpdesk.model.TicketAnswer;
 import com.br.helpdesk.model.User;
 import com.br.helpdesk.service.AttachmentsService;
+import com.br.helpdesk.service.ChangesTicketService;
 import com.br.helpdesk.service.EmailService;
 import com.br.helpdesk.service.TicketAnswerService;
 import com.br.helpdesk.service.TicketService;
@@ -45,7 +46,8 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 public class TicketAnswerController {
 
     private TicketAnswerService answerService;
-
+    
+  
     public void setService(TicketAnswerService service) {
         this.answerService = service;
     }
@@ -82,6 +84,13 @@ public class TicketAnswerController {
     public void setEmailService(EmailService service) {
         this.emailService = service;
     }
+    
+    private ChangesTicketService changesTicketService;
+    
+    @Autowired
+    public void setChangesTicketService(ChangesTicketService service) {
+        this.changesTicketService = service;
+    }
 
     @RequestMapping(method = RequestMethod.GET)
     public @ResponseBody
@@ -107,7 +116,8 @@ public class TicketAnswerController {
 
         Ticket ticket = ticketService.findById(idTicket);
         User userAnswer = userService.findById(userId);
-
+        Ticket olderTicket = null;
+        
         List<File> filesToSave = attachmentsService.getAttachmentsFromUser(userAnswer.getUserName());
 
         TicketAnswer answer = new TicketAnswer();
@@ -123,9 +133,14 @@ public class TicketAnswerController {
         
         //setting ticket responsible if ticket is without responsible
         if(ticket.getResponsible() == null && userAnswer.getUserGroup().getId().equals(1L)){
+            olderTicket = Ticket.copy(ticket);
             ticket.setResponsible(userAnswer);
         }
         ticketService.save(ticket);
+        if(olderTicket != null){
+            // saving change responsible.
+            changesTicketService.save(olderTicket, ticket, userAnswer);
+        }
 
         Attachments attachment = null;
         for (File file : filesToSave) {

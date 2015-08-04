@@ -271,5 +271,28 @@ public class Ticket {
     public void setUserLastInteration(User userLastInteration) {
         this.userLastInteration = userLastInteration;
     }
+    
+    public static Ticket copy(Ticket ticket){
+        Ticket newTicket = new Ticket();
+        
+        newTicket.setCategory(ticket.getCategory());
+        newTicket.setClient(ticket.getClient());
+        newTicket.setDescription(ticket.getDescription());
+        newTicket.setEndDate(ticket.getEndDate());
+        newTicket.setEstimateTime(ticket.getEstimateTime());
+        newTicket.setId(ticket.getId());
+        newTicket.setIsOpen(ticket.isOpen);
+        newTicket.setLastInteration(ticket.getLastInteration());
+        newTicket.setPriority(ticket.getPriority());
+        newTicket.setResponsible(ticket.getResponsible());
+        newTicket.setStartDate(ticket.getStartDate());
+        newTicket.setStepsTicket(ticket.getStepsTicket());
+        newTicket.setTitle(ticket.getTitle());
+        newTicket.setUser(ticket.getUser());
+        newTicket.setUserGroupName(ticket.getUserGroupName());
+        newTicket.setUserLastInteration(ticket.getUserLastInteration());
+        
+        return newTicket;
+    }
 
 }
