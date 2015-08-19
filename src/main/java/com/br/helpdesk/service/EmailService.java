@@ -349,7 +349,7 @@ public class EmailService {
 
             // Display the messages
             for (Message message : messages) {
-
+                message.setFlag(Flags.Flag.SEEN, true);
                 //Recebe o id do ticket se for resposta de tickets já criados.
                 String[] ss;
                 long idTicket = 0;
